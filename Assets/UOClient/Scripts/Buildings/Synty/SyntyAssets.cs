@@ -101,14 +101,6 @@ namespace UOClient.Buildings.Synty
 #endif
     }
 
-    /// <summary>The kit prefabs and materials the building generator may ask for by name.</summary>
-    [CreateAssetMenu(menuName = "UO Client/Synty Asset Registry", fileName = "SyntyAssetRegistry")]
-    public sealed class SyntyAssetRegistry : ScriptableObject
-    {
-        public GameObject[] Prefabs = new GameObject[0];
-        public Material[] Materials = new Material[0];
-    }
-
     /// <summary>
     /// Names of the generated wall-skin materials some wall sets ask for. The generator looks them up by
     /// name; until those atlases exist in this project, the wall sets fall back to the kit's own material.

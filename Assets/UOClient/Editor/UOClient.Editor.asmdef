@@ -1,0 +1,10 @@
+{
+    "name": "UOClient.Editor",
+    "rootNamespace": "UOClient.EditorTools",
+    "references": ["UOClient", "UOClient.Buildings"],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": false,
+    "noEngineReferences": false
+}

@@ -22,6 +22,41 @@ the scenes, or prefab and material references will be missing:
 UO game data (map, statics, tiledata, art) is read at runtime from a local UO install and is
 never committed.
 
+## Release builds (paid art ships encrypted)
+
+Players get the Synty/BK art, but never as files they can lift out. A plain Unity build would pack
+it into `sharedassets*.assets` and `resources.assets`, which AssetRipper/AssetStudio open in one
+click, so plain player builds are blocked (`ReleaseBuildGuard`). Always build with
+**UO Client > Release > Build**:
+
+1. `ReleaseBuilder` copies `WorldView`'s asset fields and the house-kit registry into a temporary
+   `ContentPack` and builds it, with every dependency, into one AssetBundle (no type trees).
+2. The bundle is encrypted with AES-256-CTR into `UOClient_Data/StreamingAssets/content.pak`.
+   At runtime `ProtectedContent` opens it with `AssetBundle.LoadFromStream` through a decrypting
+   stream (`CtrCipherStream`), so the decrypted bundle only ever exists in memory.
+3. During the player build, `WorldView`'s fields are cleared in the scene, and the packs'
+   `Resources` folders (Sidekick's is 575 MB) are moved aside, so the player's own data holds no paid
+   art.
+4. The player is IL2CPP, so the key is compiled into native code rather than decompilable IL.
+   IL2CPP's generated C++ (which contains the key) is moved to `Builds/Release/UOClient_DoNotShip`.
+5. The build is verified: the pack decrypts, no do-not-ship folder remains, and none of the
+   protected asset names appear in the player's data files.
+
+The key lives in `Assets/UOClient/Scripts/Content/ContentKey.Local.cs`, which is git-ignored and
+made by **UO Client > Release > Generate Content Key** (once per build machine). Never commit it.
+
+Publish with:
+
+```powershell
+./Tools/Release/publish-release.ps1 -Tag v0.1.0
+```
+
+It refuses to ship anything that must not ship, runs `UOClient.exe -contentSelfTest`, zips the
+build and creates a GitHub release. CI can't build releases, because the paid packs aren't in the repo.
+
+This keeps the art from being available as usable files, which is what the asset licences ask for.
+No client can stop someone capturing meshes from GPU memory while the game runs.
+
 ## Layout
 
 | Path | What |

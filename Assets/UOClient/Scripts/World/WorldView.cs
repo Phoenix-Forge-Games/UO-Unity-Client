@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UOClient.Content;
 using UOClient.Data;
 using UOClient.World;
 
@@ -52,6 +53,11 @@ namespace UOClient
 
         private void Start()
         {
+            if (!Application.isEditor)
+            {
+                ApplyContentPack(ProtectedContent.Load());
+            }
+
             UoClientRuntime runtime = UoClientRuntime.Instance;
             if (runtime == null || runtime.World?.Player == null)
             {
@@ -132,6 +138,33 @@ namespace UOClient
             {
                 _cameraTarget.Target = _entities.Get(_world.Player.Serial)?.transform;
                 _cameraTarget.SnapToTarget();
+            }
+        }
+
+        /// <summary>
+        /// Release builds ship the scene with the paid-art fields cleared (see <see cref="ContentPack"/>);
+        /// this puts them back from the decrypted content pack before anything uses them.
+        /// </summary>
+        private void ApplyContentPack(ContentPack pack)
+        {
+            if (pack == null)
+            {
+                return;
+            }
+
+            _worldMaterial = pack.WorldMaterial;
+            _terrainMaterial = pack.TerrainMaterial;
+            _waterMaterial = pack.WaterMaterial;
+            _landLayers = pack.LandLayers;
+            _vegetation = pack.Vegetation;
+            _wallKit = pack.WallKit;
+            _props = pack.Props;
+            _humanoidPrefabs = pack.HumanoidPrefabs;
+            _humanoidAnimator = pack.HumanoidAnimator;
+            _wardrobe = pack.Wardrobe;
+            if (pack.Kit != null)
+            {
+                UOClient.Buildings.Synty.SyntyAssets.Registry = pack.Kit;
             }
         }
 

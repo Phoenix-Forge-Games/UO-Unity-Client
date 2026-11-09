@@ -56,3 +56,9 @@ Thumbs.db
 # Textures derived from Synty POLYGON Fantasy Kingdom (not redistributable)
 /Assets/UOClient/Materials/SyntyWalls/*.png
 /Assets/UOClient/Materials/SyntyWalls/*.png.meta
+
+# Release pipeline: the content key must never be published; the pack asset is temporary
+/Assets/UOClient/Scripts/Content/ContentKey.Local.cs
+/Assets/UOClient/Scripts/Content/ContentKey.Local.cs.meta
+/Assets/UOClient/Generated/
+/Assets/UOClient/Generated.meta

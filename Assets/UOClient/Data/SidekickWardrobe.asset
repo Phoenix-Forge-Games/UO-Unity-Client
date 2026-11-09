@@ -1,0 +1,510 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbdd0123bfc6bd148a85808a2a725a21, type: 3}
+  m_Name: SidekickWardrobe
+  m_EditorClassIdentifier: UOClient::UOClient.SidekickWardrobe
+  BaseModel: {fileID: 3371209851704607221, guid: ee97cb0d42863da48a7823104da8c6e7, type: 3}
+  Material: {fileID: 2100000, guid: 98b1d822623226840b0be8e30bf5a7b1, type: 2}
+  Schemes:
+  - {fileID: 2800000, guid: 2a028b3e0aa947648add582ca16a29b1, type: 3}
+  Body:
+  - {fileID: 919132149155446097, guid: 7eadea74e22ac9f498597ee4898b9c25, type: 3}
+  - {fileID: 919132149155446097, guid: 0a13259e2e1801346bbd6f1d2d581325, type: 3}
+  - {fileID: 919132149155446097, guid: b94380d9b7732f54987c0849050c67f1, type: 3}
+  - {fileID: 919132149155446097, guid: af016b82c7fcece43af1714c5653c64a, type: 3}
+  - {fileID: 919132149155446097, guid: b4b6edefeb11f8d43ab98d1be86893e6, type: 3}
+  - {fileID: 919132149155446097, guid: 9393e37b4db411c469d7c274c232a8ad, type: 3}
+  - {fileID: 919132149155446097, guid: 85f91315d25021247afb11c268d86b31, type: 3}
+  - {fileID: 919132149155446097, guid: bfd664514da041243b22a6ab9a6b103e, type: 3}
+  - {fileID: 919132149155446097, guid: 780ef39007ccf884880e4cfa638acd1c, type: 3}
+  - {fileID: 919132149155446097, guid: 255f26f6a974cc44b856d737b3b9d4af, type: 3}
+  - {fileID: 919132149155446097, guid: 19f56a996d96174438dd264b28b3f117, type: 3}
+  - {fileID: 919132149155446097, guid: cca8b8751cbb90f489b164f90027eecb, type: 3}
+  - {fileID: 919132149155446097, guid: 5d1dc8955dd7bf24a8e69edc0e21d454, type: 3}
+  - {fileID: 919132149155446097, guid: 91d860e42297ca44fbcb714158c2ba5b, type: 3}
+  - {fileID: 919132149155446097, guid: 77d92666cdb799f45a06ecca4b8c0fcd, type: 3}
+  - {fileID: 919132149155446097, guid: 353c718dd5e9a234fb9292852df9eacb, type: 3}
+  - {fileID: 919132149155446097, guid: b3ee2f840da91ab4f9088f5358b9aadc, type: 3}
+  - {fileID: 919132149155446097, guid: ae7d339ec0046c245bf096797ce16606, type: 3}
+  - {fileID: 919132149155446097, guid: f470578e834137242b2460a5f5e8d157, type: 3}
+  - {fileID: 919132149155446097, guid: bf55b78dd7cc7d44dbe8276efeab9954, type: 3}
+  - {fileID: 919132149155446097, guid: daa1e3cf2e5b6d54d8159df90eaefe04, type: 3}
+  - {fileID: 919132149155446097, guid: b005a7422f4d71842ae80386a96264a8, type: 3}
+  Faces:
+  - {fileID: 919132149155446097, guid: 18becb00e36a85444a319c40e28c9236, type: 3}
+  - {fileID: 919132149155446097, guid: 539dfc0fbaa8b0d47a4c5e2097590bd3, type: 3}
+  - {fileID: 919132149155446097, guid: b7c706ad07feede40b7e539ef83ab18e, type: 3}
+  - {fileID: 919132149155446097, guid: c60e39464d6f4c245b71f13fa5004e52, type: 3}
+  - {fileID: 919132149155446097, guid: 54dc27122ce15b44f929d20045955a3f, type: 3}
+  - {fileID: 919132149155446097, guid: bdc5c95e81046f642924f65e32597887, type: 3}
+  - {fileID: 919132149155446097, guid: 9557bf43a5e834a458511ed4229c75a8, type: 3}
+  - {fileID: 919132149155446097, guid: 3d08e284bda9aac4a8a9d895aabb0335, type: 3}
+  - {fileID: 919132149155446097, guid: d9b920e196bab22429a6a7f1069c1c7e, type: 3}
+  - {fileID: 919132149155446097, guid: 2bea61fbf7c798646b5ce0b8b7bf06e8, type: 3}
+  - {fileID: 919132149155446097, guid: 37f7219133d34024ea132adf232c3a9a, type: 3}
+  - {fileID: 919132149155446097, guid: b7fb4660c1e9e8648b069ea2ed6d0f05, type: 3}
+  - {fileID: 919132149155446097, guid: 738ab0d7f3d0df747a08c9ec73e6c50c, type: 3}
+  - {fileID: 919132149155446097, guid: f30b9611640168b43a34d8e20654780b, type: 3}
+  - {fileID: 919132149155446097, guid: d156bced7fbf12d45908b4c53af980e3, type: 3}
+  - {fileID: 919132149155446097, guid: 6f79f6d471bc2f04a95835effb5aa754, type: 3}
+  - {fileID: 919132149155446097, guid: 5d0ef7116fe622d40814acf184a86cf9, type: 3}
+  - {fileID: 919132149155446097, guid: 86266642994d5c24ebfbee7723356886, type: 3}
+  - {fileID: 919132149155446097, guid: ae4aab63a924ab64eaf89e5d25636dd2, type: 3}
+  - {fileID: 919132149155446097, guid: 33c1243b8a975f547bae99bdd36bc747, type: 3}
+  - {fileID: 919132149155446097, guid: 6e1237f85d86c87409e54fdd5b45e268, type: 3}
+  - {fileID: 919132149155446097, guid: 0472cfaa741f52d4091424b48ac8474b, type: 3}
+  - {fileID: 919132149155446097, guid: d95d20a2f0d040f469551a2e860010b6, type: 3}
+  - {fileID: 919132149155446097, guid: f5bb33a185a2ceb47ad3e9ef708fe972, type: 3}
+  - {fileID: 919132149155446097, guid: ceb37d2e273b29f40920414ccf0e4399, type: 3}
+  - {fileID: 919132149155446097, guid: 266641c7ddf7446478c208cfb65002e9, type: 3}
+  - {fileID: 919132149155446097, guid: 58c276938bab7d845846514d70e98c33, type: 3}
+  - {fileID: 919132149155446097, guid: 01e087ee577dbf247b3080fed69a2edb, type: 3}
+  - {fileID: 919132149155446097, guid: cf7684e9f28bf6241835e00cb266e0d6, type: 3}
+  - {fileID: 919132149155446097, guid: bf2fd37c8da39584ca616aa5110c1b65, type: 3}
+  - {fileID: 919132149155446097, guid: 19066391520863f45885e1461656db9d, type: 3}
+  - {fileID: 919132149155446097, guid: 373dbd34fd99cf4498e5fe87d71e0013, type: 3}
+  - {fileID: 919132149155446097, guid: 767fc3ee56643374cad5c6b4989b2223, type: 3}
+  - {fileID: 919132149155446097, guid: 32b873197a18c52408279f13eca0b0c2, type: 3}
+  - {fileID: 919132149155446097, guid: a9e791ace5c3a9543946108d2432b1f7, type: 3}
+  - {fileID: 919132149155446097, guid: 590d4c1fdeb0ae745923b3386018f078, type: 3}
+  - {fileID: 919132149155446097, guid: 2024677bc0d799f4f9a2b7e7be93ba1a, type: 3}
+  - {fileID: 919132149155446097, guid: 5287dcdf8b6c0e746a3c74f11f541430, type: 3}
+  - {fileID: 919132149155446097, guid: 55bc22c82844be94c938e2d4b30e343f, type: 3}
+  - {fileID: 919132149155446097, guid: bc875ffbc1784ce4a8307d93f6d24501, type: 3}
+  - {fileID: 919132149155446097, guid: a1a815db660de84498ec636d1e176718, type: 3}
+  - {fileID: 919132149155446097, guid: dd872faa95b9d9946afe9ecb834e3d95, type: 3}
+  - {fileID: 919132149155446097, guid: a8e830ba3d6202c45b4ee0d6c35fe519, type: 3}
+  - {fileID: 919132149155446097, guid: 90d67a867e2c89c448f27ca1ee1cdb4f, type: 3}
+  - {fileID: 919132149155446097, guid: 03a31e0436ef92a4199404660c1f2d75, type: 3}
+  - {fileID: 919132149155446097, guid: cd5da67b880386d4eba1cd6cd07d49fe, type: 3}
+  Hair:
+  - Graphic: 8251
+    Parts:
+    - {fileID: 919132149155446097, guid: 191200add06df454ba2668a62a3651c6, type: 3}
+  - Graphic: 8252
+    Parts:
+    - {fileID: 919132149155446097, guid: cab96fcd0df2678498a06f7c47b7a9cc, type: 3}
+  - Graphic: 8253
+    Parts:
+    - {fileID: 919132149155446097, guid: db3d070615bd2f4428ef7cba31781dd2, type: 3}
+  - Graphic: 8260
+    Parts:
+    - {fileID: 919132149155446097, guid: e08faf39d93fb7b49b013f76d9abf4ea, type: 3}
+  - Graphic: 8261
+    Parts:
+    - {fileID: 919132149155446097, guid: eeb8af4cea3b0114792fceb3dbf2779f, type: 3}
+  - Graphic: 8262
+    Parts:
+    - {fileID: 919132149155446097, guid: 92f793d48e467ef428696b7b1180e4f7, type: 3}
+  - Graphic: 8263
+    Parts:
+    - {fileID: 919132149155446097, guid: 208fe4ca5de456a4889ea863186ad320, type: 3}
+  - Graphic: 8264
+    Parts:
+    - {fileID: 919132149155446097, guid: 3b63b452917d4174ea9685a834ecf3d6, type: 3}
+  - Graphic: 8265
+    Parts:
+    - {fileID: 919132149155446097, guid: bc987c5fed1504a4bab6119e9a437952, type: 3}
+  - Graphic: 8266
+    Parts:
+    - {fileID: 919132149155446097, guid: c794c824cd41393479711473bd2fd618, type: 3}
+  Beards:
+  - Graphic: 8254
+    Parts:
+    - {fileID: 919132149155446097, guid: 129626b6c04e0f14eb6cdde9162c0eaa, type: 3}
+  - Graphic: 8255
+    Parts:
+    - {fileID: 919132149155446097, guid: b31f948695140974aa02e53460a35d60, type: 3}
+  - Graphic: 8256
+    Parts:
+    - {fileID: 919132149155446097, guid: a9ce7e806f3307245bbd47da838ea954, type: 3}
+  - Graphic: 8257
+    Parts:
+    - {fileID: 919132149155446097, guid: 31e6f9d482c6a79438dbd22bb6e9162f, type: 3}
+  - Graphic: 8267
+    Parts:
+    - {fileID: 919132149155446097, guid: dfe4fb875ae3fa1498e575ecc02d3d78, type: 3}
+  - Graphic: 8268
+    Parts:
+    - {fileID: 919132149155446097, guid: f2ecf0ddc8ce49c44ba53ea35111bbdd, type: 3}
+  - Graphic: 8269
+    Parts:
+    - {fileID: 919132149155446097, guid: 4b4e9061cdc9fc6408b62d7cdaaa3932, type: 3}
+  Outfits:
+  - Id: FANT_KNGT_01
+    Kind: 6
+    Head: 4
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: e2663bfb05e10864e9225e54c413e6aa, type: 3}
+    - {fileID: 919132149155446097, guid: 85b6a92b60fc97541b120c29aa79d8d9, type: 3}
+    - {fileID: 919132149155446097, guid: fdb79477d700b8341a57e1a5e589e047, type: 3}
+    - {fileID: 919132149155446097, guid: ddcd6e9f7858d724db4670f5b2da9600, type: 3}
+    - {fileID: 919132149155446097, guid: 6e655f65f4f92b44f92df5fbb7e60070, type: 3}
+    - {fileID: 919132149155446097, guid: c4069f78af4bac341a90ba1e0b92f54b, type: 3}
+    - {fileID: 919132149155446097, guid: dd3217cfde7e0eb419338bfd9d405ce2, type: 3}
+    - {fileID: 919132149155446097, guid: 65f33b93fcc655c49811b1532b589e58, type: 3}
+    - {fileID: 919132149155446097, guid: 3120f4e26e9a5e3408013a15610f2e81, type: 3}
+    - {fileID: 919132149155446097, guid: bd594119e57ee9e4fa3f8413b0b605c8, type: 3}
+    - {fileID: 919132149155446097, guid: 0e1f6e96b3ea5d442811dd3bcd44858a, type: 3}
+    - {fileID: 919132149155446097, guid: 301ed5dcf7943f444b0afc529540ba47, type: 3}
+    - {fileID: 919132149155446097, guid: ba8fd25ecbca1ce4ea98dd5f539a4bfd, type: 3}
+    - {fileID: 919132149155446097, guid: e2babff833b12fd4ba49700e871a1702, type: 3}
+    - {fileID: 919132149155446097, guid: 9e8087aa3c5fefb4797002cc2ecc50d8, type: 3}
+    - {fileID: 919132149155446097, guid: f66f9641989611c4d8c760f7f4ab4676, type: 3}
+    - {fileID: 919132149155446097, guid: 2cd5fdd509acace40926162be85d7f2c, type: 3}
+    - {fileID: 919132149155446097, guid: 37c7edddf7d66784e99d262a4befbd90, type: 3}
+    - {fileID: 919132149155446097, guid: 55c25296f42748e4ca2e28c85de0067a, type: 3}
+    - {fileID: 919132149155446097, guid: 6f7df40eb85df6a47a421b9b3dff1020, type: 3}
+    - {fileID: 919132149155446097, guid: 2ec4057c59899cf4998c233f4865fa8d, type: 3}
+    - {fileID: 919132149155446097, guid: 9230a7be5ce2f9a4698b1d12e2e1c03d, type: 3}
+    - {fileID: 919132149155446097, guid: 7ff559f4f01d19b4db8d7c2a99e2ba88, type: 3}
+    - {fileID: 919132149155446097, guid: 4ed1420633e65ed4290e9db04e53b035, type: 3}
+  - Id: FANT_KNGT_02
+    Kind: 6
+    Head: 4
+    LongHips: 0
+    Cape: 1
+    Parts:
+    - {fileID: 919132149155446097, guid: 7561e69a14bbd14429826cc39d8b4202, type: 3}
+    - {fileID: 919132149155446097, guid: 2e939f7d8a182c84b9123efbc4f17c97, type: 3}
+    - {fileID: 919132149155446097, guid: 7e1f868bb1147f146a6718d39965a290, type: 3}
+    - {fileID: 919132149155446097, guid: 7e9a0b5da3615784d83599cb77255350, type: 3}
+    - {fileID: 919132149155446097, guid: 801791d679608b24fb76ff79c2b7f9f6, type: 3}
+    - {fileID: 919132149155446097, guid: 9bc6278cf31afde40ba86a4c32028287, type: 3}
+    - {fileID: 919132149155446097, guid: 7698579c8fabedf4cb81f7339e4ff60c, type: 3}
+    - {fileID: 919132149155446097, guid: c0542fa777b48b94398607681554ea5b, type: 3}
+    - {fileID: 919132149155446097, guid: bffd5edfab9a3fc42bc9d64a23db001d, type: 3}
+    - {fileID: 919132149155446097, guid: b254a12ecc097424e815751119aa2e81, type: 3}
+    - {fileID: 919132149155446097, guid: 7c0c4c971430b4140b63b46fea5e5116, type: 3}
+    - {fileID: 919132149155446097, guid: fc09434e2bf27ab46a5d5e000418e223, type: 3}
+    - {fileID: 919132149155446097, guid: 2dd124c4cdd75764d83f769a2bc0bcba, type: 3}
+    - {fileID: 919132149155446097, guid: e91b9c9d3385b7b4c93d2c7493575d40, type: 3}
+    - {fileID: 919132149155446097, guid: bb5071296be4f3a448daa2f2cf206208, type: 3}
+    - {fileID: 919132149155446097, guid: a13b7160b9e76f34a8d7253fb19c58fa, type: 3}
+    - {fileID: 919132149155446097, guid: 61b9fa974fec16649b5a503b2f555dc1, type: 3}
+    - {fileID: 919132149155446097, guid: 3f3fffe6de08c924b929c7d92f4f9aa8, type: 3}
+    - {fileID: 919132149155446097, guid: 8016ca8d5eda2174db0a43e6552577bd, type: 3}
+    - {fileID: 919132149155446097, guid: 7f5edfe27d798274898fbcec12412cc8, type: 3}
+    - {fileID: 919132149155446097, guid: 1112365d233908246a9d66404ac4ad16, type: 3}
+    - {fileID: 919132149155446097, guid: 63ad1150950ecd74c9f51891ff6721d0, type: 3}
+    - {fileID: 919132149155446097, guid: fd62f2649093623438e70d88a8b4ba93, type: 3}
+    - {fileID: 919132149155446097, guid: 2aa70de413f3fe842bbe273c661af4b6, type: 3}
+  - Id: FANT_KNGT_03
+    Kind: 6
+    Head: 6
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: c2c688456c5c77945a4cda851c5ef8e6, type: 3}
+    - {fileID: 919132149155446097, guid: 1857fc72b29272548919e68abba126a9, type: 3}
+    - {fileID: 919132149155446097, guid: 966fe003fd334d549b53791f944d9773, type: 3}
+    - {fileID: 919132149155446097, guid: 99e3a799ee3ff0d42adbf6c135beb693, type: 3}
+    - {fileID: 919132149155446097, guid: 4257c60be240a744d9e75c5bb736dba8, type: 3}
+    - {fileID: 919132149155446097, guid: 00bc219d506ce9d47bdedfe8f30f682e, type: 3}
+    - {fileID: 919132149155446097, guid: 43b15224afa905849bb661e756f30daa, type: 3}
+    - {fileID: 919132149155446097, guid: ceca2dc65c2aca148af2ce0b6e46c7b6, type: 3}
+    - {fileID: 919132149155446097, guid: 6e23a6e66b0fbf84d9730424954ade0c, type: 3}
+    - {fileID: 919132149155446097, guid: 446d3868e90b75444be1032954f3fa7f, type: 3}
+    - {fileID: 919132149155446097, guid: 93bba403f775a4943b2799463b1c7481, type: 3}
+    - {fileID: 919132149155446097, guid: 9b76062367baea04eb25766e94e49d8d, type: 3}
+    - {fileID: 919132149155446097, guid: 029f72c78ce1315418a231c85d3e4d0f, type: 3}
+    - {fileID: 919132149155446097, guid: 930e2a66965881c40b9c3c49c57b96d4, type: 3}
+    - {fileID: 919132149155446097, guid: 1b180dc779b8c29438d88c3575fdb5ad, type: 3}
+    - {fileID: 919132149155446097, guid: 32ba81b1a4e3bcc4e99291a604a1270f, type: 3}
+    - {fileID: 919132149155446097, guid: 59bc13c0f90488b42a80afdb840e15aa, type: 3}
+    - {fileID: 919132149155446097, guid: e5ebbfc378e49c34a806efe32dbbd0d9, type: 3}
+    - {fileID: 919132149155446097, guid: f8566ad14486e9f4db484223b3ea61b6, type: 3}
+    - {fileID: 919132149155446097, guid: cdbb84ca8b502144ca848f210f3338c2, type: 3}
+    - {fileID: 919132149155446097, guid: cc1cd1c6b9b668a42b5a6858a6f84bdc, type: 3}
+    - {fileID: 919132149155446097, guid: 56eff14c740d8314798ee80425f3d58f, type: 3}
+    - {fileID: 919132149155446097, guid: dea4a25d80ed0a4419ed45254b028a7e, type: 3}
+  - Id: FANT_KNGT_04
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 94a2110d325444f4383b6b962091f4a6, type: 3}
+    - {fileID: 919132149155446097, guid: d8fcb5c826ce0794ab509cce35a7bb24, type: 3}
+    - {fileID: 919132149155446097, guid: 329252a72c5848646baffd3f3186c771, type: 3}
+    - {fileID: 919132149155446097, guid: 65a3919cc4cbeac459f27b28a1cbbc3e, type: 3}
+    - {fileID: 919132149155446097, guid: 55921a7fc20ffe6449d8c62f00c7288c, type: 3}
+    - {fileID: 919132149155446097, guid: 21b2d33bbc21eca4f840dd47ad1e5bca, type: 3}
+    - {fileID: 919132149155446097, guid: ddb86ee63266b7f4c98481f50b1a9941, type: 3}
+    - {fileID: 919132149155446097, guid: dcba5efe118788b42886ae650ed82aa4, type: 3}
+    - {fileID: 919132149155446097, guid: fa2ec235d6fbe3946b50df9cf153b6c4, type: 3}
+    - {fileID: 919132149155446097, guid: 2cee94e75ec5586408ef2682c490593c, type: 3}
+    - {fileID: 919132149155446097, guid: 4f46edc5520a79249ad496ba7df0a46d, type: 3}
+    - {fileID: 919132149155446097, guid: d3cb90dfd2f10bc40902815751425047, type: 3}
+    - {fileID: 919132149155446097, guid: 8975a26475ae4104c8b9f91f56f882ba, type: 3}
+    - {fileID: 919132149155446097, guid: 108273fe837ec0e4f9521f36acfa7046, type: 3}
+    - {fileID: 919132149155446097, guid: 76eb6dd63c188b943bd6a153b5b69e02, type: 3}
+  - Id: FANT_KNGT_05
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 27d21f0365bae2c4a828ddd427b19c77, type: 3}
+    - {fileID: 919132149155446097, guid: 7d31b6580b398194d9fed3d2dc52eeaa, type: 3}
+    - {fileID: 919132149155446097, guid: 29cf5db13e9a5fb4fbfbd41c527b5de9, type: 3}
+    - {fileID: 919132149155446097, guid: 66787c6cd344c064b9c8f5c1a7b401bd, type: 3}
+    - {fileID: 919132149155446097, guid: c8a3ed2d21fc2f249ab9a9d479a2ae84, type: 3}
+    - {fileID: 919132149155446097, guid: dced9ba3ceaec354baf204d8d4381668, type: 3}
+  - Id: FANT_KNGT_06
+    Kind: 4
+    Head: 0
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 3c87c8386dd2ad642ad6099ac8c2e2b5, type: 3}
+    - {fileID: 919132149155446097, guid: ef0d5c5dace97664684bde5e9017eaa6, type: 3}
+    - {fileID: 919132149155446097, guid: 62b0e39e2eae840488e7a5735eb07c48, type: 3}
+    - {fileID: 919132149155446097, guid: 0f6db20ed40494749a70b764bd1fb7e8, type: 3}
+    - {fileID: 919132149155446097, guid: ad56169edff69af4c94874e3a33d7481, type: 3}
+  - Id: FANT_KNGT_07
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 209d75e4a57d9f24dae593cc9a780a29, type: 3}
+    - {fileID: 919132149155446097, guid: 7222a53ec6c716e4087dbd765c475cad, type: 3}
+  - Id: FANT_KNGT_08
+    Kind: 6
+    Head: 6
+    LongHips: 0
+    Cape: 1
+    Parts:
+    - {fileID: 919132149155446097, guid: e71ec1a3b37d0bb4d91058778e33ce10, type: 3}
+    - {fileID: 919132149155446097, guid: 71e0a72b28e995145b5b1fb0929fb73a, type: 3}
+  - Id: FANT_KNGT_09
+    Kind: 6
+    Head: 6
+    LongHips: 0
+    Cape: 1
+    Parts:
+    - {fileID: 919132149155446097, guid: 50d30a8e258e2cd47b1a9116216cb54d, type: 3}
+    - {fileID: 919132149155446097, guid: 39a8b9661a165744f85658c308cddf72, type: 3}
+  - Id: FANT_KNGT_10
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 833df99d61da1ef41b64c28ca22c5ca2, type: 3}
+    - {fileID: 919132149155446097, guid: d84b6797ed3274545b3253323413be03, type: 3}
+  - Id: FANT_KNGT_11
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 1
+    Parts:
+    - {fileID: 919132149155446097, guid: 6b8669012d7660d489ac61440e0f0d43, type: 3}
+    - {fileID: 919132149155446097, guid: 3366eb4648269904199931327e86a4be, type: 3}
+  - Id: FANT_KNGT_12
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 0a863c923fb314e4889df6c3dee23e95, type: 3}
+    - {fileID: 919132149155446097, guid: cfda62ed16ee7654ea3955dac02f18de, type: 3}
+  - Id: FANT_KNGT_13
+    Kind: 6
+    Head: 5
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 2c894bf0563d39f4b9103d85575e4ee7, type: 3}
+    - {fileID: 919132149155446097, guid: 2d6f80835b30641439d1c07501432df7, type: 3}
+  - Id: FANT_KNGT_14
+    Kind: 6
+    Head: 0
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: c16a08722c5611b49a89e2f50cf70fce, type: 3}
+  - Id: FANT_KNGT_15
+    Kind: 6
+    Head: 0
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 12d3dc34ef92d154f92edfa4934c73bf, type: 3}
+  - Id: FANT_KNGT_17
+    Kind: 6
+    Head: 4
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 0d0a6c9c28b90b84486bf4c5a7bee2e4, type: 3}
+    - {fileID: 919132149155446097, guid: ddf71f1a10ea4d64d8b51e54c883c683, type: 3}
+    - {fileID: 919132149155446097, guid: 1481084a60edeb24e8a21ba8141a197c, type: 3}
+    - {fileID: 919132149155446097, guid: 351dac6fc5e04be48966363516a5e569, type: 3}
+    - {fileID: 919132149155446097, guid: 00f48eab6ee8abf44a71719868122171, type: 3}
+    - {fileID: 919132149155446097, guid: 3b2af2ed2f58f094ca0d5c349f9014bb, type: 3}
+    - {fileID: 919132149155446097, guid: 210b56fc9d0cfd841a83e0d9ffb4916e, type: 3}
+    - {fileID: 919132149155446097, guid: ef7471101347b43449c8afa04da273dc, type: 3}
+    - {fileID: 919132149155446097, guid: 1f9b01be76d963b46b11ac1a1d5a9c54, type: 3}
+    - {fileID: 919132149155446097, guid: 36fb872bbf253494cbca95da2459ccf1, type: 3}
+    - {fileID: 919132149155446097, guid: d2e7595cea84f104f8ba610b04c401c9, type: 3}
+    - {fileID: 919132149155446097, guid: fb07b39ad34900a46b392203e2670b90, type: 3}
+    - {fileID: 919132149155446097, guid: b0166281ca473884ab255b84d4b4febe, type: 3}
+    - {fileID: 919132149155446097, guid: a65ab9c6c83e50f4d81c3a3a3d00329b, type: 3}
+    - {fileID: 919132149155446097, guid: c5ce21ef4a010904bad7a27a8c6c7a4e, type: 3}
+    - {fileID: 919132149155446097, guid: 52ff41263a754f345930c93d89cde97b, type: 3}
+    - {fileID: 919132149155446097, guid: 85c7614bef5da154f910f933bf870ac3, type: 3}
+    - {fileID: 919132149155446097, guid: 2145a8482c8f1fc47be615da044803e0, type: 3}
+    - {fileID: 919132149155446097, guid: bf2f0ed16c416af44a4bfb1fb4046e84, type: 3}
+    - {fileID: 919132149155446097, guid: 3149d18bc23e5a54cab3b9dd0451fdf6, type: 3}
+    - {fileID: 919132149155446097, guid: 635b5b7bb7989c24290e80ffceb39a6e, type: 3}
+    - {fileID: 919132149155446097, guid: 6de56f1284360b14c9f451f40ff20765, type: 3}
+    - {fileID: 919132149155446097, guid: b0188fd195f9fb3479c1f3f8046228cf, type: 3}
+    - {fileID: 919132149155446097, guid: 080a1b68060f135499b32e86916d1205, type: 3}
+    - {fileID: 919132149155446097, guid: a730cfd1e82fbc243b4b7b7f4db81f93, type: 3}
+  - Id: FANT_VILL_01
+    Kind: 8
+    Head: 1
+    LongHips: 1
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: f2c216059ccd08d4a816361b20aa80cf, type: 3}
+    - {fileID: 919132149155446097, guid: e7cb6615a1802bf4fa7b1b7282396282, type: 3}
+    - {fileID: 919132149155446097, guid: 0a28ab57c2f7967428aa81ea0e562bb4, type: 3}
+    - {fileID: 919132149155446097, guid: 7ff5ccb3e6ee54140947059aa8332770, type: 3}
+    - {fileID: 919132149155446097, guid: c524182a38115924688eadcbe0021fc2, type: 3}
+    - {fileID: 919132149155446097, guid: 0e85eea7be859674c8247254e7602ea0, type: 3}
+    - {fileID: 919132149155446097, guid: c96651c1a15719f4fa3a57af2724d377, type: 3}
+    - {fileID: 919132149155446097, guid: 4ba6bff01be03b54d8114577fdca82f8, type: 3}
+    - {fileID: 919132149155446097, guid: 1ec5a4ec479759d469b4103e08ac25b3, type: 3}
+    - {fileID: 919132149155446097, guid: db0c84bf6bd23504199454b38352544e, type: 3}
+    - {fileID: 919132149155446097, guid: 2e0434c91801db14a9eb0f4f89ed7380, type: 3}
+    - {fileID: 919132149155446097, guid: 0789d1724ff410c44b8e7126f4b29027, type: 3}
+    - {fileID: 919132149155446097, guid: 1fc6a68b102ea124c95352fb313b1d01, type: 3}
+    - {fileID: 919132149155446097, guid: 00340d8457c3e144c877d2a97e252efb, type: 3}
+    - {fileID: 919132149155446097, guid: 6d1db497d25adaa4fb953ea3dac039fc, type: 3}
+    - {fileID: 919132149155446097, guid: 394aae3a07383ab4790e6747e4fde6ae, type: 3}
+    - {fileID: 919132149155446097, guid: 9e57591185fac3e4c8e408884ea9f6d8, type: 3}
+    - {fileID: 919132149155446097, guid: 5b85e558eb8b68f49a32c146daed8cb5, type: 3}
+  - Id: FANT_VILL_02
+    Kind: 2
+    Head: 1
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 3e607862fd3c2244ea6663e835dce4d8, type: 3}
+    - {fileID: 919132149155446097, guid: 1cc2c6df87a33ce4f88450671207d8e6, type: 3}
+    - {fileID: 919132149155446097, guid: 1656418be34a7164ea8795fab8d04a75, type: 3}
+    - {fileID: 919132149155446097, guid: ab1312f6718eebe4aadac86c14859836, type: 3}
+    - {fileID: 919132149155446097, guid: 99e67c98194b965468614e10d0f46949, type: 3}
+    - {fileID: 919132149155446097, guid: dbca0b87689696743b54bccd31d2589f, type: 3}
+    - {fileID: 919132149155446097, guid: 3ba228664c16a2b479d21599cd52e715, type: 3}
+    - {fileID: 919132149155446097, guid: 2490f9da88a750847838d1b7f094c8e2, type: 3}
+    - {fileID: 919132149155446097, guid: 30b9bf1c1439b4e4e91c208589334b1c, type: 3}
+    - {fileID: 919132149155446097, guid: 3e566e7f1eb89de48b64ab3c145702dc, type: 3}
+    - {fileID: 919132149155446097, guid: ad55acb05440d4144820b28f50d88495, type: 3}
+    - {fileID: 919132149155446097, guid: 47df2d20c0994844b9ec9f2e0d33051c, type: 3}
+    - {fileID: 919132149155446097, guid: bcb9871cb8ffd7d44b781a5f98450454, type: 3}
+    - {fileID: 919132149155446097, guid: 3ac1a623434b4e046a618e67ea2e8cbc, type: 3}
+    - {fileID: 919132149155446097, guid: ae63d5ac55a479049b2d9cc84366737d, type: 3}
+  - Id: FANT_VILL_03
+    Kind: 0
+    Head: 3
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 59024ab33798fc3488d0d9e2e3cbc3c2, type: 3}
+    - {fileID: 919132149155446097, guid: c548195cc1be3d24a8fc931e06a3448e, type: 3}
+    - {fileID: 919132149155446097, guid: ead9752e13138cd4e9c3947b4c4c2013, type: 3}
+    - {fileID: 919132149155446097, guid: dbcde36d60ba30b4a80475868779f4b2, type: 3}
+    - {fileID: 919132149155446097, guid: a9622797bce955b4aaed723497014288, type: 3}
+    - {fileID: 919132149155446097, guid: d1c150ae3a67d3a428a6b0f37b803727, type: 3}
+    - {fileID: 919132149155446097, guid: 902a16e380929cd4faf41331d1ccd5e6, type: 3}
+    - {fileID: 919132149155446097, guid: 29e5d92dfe03ad242953b7b0f40a0a69, type: 3}
+    - {fileID: 919132149155446097, guid: 6ee158accd79c694aacde5df98913ec8, type: 3}
+    - {fileID: 919132149155446097, guid: 9cea4010d15aba54398a44f113322aba, type: 3}
+    - {fileID: 919132149155446097, guid: 99c25deb28d7f6a42a5403e3be8e5551, type: 3}
+    - {fileID: 919132149155446097, guid: 5fbd2ca94e61d28439799c33b09107ff, type: 3}
+    - {fileID: 919132149155446097, guid: 469b7784b45d586419a9362c6d2fdcd0, type: 3}
+  - Id: FANT_VILL_04
+    Kind: 0
+    Head: 3
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: af1c376da4a5ed64fb02eb8a1656b0ad, type: 3}
+    - {fileID: 919132149155446097, guid: e1913ed126645ba47a820924f7c22573, type: 3}
+    - {fileID: 919132149155446097, guid: cfd1e330cc2da0946b558f7b0bd097d4, type: 3}
+    - {fileID: 919132149155446097, guid: da85bd59a3ae66942babb1c5a7f12e82, type: 3}
+    - {fileID: 919132149155446097, guid: dbb3a513f8cbc2f4ca5fceacd2406ce2, type: 3}
+    - {fileID: 919132149155446097, guid: 83d2fb5d5829a614da67432d651489e4, type: 3}
+    - {fileID: 919132149155446097, guid: 4e3a159c484444545a46933d2b77b9fd, type: 3}
+    - {fileID: 919132149155446097, guid: cfc265154c9df2d498cb6984ddcc70ec, type: 3}
+  - Id: FANT_VILL_05
+    Kind: 3
+    Head: 3
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: e85334b8b924b314fb8ce0c86f585206, type: 3}
+    - {fileID: 919132149155446097, guid: 9521d8767efb30045b41c124ea65ea3f, type: 3}
+    - {fileID: 919132149155446097, guid: 0e25e9679deb0c046b1117cfe095fe68, type: 3}
+    - {fileID: 919132149155446097, guid: 8601faccc5bc643479ba23599ca85dc3, type: 3}
+    - {fileID: 919132149155446097, guid: 0f9686ad6cb9f544e84de6a514e24bde, type: 3}
+    - {fileID: 919132149155446097, guid: 140f47f1738d0db4f92e742b80a484ce, type: 3}
+  - Id: FANT_VILL_06
+    Kind: 1
+    Head: 2
+    LongHips: 1
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: bedef37c1ecc7d44ca6fb8764788c769, type: 3}
+    - {fileID: 919132149155446097, guid: 1c4477fe1f9957a4390092ead88ff83a, type: 3}
+    - {fileID: 919132149155446097, guid: c93b70b1b6c934b42bd2c5b1d24df4ca, type: 3}
+    - {fileID: 919132149155446097, guid: b04195184ad87e04fb048c430512a81f, type: 3}
+    - {fileID: 919132149155446097, guid: b26a750f9afc08740a45a393591c192f, type: 3}
+    - {fileID: 919132149155446097, guid: d84e9123eafd3a54aa590e9aeff32d5f, type: 3}
+  - Id: FANT_VILL_07
+    Kind: 1
+    Head: 2
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 94e4f0a2f2d28b447a69a76f844d649c, type: 3}
+    - {fileID: 919132149155446097, guid: 6536753eeefb2964aa34880346b302af, type: 3}
+    - {fileID: 919132149155446097, guid: 4771d0745963a9440bc947d90310dcf7, type: 3}
+    - {fileID: 919132149155446097, guid: da7d6deb1faadf74ab1ec71513a656be, type: 3}
+  - Id: FANT_VILL_08
+    Kind: 0
+    Head: 2
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: c7b8fb2b1d53ce046be44b62dcf69aab, type: 3}
+  - Id: FANT_VILL_09
+    Kind: 0
+    Head: 2
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: 3349d7162bada1547b3b0e8c58981ea2, type: 3}
+    - {fileID: 919132149155446097, guid: 38eb6598d86a9074d8befe99802230ad, type: 3}
+  - Id: FANT_VILL_10
+    Kind: 0
+    Head: 3
+    LongHips: 0
+    Cape: 0
+    Parts:
+    - {fileID: 919132149155446097, guid: ef17b30701a944f478629400022297a0, type: 3}

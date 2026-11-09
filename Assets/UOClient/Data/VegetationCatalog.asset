@@ -1,0 +1,1140 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2fac7b1afcc8784abc87a15157ae61c, type: 3}
+  m_Name: VegetationCatalog
+  m_EditorClassIdentifier: UOClient::UOClient.VegetationCatalog
+  _entries:
+  - Kind: 2
+    Biome: 0
+    Prefabs:
+    - {fileID: 4315413144059333744, guid: 2bfadbb124874af78c396f4f08c37293, type: 3}
+    - {fileID: 4756925298375183984, guid: 0ff6b7308dc249d3a134a48bd267a000, type: 3}
+    - {fileID: 2705122434220341171, guid: 2944cb6fda054688b38a16327b65b707, type: 3}
+    - {fileID: 6071758908861754449, guid: c04afded2efd4b6299cfbb09d8c6717a, type: 3}
+    - {fileID: 826414694984998496, guid: 3b8dfcd6771344b783f4aad5a7715f50, type: 3}
+    - {fileID: 6986869333357395922, guid: 153189b898dd4d50b6538da1f8e8bba5, type: 3}
+    - {fileID: 4853159057032395138, guid: 0528106aaf2f4e229e084bbc43cd4c8c, type: 3}
+    - {fileID: 5491418448796930955, guid: 080c176c29c04923a03f3d4f08ccd16e, type: 3}
+    - {fileID: 8734265532261517160, guid: 05d9459b3349498cbdba4a8e4f69b532, type: 3}
+    - {fileID: 7132005667035571255, guid: bdfa9ec74d8440ff9698aca0e9964c33, type: 3}
+    - {fileID: 7911767074575249742, guid: b9d9b472f6084c999525828334e6fe09, type: 3}
+    - {fileID: 1828112207804217397, guid: ead1c15a7e83458ba1068f2f6471dbef, type: 3}
+    - {fileID: 5912192358531943496, guid: aaa307c23e4d40d4ba1d269330af1582, type: 3}
+    - {fileID: 8435862596611391602, guid: 7b6e4c91e703453c8f0cfbf3278b737b, type: 3}
+    - {fileID: 7197156711381218709, guid: ce1312b56a5747809dacfb3eede63f36, type: 3}
+    - {fileID: 3467451918351931971, guid: b5f5b9caf7e348f19745a0420d51bdd0, type: 3}
+    - {fileID: 2739850366901698462, guid: 840647bb0f98493e904c022ba89e1ea8, type: 3}
+    - {fileID: 6032531126956847352, guid: 85725d1cc283405cb442b2ec7ff53a19, type: 3}
+    NaturalHeights:
+    - 10.536614
+    - 14.540123
+    - 14.647157
+    - 19.51276
+    - 20.412933
+    - 22.736767
+    - 8.615376
+    - 13.224077
+    - 13.86291
+    - 14.438234
+    - 16.847216
+    - 17.593893
+    - 6.727479
+    - 8.744125
+    - 11.861259
+    - 17.136059
+    - 17.796703
+    - 18.94459
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 3
+    Biome: 0
+    Prefabs:
+    - {fileID: 6450392750413998939, guid: 71a13115ba1445aabb87625c4feaba61, type: 3}
+    - {fileID: 5417132463569787846, guid: 7b21ec09bc4b452b8633e6917c4112ea, type: 3}
+    - {fileID: 5143076074833769291, guid: 75e484ef07a94b5ca3f50a2e3fd11d04, type: 3}
+    - {fileID: 5226503077295968227, guid: a30160275729469bbf318559a022aa19, type: 3}
+    - {fileID: 1701612629451405494, guid: 00e795d9e2424a3eaa4fd67c3ed5befe, type: 3}
+    - {fileID: 8376686560169678993, guid: e7c5ac575c884e79816f4f6f8d37e404, type: 3}
+    - {fileID: 4827700149028538118, guid: 02d545911bac4e76b93ea6620f011336, type: 3}
+    - {fileID: 7230932345140146853, guid: 95be43cc7cd048c5a4fe45d26d0b4ae9, type: 3}
+    - {fileID: 6162276905758177793, guid: a3660427351b40819347e3ee8d0d01c9, type: 3}
+    - {fileID: 1879292450213355106, guid: 0be7b22ed75c47d9ac0fbfe494921a35, type: 3}
+    - {fileID: 4501768990532002667, guid: fcec60d44d8146b6a70249b18b8f13c6, type: 3}
+    - {fileID: 1992998091634362620, guid: ff6fb5b9f0f04ce0a985c1fb33cd8b20, type: 3}
+    - {fileID: 6978464539711513841, guid: f0918de67dd64cfe9c14a1019aa25415, type: 3}
+    - {fileID: 5471172434619682828, guid: 25de6138e2d44b90ad59467f42057041, type: 3}
+    - {fileID: 2658077318642131114, guid: 95d38b0ac92d47e0a53d166a9d19941f, type: 3}
+    - {fileID: 7389756694171113931, guid: fb696cc4775540dab1ed0cd41ba71add, type: 3}
+    - {fileID: 1323020111034108088, guid: b5a4b1734ca04b868c2eb68f640c28e5, type: 3}
+    - {fileID: 3912059405692488580, guid: dfb8c44db5ba46efbb59fe66f5cc1828, type: 3}
+    NaturalHeights:
+    - 5.811666
+    - 7.860692
+    - 8.919361
+    - 9.654148
+    - 12.25841
+    - 15.2671
+    - 8.570507
+    - 10.25205
+    - 12.726804
+    - 16.326591
+    - 22.109112
+    - 24.930298
+    - 8.579456
+    - 10.26921
+    - 12.751539
+    - 16.37923
+    - 22.13466
+    - 25.02124
+    TargetHeight: {x: 8, y: 12}
+  - Kind: 4
+    Biome: 0
+    Prefabs:
+    - {fileID: 7425150810435458270, guid: 56a1f7e252b749868d03db6c65ee5651, type: 3}
+    - {fileID: 2856927027294085550, guid: 441a67bbcdea4895837a6a5f0117aed9, type: 3}
+    - {fileID: 3700871416261095885, guid: c377cbb9fb1d427c8a906539a61c2353, type: 3}
+    NaturalHeights:
+    - 12.746828
+    - 15.571146
+    - 14.176479
+    TargetHeight: {x: 6, y: 8}
+  - Kind: 5
+    Biome: 0
+    Prefabs:
+    - {fileID: 267010896557825742, guid: 022a74b9ac0d444b8647a424ac29e919, type: 3}
+    - {fileID: 4602808573824989961, guid: 030143b274ad4cc5a7dcbf6dd795e76d, type: 3}
+    - {fileID: 1874526385773038500, guid: 9a7052f41d244641a3a8560bc73a9111, type: 3}
+    NaturalHeights:
+    - 4.8299627
+    - 9.415098
+    - 13.820108
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 6
+    Biome: 0
+    Prefabs:
+    - {fileID: 4862012380726095740, guid: 3116fe56d90a4e4bb3c63be2c7ca6068, type: 3}
+    - {fileID: 8485893231006620345, guid: f6b432ab29364fb0a0b0ab7a44d1e899, type: 3}
+    - {fileID: 6745553711898707945, guid: 19216f88adc74159be81e2dbbe0eea71, type: 3}
+    - {fileID: 8889348439685519245, guid: 2f3e9539bda247f49c4d64b142c4bbae, type: 3}
+    - {fileID: 7847929318069722688, guid: 552365f4070b4fc8aac383be43a197ed, type: 3}
+    - {fileID: 3079479647208147444, guid: 0500c9cc85014f5f9807902c10469a4e, type: 3}
+    NaturalHeights:
+    - 3.869266
+    - 7.5930204
+    - 10.129916
+    - 13.470448
+    - 12.587877
+    - 16.981596
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 7
+    Biome: 0
+    Prefabs:
+    - {fileID: 1041727084507182717, guid: 385ac312318c4ae0844e85a452c9d2c5, type: 3}
+    - {fileID: 8245666208044949918, guid: c346cdf4315b4ef2aedd9d892d2627fb, type: 3}
+    - {fileID: 7930606042431163983, guid: f55fb033d99548038a35bef9fce1a78d, type: 3}
+    - {fileID: 2851941582810281593, guid: 8a17a4e1777a40378e5c694736f3844b, type: 3}
+    - {fileID: 2185956102238645748, guid: 01befcd41fd3443e9ada6e4309b9ca28, type: 3}
+    - {fileID: 1198035627917011479, guid: 2d49e6b954b24760ab91cdde7590baa8, type: 3}
+    NaturalHeights:
+    - 0.8155472
+    - 1.8208902
+    - 2.1049674
+    - 2.282358
+    - 2.9298372
+    - 3.4637454
+    TargetHeight: {x: 2.5, y: 4}
+  - Kind: 8
+    Biome: 0
+    Prefabs:
+    - {fileID: 498694977156446032, guid: 0e2ced96798e488582adefee51d9334f, type: 3}
+    - {fileID: 7839082788250308832, guid: 1f87adc5aa9d4772a70bced70bf09953, type: 3}
+    - {fileID: 2702162046013472174, guid: 4d5019445ceb46e5966f29ba270d27dd, type: 3}
+    - {fileID: 4848102130540397860, guid: ababef5d05864bef8b22e474678f72a6, type: 3}
+    - {fileID: 8544172029258899311, guid: 610c153640db448c9f2bf319f202844d, type: 3}
+    NaturalHeights:
+    - 1.8337241
+    - 1.8865756
+    - 2.4375584
+    - 0.91829365
+    - 1.0529363
+    TargetHeight: {x: 1, y: 1.8}
+  - Kind: 9
+    Biome: 0
+    Prefabs:
+    - {fileID: 3718234175757677324, guid: de1a9befa87e4e0c9e05e5be1b6a0d9e, type: 3}
+    - {fileID: 8424166792082356972, guid: 43cdcf9ccb514cba9a8e3bd5dfe047ae, type: 3}
+    - {fileID: 3127073686674552130, guid: 15dbd82f6f1e459f923c973de4955df3, type: 3}
+    - {fileID: 1295952996075420507, guid: 089891217c694a1db7f6954b9ee323c8, type: 3}
+    - {fileID: 1419240356331564562, guid: 7350c1378be84000859a25ed8aa16434, type: 3}
+    - {fileID: 2072110985762705636, guid: 5217c6750cf14fe8a7139bfc7e60e6cf, type: 3}
+    - {fileID: 264146682395569308, guid: 4f17a3c4ce214899adc37bdafa550c7d, type: 3}
+    - {fileID: 8649029023189191725, guid: d1fe66ee8cae461fad4774fdec78d35b, type: 3}
+    NaturalHeights:
+    - 0.23450787
+    - 0.29208967
+    - 0.99062455
+    - 0.375733
+    - 1.0534259
+    - 1.105516
+    - 1.1319767
+    - 1.150168
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 10
+    Biome: 0
+    Prefabs:
+    - {fileID: 1500982763442207621, guid: 9cda081ce36d445296ac4ee06307766b, type: 3}
+    - {fileID: 3556717636172139010, guid: a03f5af326d14fdc8d5e3f0c40a2c287, type: 3}
+    - {fileID: 7559663927838335691, guid: 89c7fac2d9b8456da7b422cabb9bebed, type: 3}
+    - {fileID: 8508520234447486238, guid: 63b2abaa2af44957a4027a620d9e2a7d, type: 3}
+    - {fileID: 5728903360357139749, guid: 1b0189253bfb4ec8baa2d6605fd145d2, type: 3}
+    - {fileID: 3429271475585376614, guid: 3677aa374c3b4f7883c60f603a11b466, type: 3}
+    - {fileID: 296511370029387415, guid: 27e3fdc2e56549e2a3abb6eeebd2fa76, type: 3}
+    - {fileID: 6948050365062324295, guid: 6a9ffef01fe544e68fb3b6b20e15234d, type: 3}
+    - {fileID: 6958796550626104609, guid: 0f5310c74b504f11868794aa9b7a604a, type: 3}
+    - {fileID: 4586472033715033344, guid: 973cea1577714411acc66c44203f4b7d, type: 3}
+    - {fileID: 6212621123848149967, guid: cba9c56f71914973adda2c8acc62b0dc, type: 3}
+    NaturalHeights:
+    - 1.1346831
+    - 1.0990136
+    - 1.115817
+    - 1.1264616
+    - 0.10670991
+    - 0.10670991
+    - 0.10670991
+    - 0.09436737
+    - 0.9508903
+    - 1.0518667
+    - 1.1112463
+    TargetHeight: {x: 0.35, y: 0.7}
+  - Kind: 11
+    Biome: 0
+    Prefabs:
+    - {fileID: 4380104539694431625, guid: 056c9f2da7a146f9b86bc9a96fdf97d6, type: 3}
+    - {fileID: 8307077246628008640, guid: 86e9eb34394a4883a28ddf820c49cf93, type: 3}
+    NaturalHeights:
+    - 0.40061954
+    - 0.7803648
+    TargetHeight: {x: 0.6, y: 1}
+  - Kind: 12
+    Biome: 0
+    Prefabs:
+    - {fileID: 1989307434397701040, guid: 0f13d49c177e49e788fa993de0f028c3, type: 3}
+    NaturalHeights:
+    - 1.1377044
+    TargetHeight: {x: 1, y: 1.6}
+  - Kind: 13
+    Biome: 0
+    Prefabs:
+    - {fileID: 2517970341066176387, guid: e1249d08f3824053883adf36d65a3e00, type: 3}
+    - {fileID: 5723192246528322359, guid: aa5456ba41414320a3c1788c0d0e921b, type: 3}
+    - {fileID: 6980810433894823709, guid: f304ed247358406da2d84a83097dfee7, type: 3}
+    - {fileID: 1428395844353511693, guid: 7a2230d0b9af4fa99f9b7255f89aef31, type: 3}
+    - {fileID: 2172032437937302346, guid: 304dee25c8d245fe9f287d83289f4315, type: 3}
+    - {fileID: 3135474206252743235, guid: 4e1f89d2adc542efa144cf6c006ce7c0, type: 3}
+    NaturalHeights:
+    - 0.7043379
+    - 0.8022406
+    - 1.039046
+    - 0.53697246
+    - 0.74316794
+    - 0.8660726
+    TargetHeight: {x: 0.15, y: 0.35}
+  - Kind: 14
+    Biome: 0
+    Prefabs:
+    - {fileID: 7938261609556105917, guid: 5b4324e23d44454b8daa220322c81407, type: 3}
+    - {fileID: 110377534288156138, guid: 0d945f050b5f4f8f87314d2d8e3bba4d, type: 3}
+    - {fileID: 2229048053857796286, guid: fbfe7b2d8dc742a8989dfe21753240cd, type: 3}
+    - {fileID: 8040845392702113884, guid: a2d7192df0f44a51ba2a1d52179470a6, type: 3}
+    - {fileID: 3735179139402186920, guid: 5a4a52015d8d444d86d4a9599a10df70, type: 3}
+    - {fileID: 3266839777688863865, guid: 5eb0671c1ef4444f9953716c460bc8b7, type: 3}
+    NaturalHeights:
+    - 0.50443566
+    - 0.75100136
+    - 0.7513907
+    - 1.0073484
+    - 1.4983202
+    - 1.498331
+    TargetHeight: {x: 0.5, y: 1.2}
+  - Kind: 15
+    Biome: 0
+    Prefabs:
+    - {fileID: 6593067506656436230, guid: 9151cef60461422eb7a051f0a13043af, type: 3}
+    - {fileID: 7159810156994416468, guid: ba84b849e89a4fdd96c9422b7812ebba, type: 3}
+    - {fileID: 4116679842028985597, guid: 53491d5391b04b20af5d6d7d675b8c2b, type: 3}
+    NaturalHeights:
+    - 0.8335984
+    - 1.0653638
+    - 1.190058
+    TargetHeight: {x: 0.5, y: 0.8}
+  - Kind: 16
+    Biome: 0
+    Prefabs:
+    - {fileID: 7783401414580840206, guid: bcac61dd3d2c498eab240c40858a4e2e, type: 3}
+    - {fileID: 3242371690673300949, guid: 06e94c8bda604847a8f260a2b38ad852, type: 3}
+    - {fileID: 5668468775787569312, guid: d9e1abd156c64d05898601fc661e7e07, type: 3}
+    NaturalHeights:
+    - 0.02115175
+    - 0.019805403
+    - 0.020476
+    TargetHeight: {x: 0, y: 0}
+  - Kind: 2
+    Biome: 1
+    Prefabs:
+    - {fileID: 4315413144059333744, guid: 2bfadbb124874af78c396f4f08c37293, type: 3}
+    - {fileID: 4756925298375183984, guid: 0ff6b7308dc249d3a134a48bd267a000, type: 3}
+    - {fileID: 2705122434220341171, guid: 2944cb6fda054688b38a16327b65b707, type: 3}
+    - {fileID: 6071758908861754449, guid: c04afded2efd4b6299cfbb09d8c6717a, type: 3}
+    - {fileID: 826414694984998496, guid: 3b8dfcd6771344b783f4aad5a7715f50, type: 3}
+    - {fileID: 6986869333357395922, guid: 153189b898dd4d50b6538da1f8e8bba5, type: 3}
+    - {fileID: 4853159057032395138, guid: 0528106aaf2f4e229e084bbc43cd4c8c, type: 3}
+    - {fileID: 5491418448796930955, guid: 080c176c29c04923a03f3d4f08ccd16e, type: 3}
+    - {fileID: 8734265532261517160, guid: 05d9459b3349498cbdba4a8e4f69b532, type: 3}
+    - {fileID: 7132005667035571255, guid: bdfa9ec74d8440ff9698aca0e9964c33, type: 3}
+    - {fileID: 7911767074575249742, guid: b9d9b472f6084c999525828334e6fe09, type: 3}
+    - {fileID: 1828112207804217397, guid: ead1c15a7e83458ba1068f2f6471dbef, type: 3}
+    NaturalHeights:
+    - 10.536614
+    - 14.540123
+    - 14.647157
+    - 19.51276
+    - 20.412933
+    - 22.736767
+    - 8.615376
+    - 13.224077
+    - 13.86291
+    - 14.438234
+    - 16.847216
+    - 17.593893
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 3
+    Biome: 1
+    Prefabs:
+    - {fileID: 3275461973986005706, guid: 0311c0ab0a3b46c09db5dba476474306, type: 3}
+    - {fileID: 5213606894726874390, guid: 420af6d3889345d6bbabac6961bf067e, type: 3}
+    - {fileID: 4604313003708877869, guid: 03c14b19901a470888f78e2cbad44753, type: 3}
+    - {fileID: 8264121531677596090, guid: 8031b0d0b5a94836ab8afc41c2792012, type: 3}
+    - {fileID: 687773190899789772, guid: e65ea4d5fe8f49f787ca02becc4aca5f, type: 3}
+    - {fileID: 9151827264640087525, guid: 20410a3ee2854b278f9eebc5f5395ddb, type: 3}
+    - {fileID: 5316417173899928247, guid: 1c18353cd56043d88ddad1eea5c843f2, type: 3}
+    - {fileID: 2153419841697123951, guid: 6243f6e9517845079900fbbbe6a08a04, type: 3}
+    - {fileID: 5402869373027752477, guid: 31afcbe9536f46c2a3d7f8263bd05141, type: 3}
+    - {fileID: 7910190387193582375, guid: 30ed8e21dd654d42836390858add0bcf, type: 3}
+    - {fileID: 1910924134876281916, guid: cf9d27aaf96145cdbcbf5e048862582d, type: 3}
+    - {fileID: 9056862451146723582, guid: 675663b655904c1f908f3b306fc424df, type: 3}
+    - {fileID: 2979553185772560983, guid: 3f15b9ee9e6740eaa81316c465799987, type: 3}
+    NaturalHeights:
+    - 2.051992
+    - 3.8953257
+    - 5.060416
+    - 7.4690094
+    - 9.218924
+    - 10.643166
+    - 9.211178
+    - 9.2317295
+    - 6.2055182
+    - 7.8719335
+    - 9.6291485
+    - 11.877923
+    - 12.469018
+    TargetHeight: {x: 10, y: 14}
+  - Kind: 9
+    Biome: 1
+    Prefabs:
+    - {fileID: 3987863668785023380, guid: 63e885cd370d465c814f441ccfae59de, type: 3}
+    - {fileID: 328724798720682844, guid: 673df8a977ed4c1b81b4ced247767616, type: 3}
+    - {fileID: 3421414042460034697, guid: cf89ccd0f5ca4dadbdc451357746503a, type: 3}
+    - {fileID: 4468518745355309229, guid: aece0672271445bc93dcd309a2faa280, type: 3}
+    NaturalHeights:
+    - 0.23450787
+    - 0.29208967
+    - 0.99062455
+    - 0.23450787
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 11
+    Biome: 1
+    Prefabs:
+    - {fileID: 7698320972441735119, guid: eeaed7e7a1c243b0812121d210825e00, type: 3}
+    - {fileID: 2233280587362803143, guid: 46cd57a0053f45fb8ca50113d8c04a7e, type: 3}
+    - {fileID: 1257424481780975260, guid: 6f2aa6da704d4747987b673919fb7ce6, type: 3}
+    - {fileID: 3825878511393328990, guid: fd7dd56049f24d4289e14771e68ae256, type: 3}
+    - {fileID: 1406658672727570165, guid: fb47f7435f49447a8d89140b8b945628, type: 3}
+    NaturalHeights:
+    - 0.21335033
+    - 0.15905926
+    - 0.30727917
+    - 0.4211046
+    - 0.5277308
+    TargetHeight: {x: 0.6, y: 1}
+  - Kind: 14
+    Biome: 1
+    Prefabs:
+    - {fileID: 9181322648506198636, guid: dcd42e926c3748c69a5eab6105e85a7e, type: 3}
+    - {fileID: 4076848249337786993, guid: 5ee41753bf0e45fdbda6885263a91206, type: 3}
+    - {fileID: 4117603637272631964, guid: 4e85498acd794504b988d57abe3e3716, type: 3}
+    - {fileID: 5701419397629302217, guid: 241c9a002b454c87850c1f209cd86136, type: 3}
+    - {fileID: 7972499640804931529, guid: 669cfb59d6dd489f80841d3679997704, type: 3}
+    - {fileID: 7972442739692130118, guid: 04e47ced89434d0f99374252ca3d872e, type: 3}
+    NaturalHeights:
+    - 1.9020498
+    - 2.0194955
+    - 2.145989
+    - 3.0438342
+    - 2.4942603
+    - 2.191998
+    TargetHeight: {x: 0.6, y: 1.3}
+  - Kind: 13
+    Biome: 1
+    Prefabs:
+    - {fileID: 7872432596977408049, guid: 87746b619f9a483dbef9630fcf795b9f, type: 3}
+    - {fileID: 5702330836189725159, guid: e8f1178fe61f4086a8a33fc8d4d4cb78, type: 3}
+    - {fileID: 8705264283881034349, guid: 4782699a97664b4da1cbd03315e14c65, type: 3}
+    NaturalHeights:
+    - 0.11179185
+    - 0.10725649
+    - 0.10575861
+    TargetHeight: {x: 0.2, y: 0.4}
+  - Kind: 2
+    Biome: 2
+    Prefabs:
+    - {fileID: 3270251470116878460, guid: 8a7d7fcdbb174de18edc0b968e8dab51, type: 3}
+    - {fileID: 1377970573560045117, guid: a1681f2c6482435aa351534ad2219738, type: 3}
+    - {fileID: 640726290076689912, guid: d6de07b6226a44d49af4fcaa7c722418, type: 3}
+    - {fileID: 4862012380726095740, guid: 3116fe56d90a4e4bb3c63be2c7ca6068, type: 3}
+    - {fileID: 8485893231006620345, guid: f6b432ab29364fb0a0b0ab7a44d1e899, type: 3}
+    - {fileID: 6745553711898707945, guid: 19216f88adc74159be81e2dbbe0eea71, type: 3}
+    - {fileID: 8889348439685519245, guid: 2f3e9539bda247f49c4d64b142c4bbae, type: 3}
+    - {fileID: 7847929318069722688, guid: 552365f4070b4fc8aac383be43a197ed, type: 3}
+    - {fileID: 3079479647208147444, guid: 0500c9cc85014f5f9807902c10469a4e, type: 3}
+    NaturalHeights:
+    - 10.437353
+    - 10.16044
+    - 14.008364
+    - 3.869266
+    - 7.5930204
+    - 10.129916
+    - 13.470448
+    - 12.587877
+    - 16.981596
+    TargetHeight: {x: 6, y: 9}
+  - Kind: 6
+    Biome: 2
+    Prefabs:
+    - {fileID: 4862012380726095740, guid: 3116fe56d90a4e4bb3c63be2c7ca6068, type: 3}
+    - {fileID: 8485893231006620345, guid: f6b432ab29364fb0a0b0ab7a44d1e899, type: 3}
+    - {fileID: 6745553711898707945, guid: 19216f88adc74159be81e2dbbe0eea71, type: 3}
+    - {fileID: 8889348439685519245, guid: 2f3e9539bda247f49c4d64b142c4bbae, type: 3}
+    - {fileID: 7847929318069722688, guid: 552365f4070b4fc8aac383be43a197ed, type: 3}
+    - {fileID: 3079479647208147444, guid: 0500c9cc85014f5f9807902c10469a4e, type: 3}
+    NaturalHeights:
+    - 3.869266
+    - 7.5930204
+    - 10.129916
+    - 13.470448
+    - 12.587877
+    - 16.981596
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 8
+    Biome: 2
+    Prefabs:
+    - {fileID: 3076760232845015929, guid: 6064bc7ce72a4b44aae75f5fcf0c9fc4, type: 3}
+    - {fileID: 459708278923358966, guid: ced8aa8282584fec9788f9e159996331, type: 3}
+    - {fileID: 7699218175217125046, guid: 3262da84c1664da7b1fee590d10fa651, type: 3}
+    - {fileID: 1883203016015718108, guid: 91ab9175b39e4243a065b27a4d33d883, type: 3}
+    - {fileID: 3104581266277880389, guid: 115611a83bf24e1a8c7df487cd1a544d, type: 3}
+    - {fileID: 8459377158986489142, guid: 8faf8407a2f1417aafc7fc355f9674ff, type: 3}
+    NaturalHeights:
+    - 1.7630535
+    - 2.0097241
+    - 2.292614
+    - 1.0949097
+    - 1.4682575
+    - 1.2786722
+    TargetHeight: {x: 1, y: 1.8}
+  - Kind: 9
+    Biome: 2
+    Prefabs:
+    - {fileID: 3987863668785023380, guid: 02ef8db388f544d6ac807b67758063ee, type: 3}
+    - {fileID: 328724798720682844, guid: 5b7f82bb880d4b07a816096326b25e8e, type: 3}
+    - {fileID: 3421414042460034697, guid: 8959c2ce095d4eb387e0d89f3c0f9d0e, type: 3}
+    NaturalHeights:
+    - 0.23450787
+    - 0.2920897
+    - 0.99062467
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 11
+    Biome: 2
+    Prefabs:
+    - {fileID: 936885022748966400, guid: 37c6058d649849399ecd8453f0d0e9d5, type: 3}
+    - {fileID: 3279766148649637828, guid: d91d1eb25948408988cbd8c28d2987c8, type: 3}
+    - {fileID: 4062056727193576093, guid: 83eb4858addf4de5ad6fea60dc7ab7e4, type: 3}
+    NaturalHeights:
+    - 0.9374222
+    - 1.0625848
+    - 1.2170588
+    TargetHeight: {x: 0.6, y: 1}
+  - Kind: 10
+    Biome: 2
+    Prefabs:
+    - {fileID: 8042627718124708016, guid: cdca6fd12706442c9a7b4e638a1903b4, type: 3}
+    - {fileID: 2615791047370129885, guid: 7a10e51428724b1f98b5db52abb5832e, type: 3}
+    - {fileID: 7284881440519063059, guid: d71b77823ac047bdbab4d400cfc820cc, type: 3}
+    - {fileID: 2826551106898291036, guid: dfc84d97278442ee9317fdd40231c11d, type: 3}
+    NaturalHeights:
+    - 0.19515018
+    - 0.89024794
+    - 0.8146422
+    - 0.9406216
+    TargetHeight: {x: 0.35, y: 0.6}
+  - Kind: 14
+    Biome: 2
+    Prefabs:
+    - {fileID: 1144235722654694036, guid: 6117edfabfc34861a5f11525a3dd6716, type: 3}
+    - {fileID: 2498912299649407062, guid: c4e94b00b5fc406b9a10eda663aa7809, type: 3}
+    - {fileID: 7707716675295759865, guid: b34fed6350bd42809df177886ae6e979, type: 3}
+    - {fileID: 9202115494782022884, guid: 4ab044ede82546f0b0578ad72081d51f, type: 3}
+    - {fileID: 4525297410845087473, guid: e9827a9f87a84566b7f07c41e1cad964, type: 3}
+    - {fileID: 5460746607856995012, guid: ab25310c65224d8fa7df7e0a58529e25, type: 3}
+    - {fileID: 8888003951610112524, guid: d85b0b99ba2541fc8d1d67b661fcae64, type: 3}
+    - {fileID: 1280775136720273797, guid: c248f2c54a744cdb8ced79a33acddf12, type: 3}
+    NaturalHeights:
+    - 0.50833535
+    - 0.6646699
+    - 0.6329354
+    - 0.555207
+    - 0.5282637
+    - 0.6058488
+    - 0.5895872
+    - 0.5610351
+    TargetHeight: {x: 0.6, y: 1.3}
+  - Kind: 2
+    Biome: 3
+    Prefabs:
+    - {fileID: 634035011338650778, guid: 1344a623d23b40138bbdf1574d86f54a, type: 3}
+    - {fileID: 4236164158493513366, guid: 557c1eb05e3941ddab72e1f0b0f91203, type: 3}
+    - {fileID: 3188247439551017426, guid: 002cfe9e68b9452b93599e6057b05735, type: 3}
+    - {fileID: 7982942204040807140, guid: c67d7c8d3c664df1a9e496806f5f2030, type: 3}
+    - {fileID: 8726927526023666070, guid: 311295fd55e649449fd743093435e5cc, type: 3}
+    - {fileID: 5007847129825518234, guid: a597f0f212014749bb5732b355b3b885, type: 3}
+    - {fileID: 4061478843022069875, guid: 034a71ea7e2740618e452d9de45cd280, type: 3}
+    - {fileID: 1670492871776961195, guid: f801ea5ffbaf49cc8b791b045c408f24, type: 3}
+    NaturalHeights:
+    - 56.157425
+    - 56.360046
+    - 70.15208
+    - 64.35628
+    - 65.534775
+    - 56.68758
+    - 58.199173
+    - 61.419754
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 3
+    Biome: 3
+    Prefabs:
+    - {fileID: 634035011338650778, guid: 1344a623d23b40138bbdf1574d86f54a, type: 3}
+    - {fileID: 4236164158493513366, guid: 557c1eb05e3941ddab72e1f0b0f91203, type: 3}
+    - {fileID: 3188247439551017426, guid: 002cfe9e68b9452b93599e6057b05735, type: 3}
+    - {fileID: 7982942204040807140, guid: c67d7c8d3c664df1a9e496806f5f2030, type: 3}
+    - {fileID: 8726927526023666070, guid: 311295fd55e649449fd743093435e5cc, type: 3}
+    - {fileID: 5007847129825518234, guid: a597f0f212014749bb5732b355b3b885, type: 3}
+    - {fileID: 4061478843022069875, guid: 034a71ea7e2740618e452d9de45cd280, type: 3}
+    - {fileID: 1670492871776961195, guid: f801ea5ffbaf49cc8b791b045c408f24, type: 3}
+    NaturalHeights:
+    - 56.157425
+    - 56.360046
+    - 70.15208
+    - 64.35628
+    - 65.534775
+    - 56.68758
+    - 58.199173
+    - 61.419754
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 4
+    Biome: 3
+    Prefabs:
+    - {fileID: 634035011338650778, guid: 1344a623d23b40138bbdf1574d86f54a, type: 3}
+    - {fileID: 4236164158493513366, guid: 557c1eb05e3941ddab72e1f0b0f91203, type: 3}
+    - {fileID: 3188247439551017426, guid: 002cfe9e68b9452b93599e6057b05735, type: 3}
+    - {fileID: 7982942204040807140, guid: c67d7c8d3c664df1a9e496806f5f2030, type: 3}
+    - {fileID: 8726927526023666070, guid: 311295fd55e649449fd743093435e5cc, type: 3}
+    - {fileID: 5007847129825518234, guid: a597f0f212014749bb5732b355b3b885, type: 3}
+    - {fileID: 4061478843022069875, guid: 034a71ea7e2740618e452d9de45cd280, type: 3}
+    - {fileID: 1670492871776961195, guid: f801ea5ffbaf49cc8b791b045c408f24, type: 3}
+    NaturalHeights:
+    - 56.157425
+    - 56.360046
+    - 70.15208
+    - 64.35628
+    - 65.534775
+    - 56.68758
+    - 58.199173
+    - 61.419754
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 5
+    Biome: 3
+    Prefabs:
+    - {fileID: 5007847129825518234, guid: a597f0f212014749bb5732b355b3b885, type: 3}
+    - {fileID: 4061478843022069875, guid: 034a71ea7e2740618e452d9de45cd280, type: 3}
+    - {fileID: 1670492871776961195, guid: f801ea5ffbaf49cc8b791b045c408f24, type: 3}
+    NaturalHeights:
+    - 56.68758
+    - 58.199173
+    - 61.419754
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 9
+    Biome: 3
+    Prefabs:
+    - {fileID: 3718234175757677324, guid: db24325b9be64b89a57a4c4f0048ce9a, type: 3}
+    - {fileID: 8424166792082356972, guid: f866bbadf26b45aaa4fdc06ff875e2ca, type: 3}
+    - {fileID: 3127073686674552130, guid: 696bcbd23e31421c9ddbccfc676b76ef, type: 3}
+    NaturalHeights:
+    - 0.23450787
+    - 0.29208967
+    - 0.99062455
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 12
+    Biome: 3
+    Prefabs:
+    - {fileID: 3672005273306243710, guid: d594870096be48649d2f599cc3aed7c9, type: 3}
+    - {fileID: 9050092567347940966, guid: f7aa18daad7b44a3a0a0cb5465e2b2e5, type: 3}
+    - {fileID: 1979989941912582039, guid: f395b07789a645fa84e9e5e8b7fe7898, type: 3}
+    - {fileID: 4962553775894950702, guid: a6b7988e4bf74969b1c5d7e1ca015fe9, type: 3}
+    - {fileID: 6028949817085496270, guid: c86e55e5c8174c468a4445811c5f6777, type: 3}
+    NaturalHeights:
+    - 0.947987
+    - 0.9425196
+    - 1.239233
+    - 1.213265
+    - 1.3558224
+    TargetHeight: {x: 1, y: 1.6}
+  - Kind: 10
+    Biome: 3
+    Prefabs:
+    - {fileID: 8189299941839978963, guid: 10c2a5de287e49f1ba1a0f81f123a352, type: 3}
+    - {fileID: 2063158300798254768, guid: 85ab90ab64ef4fc0be8552fe5b309e25, type: 3}
+    - {fileID: 1589088563509035540, guid: 6c05d646e3a6415eaa21872474b548ea, type: 3}
+    - {fileID: 1427662353774671766, guid: eb3c88c707484cda96d0d2f44ab621cc, type: 3}
+    - {fileID: 7833724281861886272, guid: 249f40ab195f4e6a92b17a817918b593, type: 3}
+    NaturalHeights:
+    - 0.06958564
+    - 0.15257098
+    - 0.14610514
+    - 0.28615683
+    - 0.27504146
+    TargetHeight: {x: 0.4, y: 0.7}
+  - Kind: 14
+    Biome: 3
+    Prefabs:
+    - {fileID: 8977612526517430383, guid: be7c94982cb54ce4b703f5fd40b44203, type: 3}
+    - {fileID: 7223625432898211725, guid: 3fb14a94a67e45db8e191159c3a73656, type: 3}
+    - {fileID: 8797037783667044369, guid: c611f90ba6214906bbea338700d2c846, type: 3}
+    - {fileID: 4641862984402274907, guid: bb0bb5837d8a46469e98887410d07b00, type: 3}
+    - {fileID: 5196973590783099383, guid: 8f4cbdb6576b441db93c076c7dea07c4, type: 3}
+    - {fileID: 1535324143885438238, guid: 6f6e8682ed6f4d9083a8848cf4e5d174, type: 3}
+    - {fileID: 6326210769481074701, guid: 7936ee33d2e44f0dac1e508ebd0922c3, type: 3}
+    - {fileID: 6596909588227246478, guid: 1177f14163624bd4b427adb675d37f4b, type: 3}
+    - {fileID: 615755323156945235, guid: b27b6473fb6a49d8ad2f91a326f44938, type: 3}
+    - {fileID: 6997386008148423092, guid: d3a06ea44ed04df8a3373221e90e416e, type: 3}
+    - {fileID: 8779438292500257605, guid: 2e09c1c314c8444eb228db853ecabe19, type: 3}
+    - {fileID: 8473083789776191721, guid: 4775b52d352c460ea76a552db5fdd70f, type: 3}
+    - {fileID: 396806190702603047, guid: ac7d4c16020c453a9124fc35564c142f, type: 3}
+    - {fileID: 4360811544817740536, guid: dfcb6c6a4c5e44cb82385ed6df8f279b, type: 3}
+    - {fileID: 4251049221889338808, guid: 038a2dcbe0f347d0a3c3ed710fc4eaa9, type: 3}
+    NaturalHeights:
+    - 1.1225742
+    - 0.5011389
+    - 0.5895544
+    - 0.53887343
+    - 0.96477294
+    - 0.5110516
+    - 0.5650996
+    - 0.65100324
+    - 0.6972331
+    - 0.68717647
+    - 0.7944958
+    - 0.6908196
+    - 0.61149526
+    - 0.8962301
+    - 0.67979896
+    TargetHeight: {x: 0.6, y: 1.3}
+  - Kind: 13
+    Biome: 3
+    Prefabs:
+    - {fileID: 2517970341066176387, guid: cff259d9e648447fa4268bfe8008d151, type: 3}
+    - {fileID: 5723192246528322359, guid: 6b911eaa8c59481297b7f701be19bb17, type: 3}
+    - {fileID: 6980810433894823709, guid: 5d140f1fe63542e4b09b5a7e1b04ee1f, type: 3}
+    NaturalHeights:
+    - 0.7043379
+    - 0.8022406
+    - 1.039046
+    TargetHeight: {x: 0.2, y: 0.4}
+  - Kind: 16
+    Biome: 3
+    Prefabs:
+    - {fileID: 2623264045943682945, guid: a25a9686412f47afb08e15f7b3804e6c, type: 3}
+    - {fileID: 2523585418604101178, guid: cc5c02cedf7d48888a40362e69715bf8, type: 3}
+    - {fileID: 3716360258986476164, guid: 111b1a5f282f485a844a804ebcb4bcc5, type: 3}
+    - {fileID: 5758835440196121471, guid: 3c1db1c1487e4b1ba075b19fff3bc1ac, type: 3}
+    - {fileID: 5924940827187793385, guid: 7313d6d59ad34164aceff511283fb1a0, type: 3}
+    NaturalHeights:
+    - 0.34311604
+    - 0.20889546
+    - 0.29448712
+    - 0.16840754
+    - 0.27653688
+    TargetHeight: {x: 0, y: 0}
+  - Kind: 2
+    Biome: 4
+    Prefabs:
+    - {fileID: 8913931649159518070, guid: ef7447d05e5140b28dafcfce105eed24, type: 3}
+    - {fileID: 8676090123148648708, guid: 4a58bc8e18ec434cb6127a272e40e1eb, type: 3}
+    - {fileID: 6555778683053550445, guid: bb610a5f6b7c49df9e43e3118d33b2ae, type: 3}
+    - {fileID: 2061162532624048740, guid: 6e07b40029b04a07b3827d4d4914fd0a, type: 3}
+    - {fileID: 6356886380419647039, guid: 1753d2216aa942d1846f6cee6347373d, type: 3}
+    - {fileID: 545034994985791247, guid: b254bb0cafe743dface3b2d3f189ccaa, type: 3}
+    NaturalHeights:
+    - 5.8806214
+    - 6.8335395
+    - 6.442806
+    - 7.3959866
+    - 7.6530027
+    - 7.3909955
+    TargetHeight: {x: 8, y: 11}
+  - Kind: 3
+    Biome: 4
+    Prefabs:
+    - {fileID: 8913931649159518070, guid: ef7447d05e5140b28dafcfce105eed24, type: 3}
+    - {fileID: 8676090123148648708, guid: 4a58bc8e18ec434cb6127a272e40e1eb, type: 3}
+    - {fileID: 6555778683053550445, guid: bb610a5f6b7c49df9e43e3118d33b2ae, type: 3}
+    - {fileID: 2061162532624048740, guid: 6e07b40029b04a07b3827d4d4914fd0a, type: 3}
+    - {fileID: 6356886380419647039, guid: 1753d2216aa942d1846f6cee6347373d, type: 3}
+    - {fileID: 545034994985791247, guid: b254bb0cafe743dface3b2d3f189ccaa, type: 3}
+    NaturalHeights:
+    - 5.8806214
+    - 6.8335395
+    - 6.442806
+    - 7.3959866
+    - 7.6530027
+    - 7.3909955
+    TargetHeight: {x: 8, y: 11}
+  - Kind: 5
+    Biome: 4
+    Prefabs:
+    - {fileID: 8913931649159518070, guid: ef7447d05e5140b28dafcfce105eed24, type: 3}
+    - {fileID: 8676090123148648708, guid: 4a58bc8e18ec434cb6127a272e40e1eb, type: 3}
+    - {fileID: 6555778683053550445, guid: bb610a5f6b7c49df9e43e3118d33b2ae, type: 3}
+    - {fileID: 2061162532624048740, guid: 6e07b40029b04a07b3827d4d4914fd0a, type: 3}
+    - {fileID: 6356886380419647039, guid: 1753d2216aa942d1846f6cee6347373d, type: 3}
+    - {fileID: 545034994985791247, guid: b254bb0cafe743dface3b2d3f189ccaa, type: 3}
+    NaturalHeights:
+    - 5.8806214
+    - 6.8335395
+    - 6.442806
+    - 7.3959866
+    - 7.6530027
+    - 7.3909955
+    TargetHeight: {x: 8, y: 11}
+  - Kind: 4
+    Biome: 4
+    Prefabs:
+    - {fileID: 8913931649159518070, guid: ef7447d05e5140b28dafcfce105eed24, type: 3}
+    - {fileID: 8676090123148648708, guid: 4a58bc8e18ec434cb6127a272e40e1eb, type: 3}
+    - {fileID: 6555778683053550445, guid: bb610a5f6b7c49df9e43e3118d33b2ae, type: 3}
+    - {fileID: 2061162532624048740, guid: 6e07b40029b04a07b3827d4d4914fd0a, type: 3}
+    - {fileID: 6356886380419647039, guid: 1753d2216aa942d1846f6cee6347373d, type: 3}
+    - {fileID: 545034994985791247, guid: b254bb0cafe743dface3b2d3f189ccaa, type: 3}
+    NaturalHeights:
+    - 5.8806214
+    - 6.8335395
+    - 6.442806
+    - 7.3959866
+    - 7.6530027
+    - 7.3909955
+    TargetHeight: {x: 8, y: 11}
+  - Kind: 14
+    Biome: 4
+    Prefabs:
+    - {fileID: 2248725117019112876, guid: 1bee152429034d88b93267da0b7780c9, type: 3}
+    - {fileID: 4981765559377172757, guid: 9684940c8ab647b38114cd37ba73d549, type: 3}
+    - {fileID: 6255488498559735999, guid: d93b8ea6e0164986a97b1b0936657a82, type: 3}
+    - {fileID: 2107118713333512654, guid: 1abb317edc1e489a8dabdc5d4f615ee9, type: 3}
+    - {fileID: 3228976027224757757, guid: be94d27f38bd4dfa9b6cc7db5bf32932, type: 3}
+    - {fileID: 8163240619920480780, guid: ddcff4a31add41eda6740c7c93262444, type: 3}
+    - {fileID: 5269615279196438970, guid: a24f192067f241a293329a98a2116716, type: 3}
+    - {fileID: 6104775465154258797, guid: 7dd2fb03c3824679a2df49f9ce32ce54, type: 3}
+    - {fileID: 3042109139880259414, guid: e41fbd7528454da79b6fe98798af5947, type: 3}
+    - {fileID: 6021459979417754240, guid: 161a7af7993d4aa49d8601a2cc861732, type: 3}
+    NaturalHeights:
+    - 3.3984203
+    - 2.8994694
+    - 2.574566
+    - 2.2913299
+    - 4.404808
+    - 4.2201853
+    - 4.404808
+    - 4.089815
+    - 2.3098736
+    - 3.979958
+    TargetHeight: {x: 0.6, y: 1.3}
+  - Kind: 2
+    Biome: 5
+    Prefabs:
+    - {fileID: 1521360691989524785, guid: a4844c97b70b455bbf8038ea68900814, type: 3}
+    - {fileID: 5298806789254622635, guid: deec789f3b40472b8e11bec0dd8977e5, type: 3}
+    - {fileID: 6477553851667867745, guid: 07e31e208aca49eca9ddb3b1bac2f296, type: 3}
+    - {fileID: 6210230931992336545, guid: cd6965b2f289444d89c5d1666128bf06, type: 3}
+    - {fileID: 3437138144566821236, guid: 975500f72d5c4e02a13219a9290faa9c, type: 3}
+    - {fileID: 6122187036939489240, guid: 9e249516434344d08b18d7d53901cd17, type: 3}
+    - {fileID: 1099292847521465744, guid: f92a955d87bd456b800de985a9e4f114, type: 3}
+    - {fileID: 7201372457418681001, guid: 8da9d01ad2f54aea9598050e7e47f40d, type: 3}
+    - {fileID: 1006474954910806971, guid: 5b2d5a7095424fb99c9a7dc1cb21b4eb, type: 3}
+    - {fileID: 1410163575232536493, guid: 3bb6235972644c6d9b1e0ce7c3111af3, type: 3}
+    - {fileID: 4119003952690273609, guid: 875efee7e4274b2aaab90aedf98ca42c, type: 3}
+    - {fileID: 2476114204284301156, guid: 987f5258ac9342b3992bbcf9d80ba8df, type: 3}
+    - {fileID: 5565085929033719162, guid: 68aabaa5b7e54613bf0f28ba1b1aa1b7, type: 3}
+    - {fileID: 6858216924899396632, guid: 87193bbe2cf8495dbe080b8e1db78adf, type: 3}
+    - {fileID: 1438170548352257834, guid: 15e7d4574caf40218f856a8d0889d2e3, type: 3}
+    - {fileID: 6747794297380572633, guid: c8f79e452d60431aa2e8aa51177c1ab9, type: 3}
+    - {fileID: 1731417014730875212, guid: 0b0ae2b8d58148eea13bb810990c25a7, type: 3}
+    NaturalHeights:
+    - 8.903318
+    - 8.6678095
+    - 10.20089
+    - 13.340142
+    - 15.743328
+    - 6.7566047
+    - 10.789408
+    - 10.615374
+    - 10.863369
+    - 5.456875
+    - 6.2115755
+    - 6.329517
+    - 6.012206
+    - 5.2727766
+    - 8.659348
+    - 9.388628
+    - 11.347252
+    TargetHeight: {x: 5, y: 7}
+  - Kind: 6
+    Biome: 5
+    Prefabs:
+    - {fileID: 2611588523068720836, guid: af4014f61793480686387b57c55448e4, type: 3}
+    - {fileID: 5037314164210229809, guid: d6568448a2dc47ad9bdb965b39e66e57, type: 3}
+    - {fileID: 3501486107098535314, guid: 4537fb83857d4db2ae2e745c5b3af271, type: 3}
+    - {fileID: 5057606805777445523, guid: 52a40e8a148f450f80739f7ddbe6ccaa, type: 3}
+    - {fileID: 2948848287210276743, guid: f4cbf3bd1e874f9ab2ecbb851bfcb64b, type: 3}
+    - {fileID: 4551954770441188246, guid: 7338bac4ee9c42ffbf94b775223d5459, type: 3}
+    NaturalHeights:
+    - 20.344202
+    - 6.502964
+    - 7.5175447
+    - 10.264633
+    - 12.09233
+    - 14.311721
+    TargetHeight: {x: 7, y: 10}
+  - Kind: 7
+    Biome: 5
+    Prefabs:
+    - {fileID: 1041727084507182717, guid: 385ac312318c4ae0844e85a452c9d2c5, type: 3}
+    - {fileID: 8245666208044949918, guid: c346cdf4315b4ef2aedd9d892d2627fb, type: 3}
+    - {fileID: 7930606042431163983, guid: f55fb033d99548038a35bef9fce1a78d, type: 3}
+    - {fileID: 2851941582810281593, guid: 8a17a4e1777a40378e5c694736f3844b, type: 3}
+    - {fileID: 2185956102238645748, guid: 01befcd41fd3443e9ada6e4309b9ca28, type: 3}
+    - {fileID: 1198035627917011479, guid: 2d49e6b954b24760ab91cdde7590baa8, type: 3}
+    - {fileID: 6426670965781734816, guid: 3b59c730c2ca4549a1bfa058fa237ed6, type: 3}
+    - {fileID: 4953862156002997884, guid: ebfc1d539fdc4d0eb3ff12d6f3e6265c, type: 3}
+    - {fileID: 249087115942326994, guid: 977ac4397c644b39b8248dddb47703f1, type: 3}
+    - {fileID: 2975182120241789766, guid: 2cbbd7b3ba874b7bb7fa74f80fe655b6, type: 3}
+    - {fileID: 3344515996576927497, guid: f68cd27bbfb040419fdcc69a3a812987, type: 3}
+    - {fileID: 5613210753997131801, guid: f094d64b83864b709b20fd5e401b7829, type: 3}
+    - {fileID: 8507097037375768524, guid: 775d1221569646af8746890679bc2d24, type: 3}
+    - {fileID: 8986247210725995606, guid: f23a9bdfb34d4e2a9a51ec90d6a63837, type: 3}
+    - {fileID: 8501557180507877339, guid: 748b787b9e5f454290d0f0efbbb8b7da, type: 3}
+    NaturalHeights:
+    - 0.8155472
+    - 1.8208902
+    - 2.1049674
+    - 2.282358
+    - 2.9298372
+    - 3.4637454
+    - 0.9153282
+    - 1.8205359
+    - 1.960089
+    - 2.9324443
+    - 3.0148702
+    - 3.476295
+    - 4.0229454
+    - 5.2283936
+    - 5.637949
+    TargetHeight: {x: 2.5, y: 4.5}
+  - Kind: 8
+    Biome: 5
+    Prefabs:
+    - {fileID: 4591561230733852987, guid: c4d050b4fea24d02be5e11a2b76d5ff5, type: 3}
+    - {fileID: 8167293583913833723, guid: 1bbb925551b84d44a98003b480b21a67, type: 3}
+    - {fileID: 2127037918573926402, guid: 978192e0dc5f4affa6e1d4b1fb07599d, type: 3}
+    - {fileID: 1482650211358868162, guid: a1d5d0c3c41341a1b15a3f0997700543, type: 3}
+    - {fileID: 2408263359396238296, guid: 5d3ce0b4f09a44b0a2fcb8af1b650be3, type: 3}
+    NaturalHeights:
+    - 0.79073066
+    - 0.7961449
+    - 0.8631126
+    - 0.61947113
+    - 0.66384727
+    TargetHeight: {x: 0.8, y: 1.4}
+  - Kind: 9
+    Biome: 5
+    Prefabs:
+    - {fileID: 5775918241152328441, guid: edf917a2eb724d37a5502df5d0e38278, type: 3}
+    - {fileID: 6453307808122143028, guid: 04e8d6453c5e4d17bce4ac98ffc682bb, type: 3}
+    - {fileID: 214540079457542449, guid: 4fe4f62aebc541d292796b3eb06d967d, type: 3}
+    - {fileID: 3179037247212420137, guid: 06b734106a69464e9abeb0db41eca6ef, type: 3}
+    NaturalHeights:
+    - 0.10249041
+    - 0.12390922
+    - 0.24957444
+    - 0.33493862
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 10
+    Biome: 5
+    Prefabs:
+    - {fileID: 1269462721189869992, guid: dedd5a53acbc486a8edcbc6f34a8d28f, type: 3}
+    - {fileID: 4989413303795259201, guid: d98d297ee64c4343bc29631637252ad1, type: 3}
+    - {fileID: 7233515778106127616, guid: 20816c3f6f23452694dc8dbd0daff981, type: 3}
+    - {fileID: 931989779528469154, guid: 4fe2de63e9d84828b641931dca3e61bb, type: 3}
+    NaturalHeights:
+    - 0.292671
+    - 0.4016544
+    - 0.2937974
+    - 0.30239677
+    TargetHeight: {x: 0.35, y: 0.6}
+  - Kind: 14
+    Biome: 5
+    Prefabs:
+    - {fileID: 63428583966020719, guid: fece23e62c374762a569d8d57718f01d, type: 3}
+    - {fileID: 5764559002049698272, guid: c4e93afd98e0480aa0ca8614c46ab5a8, type: 3}
+    - {fileID: 7035941276366739658, guid: 7e8561b9ec1f48139c3e65193eac2dfa, type: 3}
+    - {fileID: 4048077462002848049, guid: 337d53c8f28c4c2880e4c7bfac2b808d, type: 3}
+    - {fileID: 7203064130170561961, guid: 712099d1a5ab4aa6ba22bdd7489a4c7b, type: 3}
+    - {fileID: 100508793130157433, guid: b676cdcfe4ed43c68335fc8dab84d74d, type: 3}
+    NaturalHeights:
+    - 1.0424321
+    - 1.0059437
+    - 1.0744432
+    - 1.5633086
+    - 0.7803868
+    - 1.6544031
+    TargetHeight: {x: 0.6, y: 1.3}
+  - Kind: 2
+    Biome: 6
+    Prefabs:
+    - {fileID: 6450392750413998939, guid: 71a13115ba1445aabb87625c4feaba61, type: 3}
+    - {fileID: 5417132463569787846, guid: 7b21ec09bc4b452b8633e6917c4112ea, type: 3}
+    - {fileID: 5143076074833769291, guid: 75e484ef07a94b5ca3f50a2e3fd11d04, type: 3}
+    - {fileID: 5226503077295968227, guid: a30160275729469bbf318559a022aa19, type: 3}
+    - {fileID: 1701612629451405494, guid: 00e795d9e2424a3eaa4fd67c3ed5befe, type: 3}
+    - {fileID: 8376686560169678993, guid: e7c5ac575c884e79816f4f6f8d37e404, type: 3}
+    - {fileID: 6978464539711513841, guid: f0918de67dd64cfe9c14a1019aa25415, type: 3}
+    - {fileID: 5471172434619682828, guid: 25de6138e2d44b90ad59467f42057041, type: 3}
+    - {fileID: 2658077318642131114, guid: 95d38b0ac92d47e0a53d166a9d19941f, type: 3}
+    - {fileID: 7389756694171113931, guid: fb696cc4775540dab1ed0cd41ba71add, type: 3}
+    - {fileID: 1323020111034108088, guid: b5a4b1734ca04b868c2eb68f640c28e5, type: 3}
+    - {fileID: 3912059405692488580, guid: dfb8c44db5ba46efbb59fe66f5cc1828, type: 3}
+    NaturalHeights:
+    - 5.811666
+    - 7.860692
+    - 8.919361
+    - 9.654148
+    - 12.25841
+    - 15.2671
+    - 8.579456
+    - 10.26921
+    - 12.751539
+    - 16.37923
+    - 22.13466
+    - 25.02124
+    TargetHeight: {x: 8, y: 12}
+  - Kind: 3
+    Biome: 6
+    Prefabs:
+    - {fileID: 4827700149028538118, guid: 02d545911bac4e76b93ea6620f011336, type: 3}
+    - {fileID: 7230932345140146853, guid: 95be43cc7cd048c5a4fe45d26d0b4ae9, type: 3}
+    - {fileID: 6162276905758177793, guid: a3660427351b40819347e3ee8d0d01c9, type: 3}
+    - {fileID: 1879292450213355106, guid: 0be7b22ed75c47d9ac0fbfe494921a35, type: 3}
+    - {fileID: 4501768990532002667, guid: fcec60d44d8146b6a70249b18b8f13c6, type: 3}
+    - {fileID: 1992998091634362620, guid: ff6fb5b9f0f04ce0a985c1fb33cd8b20, type: 3}
+    - {fileID: 6978464539711513841, guid: f0918de67dd64cfe9c14a1019aa25415, type: 3}
+    - {fileID: 5471172434619682828, guid: 25de6138e2d44b90ad59467f42057041, type: 3}
+    - {fileID: 2658077318642131114, guid: 95d38b0ac92d47e0a53d166a9d19941f, type: 3}
+    - {fileID: 7389756694171113931, guid: fb696cc4775540dab1ed0cd41ba71add, type: 3}
+    - {fileID: 1323020111034108088, guid: b5a4b1734ca04b868c2eb68f640c28e5, type: 3}
+    - {fileID: 3912059405692488580, guid: dfb8c44db5ba46efbb59fe66f5cc1828, type: 3}
+    NaturalHeights:
+    - 8.570507
+    - 10.25205
+    - 12.726804
+    - 16.326591
+    - 22.109112
+    - 24.930298
+    - 8.579456
+    - 10.26921
+    - 12.751539
+    - 16.37923
+    - 22.13466
+    - 25.02124
+    TargetHeight: {x: 8, y: 12}
+  - Kind: 9
+    Biome: 6
+    Prefabs:
+    - {fileID: 7409890421483900076, guid: 057b9b31262e430f905bd30fb63c8e5f, type: 3}
+    - {fileID: 1295925683420122705, guid: 860b31386b004a64af0c59b00421d18a, type: 3}
+    - {fileID: 1158614921478590338, guid: c8ec3943b9904612ab810ca2320a1b63, type: 3}
+    - {fileID: 8701053273674781729, guid: a8a70be1f76844e9a063cf0523e99c25, type: 3}
+    NaturalHeights:
+    - 1.0534259
+    - 1.105516
+    - 1.1319767
+    - 1.150168
+    TargetHeight: {x: 0.4, y: 0.8}
+  - Kind: 8
+    Biome: 6
+    Prefabs:
+    - {fileID: 73634927564523667, guid: b103e8d3d95f4d52b0ae57658b63ee81, type: 3}
+    - {fileID: 8554060294180306902, guid: 9fd71f1866684ddabef11eb07d26b83f, type: 3}
+    - {fileID: 1149991116134378028, guid: 364dda01b5294d9394d2ad0f863b8123, type: 3}
+    NaturalHeights:
+    - 1.8337241
+    - 1.8865756
+    - 2.4375584
+    TargetHeight: {x: 1, y: 1.6}
+  - Kind: 10
+    Biome: 6
+    Prefabs:
+    - {fileID: 4032257860533156173, guid: 7a40c24b3c5b48ab8ee9e7d67b747597, type: 3}
+    - {fileID: 4032257860533156173, guid: 6be23e49aaa24b6790342a417ccdc1c3, type: 3}
+    - {fileID: 5504624565914311014, guid: 61b8d774a6c74cc381927a342e37b411, type: 3}
+    - {fileID: 2705907742334622778, guid: e47697fc7a3f4eca87a63f61ece02897, type: 3}
+    NaturalHeights:
+    - 0.09436737
+    - 0.09436737
+    - 0.9508903
+    - 1.0518667
+    TargetHeight: {x: 0.35, y: 0.6}
+  - Kind: 14
+    Biome: 6
+    Prefabs:
+    - {fileID: 8185627852894114049, guid: 997fd72ef86f4d53968ef129f0f3bd05, type: 3}
+    - {fileID: 5332959178646883714, guid: 93ed2c3075cd45d39e026e63048367f3, type: 3}
+    - {fileID: 7494982525246854214, guid: 502f8b4852774d109a9d748184d8c9b8, type: 3}
+    - {fileID: 374707031850777905, guid: 39b9ecead9f4489e8adcb07befbbc15e, type: 3}
+    - {fileID: 2179095939328072501, guid: 8baeb46b19f84b77a2e86dca4ac00b4d, type: 3}
+    - {fileID: 1434470090896617861, guid: 1eeca230bc7c4e7a9013b99048dc11a9, type: 3}
+    - {fileID: 6254882526097467731, guid: 4ad74d1ffebf4fb5aa4e2205d4a3c3d1, type: 3}
+    - {fileID: 3529426376842364587, guid: 0a4f35e3030c41c2b05b1849fef1c16b, type: 3}
+    - {fileID: 5090564502311261737, guid: 5d2925befe2744a38ccf05441c766f0e, type: 3}
+    - {fileID: 5485158113359329256, guid: 22b7b8b97646455dac65e216b0f51b8a, type: 3}
+    - {fileID: 6743684983853420040, guid: fd99a1ccd6f24462a46af1637a7dc306, type: 3}
+    - {fileID: 3205144649898884633, guid: 268bfe55f1924a86801a3aea4ef68e71, type: 3}
+    NaturalHeights:
+    - 0.24982755
+    - 0.46920973
+    - 0.42707366
+    - 0.50443566
+    - 0.50443566
+    - 0.75100136
+    - 0.75100136
+    - 0.7513908
+    - 0.7513908
+    - 1.0073484
+    - 1.0073484
+    - 1.4983201
+    TargetHeight: {x: 0.8, y: 1.6}
+  - Kind: 2
+    Biome: 7
+    Prefabs:
+    - {fileID: 1140111234031448129, guid: 416a5560162b4738a065e00ea3e4ceaa, type: 3}
+    - {fileID: 4292487785864986615, guid: d1e837e467ce47658abd18c8716405a9, type: 3}
+    - {fileID: 6454906044990653323, guid: 6e71110b0d764490bc1c39b32f7727d9, type: 3}
+    - {fileID: 5434479994030462199, guid: 05fb2b7198994228aa6f72fd4819ba4f, type: 3}
+    - {fileID: 3236645974599631667, guid: 2515a1b7e4c24fc6a12a91a06cea4ebe, type: 3}
+    - {fileID: 2612833771797366692, guid: a992a002dbb44c73905699b7d24de0cd, type: 3}
+    - {fileID: 1314480496568217847, guid: 94aca2099f104bd48cbddeb4c0c0be05, type: 3}
+    - {fileID: 2238779666728498813, guid: 33f38d30c2d34229885362503fce458f, type: 3}
+    NaturalHeights:
+    - 4.4086742
+    - 6.172521
+    - 6.736036
+    - 6.632578
+    - 8.296351
+    - 9.197974
+    - 9.594855
+    - 11.340708
+    TargetHeight: {x: 5, y: 8}
+  - Kind: 3
+    Biome: 7
+    Prefabs:
+    - {fileID: 1140111234031448129, guid: 416a5560162b4738a065e00ea3e4ceaa, type: 3}
+    - {fileID: 4292487785864986615, guid: d1e837e467ce47658abd18c8716405a9, type: 3}
+    - {fileID: 6454906044990653323, guid: 6e71110b0d764490bc1c39b32f7727d9, type: 3}
+    - {fileID: 5434479994030462199, guid: 05fb2b7198994228aa6f72fd4819ba4f, type: 3}
+    - {fileID: 3236645974599631667, guid: 2515a1b7e4c24fc6a12a91a06cea4ebe, type: 3}
+    - {fileID: 2612833771797366692, guid: a992a002dbb44c73905699b7d24de0cd, type: 3}
+    - {fileID: 1314480496568217847, guid: 94aca2099f104bd48cbddeb4c0c0be05, type: 3}
+    - {fileID: 2238779666728498813, guid: 33f38d30c2d34229885362503fce458f, type: 3}
+    NaturalHeights:
+    - 4.4086742
+    - 6.172521
+    - 6.736036
+    - 6.632578
+    - 8.296351
+    - 9.197974
+    - 9.594855
+    - 11.340708
+    TargetHeight: {x: 5, y: 8}
+  - Kind: 9
+    Biome: 7
+    Prefabs:
+    - {fileID: 5412839790121809123, guid: f5e5bcdd9e73420e90b703da26e47f05, type: 3}
+    - {fileID: 474728675238071306, guid: 91e38f7e91eb43bd82480a26c66bf72e, type: 3}
+    - {fileID: 6747365438202932336, guid: 6766d851b43f46409c24d7a17432f11c, type: 3}
+    NaturalHeights:
+    - 0.23450787
+    - 0.29208967
+    - 0.99062455
+    TargetHeight: {x: 0.4, y: 0.7}
+  - Kind: 8
+    Biome: 7
+    Prefabs:
+    - {fileID: 8320617341719187720, guid: aee5ac24ac8b4448a2cc8030b11d74da, type: 3}
+    - {fileID: 1980159769769872416, guid: 2ceef1062f984e7586f7d1649bead891, type: 3}
+    - {fileID: 1384686619961389969, guid: 2688eed556a8486bbabe50b78072bfcd, type: 3}
+    - {fileID: 5457292090531408030, guid: 8fd844d63732466ab4db1997b3f27e17, type: 3}
+    NaturalHeights:
+    - 0.61947113
+    - 0.66384727
+    - 0.7795587
+    - 1.0792315
+    TargetHeight: {x: 0.8, y: 1.3}
+  - Kind: 14
+    Biome: 7
+    Prefabs:
+    - {fileID: 658851729082096238, guid: f2a56a55c2f94670a70dd5bf79bb6c99, type: 3}
+    - {fileID: 6679259640579402397, guid: 6dbc532bea20420681ec2bd29e642635, type: 3}
+    - {fileID: 1462797205700331448, guid: 036107bd179d4d4eb54ef879beae6769, type: 3}
+    - {fileID: 1004483792724008509, guid: 3bc090240c9448d8b63ca8e1d8a1e5a3, type: 3}
+    - {fileID: 1998772109113685322, guid: 095f6c6e942f40e697e4edc273803d85, type: 3}
+    NaturalHeights:
+    - 1.4933879
+    - 1.5079354
+    - 1.5020084
+    - 1.5169876
+    - 1.4952607
+    TargetHeight: {x: 0.6, y: 1.3}

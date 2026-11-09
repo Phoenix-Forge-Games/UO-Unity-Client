@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LoginScreen.uss" />
+    <ui:VisualElement name="root" class="screen">
+        <ui:VisualElement class="panel">
+            <ui:Label text="SeriousFun" class="title" />
+            <ui:Label text="Britannia, in three dimensions" class="subtitle" />
+
+            <!-- Account login -->
+            <ui:VisualElement name="login-page" class="page">
+                <ui:TextField name="host" label="Server" class="field" />
+                <ui:IntegerField name="port" label="Port" value="2593" class="field" />
+                <ui:TextField name="account" label="Account" class="field" />
+                <ui:TextField name="password" label="Password" password="true" class="field" />
+                <ui:Button name="login-button" text="Log In" class="primary-button" />
+            </ui:VisualElement>
+
+            <!-- Shard selection -->
+            <ui:VisualElement name="server-page" class="page hidden">
+                <ui:Label text="Choose a shard" class="page-heading" />
+                <ui:ScrollView name="server-list" class="choice-list" />
+            </ui:VisualElement>
+
+            <!-- Character selection -->
+            <ui:VisualElement name="character-page" class="page hidden">
+                <ui:Label text="Choose a character" class="page-heading" />
+                <ui:ScrollView name="character-list" class="choice-list" />
+                <ui:VisualElement name="create-row" class="create-row">
+                    <ui:TextField name="new-character-name" label="New" class="field create-name" />
+                    <ui:Button name="create-button" text="Create" class="secondary-button create-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- In the world (placeholder until the world scene exists) -->
+            <ui:VisualElement name="world-page" class="page hidden">
+                <ui:Label name="world-summary" class="page-heading" />
+            </ui:VisualElement>
+
+            <ui:Label name="status" class="status" />
+            <ui:Button name="back-button" text="Back" class="secondary-button hidden" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,58 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-buildtype.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# IDE / generated project files
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Paid third-party asset packs: licensed per seat, must not be redistributed.
+# Import them yourself (see README) into these folders.
+/Assets/BK/
+/Assets/BK.meta
+/Assets/Synty/
+/Assets/Synty.meta
+/Assets/DownloadCache/
+/Assets/DownloadCache.meta
+
+# Tools build output and local test credentials
+/Tools/**/bin/
+/Tools/**/obj/
+/Tools/NetTest/local-test-account.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Textures derived from Synty POLYGON Fantasy Kingdom (not redistributable)
+/Assets/UOClient/Materials/SyntyWalls/*.png
+/Assets/UOClient/Materials/SyntyWalls/*.png.meta

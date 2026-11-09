@@ -1,0 +1,134 @@
+/* Placeholder dark-fantasy styling; Synty INTERFACE sprites replace the flat backgrounds later. */
+
+.screen {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(14, 12, 10);
+}
+
+.panel {
+    width: 440px;
+    max-width: 90%;
+    padding: 28px 32px;
+    background-color: rgba(32, 26, 20, 0.96);
+    border-width: 2px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 6px;
+}
+
+.title {
+    font-size: 34px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(226, 190, 116);
+}
+
+.subtitle {
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    color: rgb(170, 152, 120);
+    margin-bottom: 20px;
+}
+
+.page {
+    flex-direction: column;
+}
+
+.page-heading {
+    font-size: 16px;
+    color: rgb(226, 190, 116);
+    margin-bottom: 8px;
+    white-space: normal;
+}
+
+.field {
+    margin-bottom: 8px;
+}
+
+.field Label {
+    min-width: 90px;
+    color: rgb(214, 200, 176);
+}
+
+.choice-list {
+    max-height: 260px;
+}
+
+.choice-button {
+    height: 36px;
+    margin-bottom: 6px;
+    font-size: 15px;
+    color: rgb(236, 224, 200);
+    background-color: rgb(58, 46, 34);
+    border-color: rgb(120, 94, 52);
+    -unity-text-align: middle-left;
+    padding-left: 12px;
+}
+
+.choice-button:hover {
+    background-color: rgb(84, 66, 44);
+}
+
+.primary-button {
+    height: 40px;
+    margin-top: 12px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(24, 18, 12);
+    background-color: rgb(200, 158, 82);
+    border-color: rgb(120, 90, 40);
+}
+
+.primary-button:hover {
+    background-color: rgb(226, 186, 106);
+}
+
+.primary-button:disabled {
+    opacity: 0.5;
+}
+
+.secondary-button {
+    height: 30px;
+    margin-top: 8px;
+    color: rgb(214, 200, 176);
+    background-color: rgb(48, 40, 32);
+    border-color: rgb(100, 80, 50);
+}
+
+.create-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.create-name {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.create-name Label {
+    min-width: 40px;
+}
+
+.create-button {
+    margin-top: 0;
+    margin-left: 6px;
+    width: 80px;
+}
+
+.status {
+    margin-top: 12px;
+    min-height: 18px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(190, 176, 150);
+}
+
+.status.error {
+    color: rgb(230, 110, 90);
+}
+
+.hidden {
+    display: none;
+}

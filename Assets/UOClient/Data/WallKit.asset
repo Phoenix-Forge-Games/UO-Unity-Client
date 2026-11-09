@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d636d23e8e51c44be5fa8d30713df4, type: 3}
+  m_Name: WallKit
+  m_EditorClassIdentifier: UOClient::UOClient.WallKit
+  PlasterPanels:
+  - {fileID: 1381187689776896, guid: c8fbfbc6932ed064ca74598a3d2781ab, type: 3}
+  TimberPanels:
+  - {fileID: 1280003217639848, guid: 22bf6d47d1728bc43ac6a6571302fe25, type: 3}
+  StonePanels:
+  - {fileID: 1249330308905982, guid: 198d97cc0fdf2454bbc373eba6b9a969, type: 3}
+  - {fileID: 1408354367982390, guid: f179bb4745241de41aee557f43679baa, type: 3}
+  WindowPanels:
+  - {fileID: 1786417490291046, guid: 7fa0be63a8af0fd46ac094e516471fd3, type: 3}
+  - {fileID: 1643279536685848, guid: 8b6124d0f2b3e1148a5f443df23980d9, type: 3}
+  TimberPost: {fileID: 1816290431027912, guid: 965791a6a06b9ef459fb58c8a0ce2d30, type: 3}
+  StonePost: {fileID: 1165292924960960, guid: 741bad7acf5796e47a7e5bf00f415f81, type: 3}
+  StoneBlock: {fileID: 1048459307401366, guid: 5763b5c079fc82d4f9eba6bdb64be096, type: 3}
+  PostWidth: 0.35
+  TileRoofSlope: {fileID: 1388879150153634, guid: b539e47d0ccd47644932dc37490e4edf, type: 3}
+  TileRoofCap: {fileID: 1257257864059914, guid: 2e8d02e72dd32a140a587701b5ae8453, type: 3}
+  ThatchRoofSlope: {fileID: 1195470171099686, guid: b13135b4abf724b45bdc0cdca7f17447, type: 3}
+  ThatchRoofCap: {fileID: 1713024454304430, guid: e9c97c2141ed77d4d9f0a6daea37e75b, type: 3}

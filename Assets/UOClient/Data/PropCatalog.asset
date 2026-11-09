@@ -1,0 +1,926 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f99a2a688b3b01c40822096990584c10, type: 3}
+  m_Name: PropCatalog
+  m_EditorClassIdentifier: UOClient::UOClient.PropCatalog
+  Entries:
+  - Names:
+    - chest of drawers
+    - dresser
+    - drawers
+    Exclude: []
+    Prefabs:
+    - {fileID: 1137582754713678, guid: 44212a7b3cd28ae41ab20aca28f064dc, type: 3}
+    - {fileID: 1949857094923772, guid: 4f1b6b2482356cd468b1d822fb5a69b5, type: 3}
+    - {fileID: 1279659231885162, guid: 8d621885e52b5d545a277d3cb23d8096, type: 3}
+    - {fileID: 1397967245776946, guid: efd12374f1c98844bb5da187c564d955, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - armoire
+    - wardrobe
+    Exclude: []
+    Prefabs:
+    - {fileID: 1646305570385526, guid: 8727bd296951cf84aa2d2d55eb31806b, type: 3}
+    - {fileID: 1722863765286174, guid: 5e6e1bf03107aa540a81c5f43404d2a2, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bookcase
+    - bookshelf
+    - shelf
+    Exclude: []
+    Prefabs:
+    - {fileID: 1019816151821762, guid: c5e25508dd7e0574b8b175ae9335ba39, type: 3}
+    - {fileID: 1234295087365244, guid: d1e883767f839a341bf6d8a16056c15c, type: 3}
+    - {fileID: 1891858909182764, guid: 011c3732c9535d84da9550777e2553f7, type: 3}
+    - {fileID: 1916433401440084, guid: 7a7d64b9849f7904190e2eba121dc84f, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - display case
+    Exclude: []
+    Prefabs:
+    - {fileID: 1576607259431072, guid: b83ff8edd13de534dbffb9f0ca085fce, type: 3}
+    - {fileID: 1686755879487696, guid: d3d9e15b8ed5bf24f9e2b8f6130cc581, type: 3}
+    - {fileID: 1732782295662756, guid: 3c9b7c6ba63c7c547a1b676f5ba62501, type: 3}
+    Fit: 1
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - counter
+    Exclude: []
+    Prefabs:
+    - {fileID: 1902015935396048, guid: 0b4ba5e11fa43424997534c25b1068c4, type: 3}
+    - {fileID: 1555791884976562, guid: e86585cdbe32ba547a910af0132ff020, type: 3}
+    - {fileID: 1981148329644746, guid: b7bdeeb1e079e0640bd932a337d7d8dc, type: 3}
+    Fit: 1
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - table
+    Exclude:
+    - tablecloth
+    - vegetable
+    Prefabs:
+    - {fileID: 1691404736472238, guid: ff6fe2875616fb94c97c315494bdac4d, type: 3}
+    - {fileID: 1873219522500198, guid: be18093bae0a99544a5fb8097eb3a2a7, type: 3}
+    - {fileID: 1855512109005366, guid: 4f049eabdbb23924d899ef940ecf043a, type: 3}
+    - {fileID: 1184808147409474, guid: a6be3d8d97db4904aab87b6870f0cb2c, type: 3}
+    - {fileID: 1397556434144386, guid: 20e5d5a1239a075468c2750f253b2f7f, type: 3}
+    Fit: 1
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bench
+    Exclude:
+    - workbench
+    Prefabs:
+    - {fileID: 1940261937569050, guid: a5e64cdff84bd42489a68df615fff053, type: 3}
+    - {fileID: 1886310884727376, guid: 42056865e3624624289d1a01f3b8915b, type: 3}
+    - {fileID: 1206287828259018, guid: e4abe92ea92777d4da8cd195aa285156, type: 3}
+    - {fileID: 1681518481755610, guid: d4fbc3534814d2b4a902eba236bfae14, type: 3}
+    Fit: 1
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bed
+    Exclude:
+    - bedroll
+    - bedrock
+    - flower bed
+    Prefabs:
+    - {fileID: 1639433249001886, guid: fdb772a7c071f9a41ab70c92ed46560d, type: 3}
+    - {fileID: 1918832550962178, guid: 6b7be49317091734aad8a39154b362b2, type: 3}
+    - {fileID: 1605128817640788, guid: dc201bc76011dbe48b45cd58bc815b0f, type: 3}
+    - {fileID: 1059455012409756, guid: 738cf61d8bf80e846b0cca454d760017, type: 3}
+    - {fileID: 1798876308872938, guid: 1e78d882b6d2f4c46a777aea3055a6ef, type: 3}
+    Fit: 1
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - stool
+    Exclude:
+    - footstool
+    Prefabs:
+    - {fileID: 1126555239025276, guid: 74fca53229fe1034c96bcced1717b494, type: 3}
+    - {fileID: 1307463011276828, guid: 67ddc770685a06d4781b123c833bd0cf, type: 3}
+    - {fileID: 1070440974107336, guid: 4815d79ad043b5541b7beece399fa4d3, type: 3}
+    - {fileID: 1951374760646490, guid: 94e71778dd61c3c469d45f4e993abcaf, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 1
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - footstool
+    Exclude: []
+    Prefabs:
+    - {fileID: 1935168737241738, guid: cd3350a3b50362147a759b53e17f19e6, type: 3}
+    - {fileID: 1785017032467956, guid: 81596f293b175aa448cccd20f59b06e1, type: 3}
+    - {fileID: 1169996508281654, guid: 176090930008f6f4582d818c468da541, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 1
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - throne
+    - chair
+    Exclude: []
+    Prefabs:
+    - {fileID: 1590892727004766, guid: 9762bdc7d9279e34d81154eb8193f398, type: 3}
+    - {fileID: 1886099695880172, guid: cf4026db788ff5c448ac6fca18cc009a, type: 3}
+    - {fileID: 1145858314616342, guid: d5c9cfb81adee3d40b06349c34965720, type: 3}
+    - {fileID: 1426735042268512, guid: a4e06e91d0d2d704aa9dfc7d7a1a635a, type: 3}
+    - {fileID: 1882330714251282, guid: 83ae8e34ef4a29844913591ed6e1e774, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 1
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - metal chest
+    - wooden chest
+    - chest
+    Exclude:
+    - chest of drawers
+    Prefabs:
+    - {fileID: 1110624181899732, guid: e686bc0bb2dee5e4982d84f14142bb79, type: 3}
+    - {fileID: 1496317863544918, guid: f1a3d354f09203b4781e7b2d556f3d6f, type: 3}
+    - {fileID: 1135754012712868, guid: 5ac1b88cb9dd80342b54231233526bfe, type: 3}
+    - {fileID: 1452693738808372, guid: cb4aec065755ca34ca39b132f34a6fe2, type: 3}
+    - {fileID: 1223732142638916, guid: dd5ea9674251dc1428ba8d458d463c69, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - crate
+    - wooden box
+    Exclude: []
+    Prefabs:
+    - {fileID: 1719569932363254, guid: 2f8e08a414723f3478184919435f67c0, type: 3}
+    - {fileID: 1945102844411004, guid: ae362b32a2e1e1a479b8bc67e1d530bc, type: 3}
+    - {fileID: 1048619644081910, guid: 14657c6b12c9e4048b8d9ee04156c2bc, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - barrel
+    - keg
+    Exclude: []
+    Prefabs:
+    - {fileID: 1894982720226970, guid: b26e035715d763f409a7e837ae204dab, type: 3}
+    - {fileID: 1844386919898034, guid: 1a67b1e0bb5b63f42b27f651ae919fd6, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - lamp post
+    - lamppost
+    - street lamp
+    Exclude: []
+    Prefabs:
+    - {fileID: 1568525375095786, guid: bac41e063fe0fec4dae7fc7740141d27, type: 3}
+    - {fileID: 1346391149651154, guid: 08fbd81b18b8c4949b0f5b250596657a, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - signpost
+    - sign post
+    Exclude: []
+    Prefabs:
+    - {fileID: 1562408061790668, guid: 98bc07b51cba6ba4cb7ec1ec6b39f3e3, type: 3}
+    - {fileID: 1480056583309496, guid: 5b789dd8964709e47a4207ae92b62590, type: 3}
+    - {fileID: 1500218450616558, guid: fa7e5ae02c745244c861a2db6ce26057, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - sign
+    Exclude:
+    - signpost
+    - sign post
+    Prefabs:
+    - {fileID: 1972824622545806, guid: 9988305f029589f4d9d2782814060e33, type: 3}
+    - {fileID: 1120047205648888, guid: e6d42a3aaf0861447b6f2c017c0bcd40, type: 3}
+    - {fileID: 1588419836231922, guid: 98d1c0fb8c14f684ba730de310ba6677, type: 3}
+    - {fileID: 1343564613932060, guid: 54c1e96df44f00f4fad5a82a841052c4, type: 3}
+    - {fileID: 1580415722109608, guid: 4c2ccb1ff093d1b4ca9c51d5f33a8664, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - banner
+    Exclude: []
+    Prefabs:
+    - {fileID: 1368671110142866, guid: 1892a9bbd9c37a049b7326377596c2df, type: 3}
+    Fit: 6
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - anvil
+    Exclude: []
+    Prefabs:
+    - {fileID: 1843292089870526, guid: f02bab0916b694b4fb39ee47ccb08d9a, type: 3}
+    - {fileID: 1929398394035006, guid: da371e86e4bd6b74dbbaed06d9ae5f75, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - forge
+    Exclude: []
+    Prefabs:
+    - {fileID: 1709710993751724, guid: 2a21d7f798944ef4c809dd841876b762, type: 3}
+    - {fileID: 1911556445151452, guid: 92688d9f17f16614497209c890db13ef, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - potted
+    - flowerpot
+    - planter
+    Exclude: []
+    Prefabs:
+    - {fileID: 1871944868695374, guid: 3839b714b86a272448ef561e934411ed, type: 3}
+    - {fileID: 1784927641249368, guid: c9b5246722523fe458cbcd2a95092b53, type: 3}
+    - {fileID: 1869533660285440, guid: 81fd5b652405fa64998edf5943e89529, type: 3}
+    - {fileID: 1209089581053256, guid: 48f520146a1f1074190777b984ff6392, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - torch
+    Exclude: []
+    Prefabs:
+    - {fileID: 1979531206300384, guid: 4d8b9ace7ba126c47bd16c86db9c235c, type: 3}
+    - {fileID: 1470852809624960, guid: 51651d19206874a46aec23592e8985f0, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - candelabra
+    - candle
+    Exclude: []
+    Prefabs:
+    - {fileID: 1485545688585684, guid: fe109896213cadd42bdf5c2cedb31676, type: 3}
+    - {fileID: 1246495616044328, guid: ea0a735aed08a9743992c3fcf9145384, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - book
+    Exclude:
+    - bookcase
+    - bookshelf
+    Prefabs:
+    - {fileID: 1168402126317370, guid: 097664c7a3011b74289e4778ab903942, type: 3}
+    - {fileID: 1224732432766726, guid: 6d4d8f1b10aae86418ad9c3965df758f, type: 3}
+    - {fileID: 1654946016894408, guid: 3004d4b028d75d54b9590f89bc394a2f, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - pen and ink
+    - inkwell
+    - ink bottle
+    Exclude: []
+    Prefabs:
+    - {fileID: 1595455150455046, guid: c958edf19bee19e47b9aa11c66f889f2, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - well
+    Exclude: []
+    Prefabs:
+    - {fileID: 1984039378238888, guid: 0e9128c545b18fb46b1692f13b123523, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - hitching post
+    Exclude: []
+    Prefabs:
+    - {fileID: 1483388724023804, guid: 75c19b3789f67bc428b91e2a34b8124c, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - stone post
+    - stone pillar
+    - pillar
+    - column
+    Exclude: []
+    Prefabs:
+    - {fileID: 1165292924960960, guid: 741bad7acf5796e47a7e5bf00f415f81, type: 3}
+    Fit: 3
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 0.6
+    MaxHeight: 0
+  - Names:
+    - =post
+    - wooden post
+    - pier
+    Exclude: []
+    Prefabs:
+    - {fileID: 1183138894557542, guid: 2958471dc0b61d043987636716eaf502, type: 3}
+    Fit: 3
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 0.4
+    MaxHeight: 0
+  - Names:
+    - banister
+    - railing
+    Exclude: []
+    Prefabs:
+    - {fileID: 1110661347287308, guid: 1fa46e5098016ea41965a7835c313e6c, type: 3}
+    Fit: 2
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - fountain
+    Exclude: []
+    Prefabs:
+    - {fileID: 1297885529879400, guid: 7f687487d4bbab24fb547dc9af8ed83f, type: 3}
+    Fit: 1
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - statue
+    Exclude: []
+    Prefabs:
+    - {fileID: 1382234347740782, guid: fe1a0f10361a25547866107e44743441, type: 3}
+    - {fileID: 1067057911912370, guid: bc942683486cb8b4083e769da0aeae21, type: 3}
+    - {fileID: 1011661159361116, guid: c103ebf99ffb5574fbce89d35563224c, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - fireplace
+    Exclude: []
+    Prefabs:
+    - {fileID: 1991491456887154, guid: e15df4ea678e6c7448f64722a7701939, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - cauldron
+    Exclude: []
+    Prefabs:
+    - {fileID: 1802613797325304, guid: e00057df165cf81438a0466ab3345527, type: 3}
+    - {fileID: 1015495453247968, guid: 9aaf1c2e372c95d4f85361ff6b4990c5, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bucket
+    - tub
+    Exclude: []
+    Prefabs:
+    - {fileID: 1592350337673580, guid: 64c65b7a964a2964b8cc45cb9bfe9064, type: 3}
+    - {fileID: 1345360006992412, guid: 271dca3a4274f654fb1c69af60a96850, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - basket
+    Exclude: []
+    Prefabs:
+    - {fileID: 1685244815529056, guid: 5a56bea0910e46946a878d51da37757f, type: 3}
+    - {fileID: 1889753189323490, guid: f2fff414388bae44eb5b6a4801558be4, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - sack
+    - bag of
+    Exclude: []
+    Prefabs:
+    - {fileID: 1989754097958104, guid: 7ca34a6afd5cc3049a707cfdafb11b67, type: 3}
+    - {fileID: 1373800743771422, guid: e8ec50c1bdae59346957a436d45d6178, type: 3}
+    - {fileID: 1970650801774158, guid: d67ac4d47aaa0f14d9354aebb21d30dd, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - cart
+    Exclude: []
+    Prefabs:
+    - {fileID: 1716617833420696, guid: 1228021bbaede7f4bb46e7eae9f8c368, type: 3}
+    - {fileID: 1835261352249824, guid: e3db2661627b1af4a9c8641e808ada6d, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bottle
+    - empty jar
+    - jar
+    - flask
+    Exclude: []
+    Prefabs:
+    - {fileID: 1666472932181712, guid: f4bf1ea18c6356c4ba8c94bf3c351350, type: 3}
+    - {fileID: 1297295046428030, guid: ae830968ee05141439e86f9833e2333a, type: 3}
+    - {fileID: 1777117934320152, guid: 60ce4300e1864f8429f22cb43afc07c2, type: 3}
+    - {fileID: 1695034929887884, guid: 9f5774717878be54292104cebe396542, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - mug
+    - tankard
+    - cup
+    - goblet
+    Exclude: []
+    Prefabs:
+    - {fileID: 1969602273324740, guid: ea96705f0a8ae18489c209f0485af3be, type: 3}
+    - {fileID: 1624747758110360, guid: 4e32d754d965b85458985b592fb1bb7c, type: 3}
+    - {fileID: 1973287695904376, guid: 75e9b745fc01e464ea61fa479b56401f, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - plate
+    Exclude:
+    - platemail
+    - plate mail
+    Prefabs:
+    - {fileID: 1160302530673669886, guid: 996ef1324ac58be479bb80238451c19f, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bowl
+    Exclude: []
+    Prefabs:
+    - {fileID: 1521822927379026, guid: 13457bba34e7e0f44b21467400fa6f00, type: 3}
+    - {fileID: 1080750033584936, guid: 1214ee8e5ef5ca44aa77515466a7c1c0, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bread
+    - loaf
+    - cake
+    - pie
+    - muffin
+    Exclude: []
+    Prefabs:
+    - {fileID: 1301048988066782, guid: 67c2d8a6e520b5342ab173b126b530d4, type: 3}
+    - {fileID: 1131429774929556, guid: 84e4c8146d27c4644a3f80d2087c93a2, type: 3}
+    - {fileID: 1447274149028030, guid: 5bf71b0a1448e0e4594d89102439d273, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - jug
+    - pitcher
+    Exclude: []
+    Prefabs:
+    - {fileID: 1681972012984452, guid: 8e6fb74f22edd2d48b88c4386ae61758, type: 3}
+    - {fileID: 1787587576823254, guid: 7804395cb4234e848996ad620d5d9d23, type: 3}
+    - {fileID: 1412207821377164, guid: 1468f220728bf94498c7db58da4997e6, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - scroll
+    - deed
+    - parchment
+    - ship plans
+    Exclude: []
+    Prefabs:
+    - {fileID: 1523586725097524, guid: 2c36769c430e9f649b66ec6176a1bfba, type: 3}
+    - {fileID: 1989957636565882, guid: 64fcd3bea2d72d5479bc795ee7bf0bc2, type: 3}
+    - {fileID: 1277702553320504, guid: 13e80e731a05dcc4e97ce17d52b7293c, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - hammer
+    - pickaxe
+    - shovel
+    Exclude: []
+    Prefabs:
+    - {fileID: 1867716064205656, guid: 00336e1bd0470884e978db7890208c07, type: 3}
+    - {fileID: 1335308920097214, guid: 34434a91e1e47d94ba3fbc7f377d80d2, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - brick wall
+    - stone wall
+    - sandstone wall
+    - marble wall
+    Exclude: []
+    Prefabs:
+    - {fileID: 1249330308905982, guid: 198d97cc0fdf2454bbc373eba6b9a969, type: 3}
+    Fit: 5
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 0.5
+    MaxHeight: 10
+  - Names:
+    - stone stairs
+    - stone steps
+    Exclude: []
+    Prefabs:
+    - {fileID: 1381921795615506, guid: b0ce044ac5a42094e83550341d8b429b, type: 3}
+    Fit: 4
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - wooden stairs
+    - wooden steps
+    Exclude: []
+    Prefabs:
+    - {fileID: 1501785717994328, guid: 5087283034e1017459dd39b4c3c11f7e, type: 3}
+    Fit: 4
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - stone step
+    - =stone
+    Exclude: []
+    Prefabs:
+    - {fileID: 1304566019770836, guid: ea0fc023e04a9ef488cee02ad9d4e3ad, type: 3}
+    Fit: 3
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - wooden boards
+    - wooden plank
+    Exclude: []
+    Prefabs:
+    - {fileID: 1930935673161632, guid: 62918f245c347b94f86309b18199ba9b, type: 3}
+    Fit: 3
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - =wood
+    Exclude: []
+    Prefabs:
+    - {fileID: 1930935673161632, guid: 62918f245c347b94f86309b18199ba9b, type: 3}
+    Fit: 3
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - fork
+    Exclude:
+    - pitchfork
+    Prefabs:
+    - {fileID: 1191232682966920, guid: ffd7d3bbf0558ee42b8e20239d005c20, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - knife
+    Exclude: []
+    Prefabs:
+    - {fileID: 1445921096550344, guid: 7dedf257cf57dde4e8b18cc1b5acc712, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - spoon
+    Exclude: []
+    Prefabs:
+    - {fileID: 1227831350452180, guid: ceeef3d89b597c44188878020b793197, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - tray
+    Exclude: []
+    Prefabs:
+    - {fileID: 1160302530673669886, guid: 996ef1324ac58be479bb80238451c19f, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - sausage
+    Exclude: []
+    Prefabs:
+    - {fileID: 1128122334789366, guid: 1eb4d70cd15e4f044ab29c37763ebcc9, type: 3}
+    - {fileID: 1042065567057968, guid: cef228d2e46dbd2498097c8aee967139, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - bacon
+    - ham
+    - steak
+    - ribs
+    - chicken
+    - turkey
+    - meat
+    - leg of lamb
+    - bird
+    Exclude: []
+    Prefabs:
+    - {fileID: 1332647397432632, guid: d5bc113609377784183ce1ed388dcec5, type: 3}
+    - {fileID: 1430243233465446, guid: 73497d70e2673e64a96a7c211cb5710f, type: 3}
+    - {fileID: 1308103492566632, guid: 099569158edc44846aaaa52f3e359712, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - fish
+    Exclude:
+    - fishing
+    Prefabs:
+    - {fileID: 1546702689958072, guid: 65ef785a2281a1d459fb35c4aee0aced, type: 3}
+    - {fileID: 1912373017461422, guid: 971f9f98d9b1a0e4b9d016016bcd6c77, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - cheese
+    Exclude: []
+    Prefabs:
+    - {fileID: 1694282642162360, guid: cb37a3e27f84a7b4da2c303064c506b9, type: 3}
+    - {fileID: 1028937513019266, guid: 9ebfe32fdd2797347bc3f867d1f9f10b, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - milk
+    Exclude: []
+    Prefabs:
+    - {fileID: 1681972012984452, guid: 8e6fb74f22edd2d48b88c4386ae61758, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - apple
+    - carrot
+    - onion
+    - lettuce
+    - cabbage
+    - melon
+    - squash
+    - pumpkin
+    - turnip
+    - pear
+    - peach
+    - grapes
+    - lemon
+    - lime
+    - banana
+    - vegetable
+    - fruit
+    Exclude: []
+    Prefabs:
+    - {fileID: 8493272996063192780, guid: afc80491f843c5c4b95fe69abbddc991, type: 3}
+    - {fileID: 2270481393349204185, guid: 1d5c8c681032a4544ad43d7697f40838, type: 3}
+    - {fileID: 5293072324072636425, guid: 24aa13e0d4830064895edbca030098b2, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - rub%
+    - ruby
+    - amethyst
+    - emerald
+    - sapphire
+    - citrine
+    - diamond
+    - tourmaline
+    - amber
+    - gem
+    Exclude: []
+    Prefabs:
+    - {fileID: 1368006709507792, guid: deb812e76c4026d46a465bd368137a7c, type: 3}
+    - {fileID: 1146353396805070, guid: e1820a200f03cec468ffc85b587c2d06, type: 3}
+    - {fileID: 1431481544899506, guid: 59815b03e478cdc44956f72b6c66bcb7, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - painting
+    - portrait
+    Exclude: []
+    Prefabs:
+    - {fileID: 1939901374298310, guid: 7abc15b779ccd174a884b3936e555989, type: 3}
+    - {fileID: 1963151773956248, guid: c53548d07b6b9644ea48f55e6e847ba2, type: 3}
+    - {fileID: 1609833263259430, guid: 0fe278bc34aa28e4ea36f3050e33237b, type: 3}
+    - {fileID: 1763471629544494, guid: e339d3c1a1a3291459d5fe01a74c0c0c, type: 3}
+    Fit: 6
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - decorative shield
+    Exclude: []
+    Prefabs:
+    - {fileID: 1213316036247922, guid: 691193207fb498347995d8573572685a, type: 3}
+    - {fileID: 1777489823926884, guid: 56c5780ef6bb93b47a1c3f13ffe36a34, type: 3}
+    - {fileID: 1691778326813534, guid: 56359a0b63e0cfa4787dc3ce3cd41229, type: 3}
+    Fit: 6
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - decorative weapons
+    - weapon rack
+    Exclude: []
+    Prefabs:
+    - {fileID: 1140009013063516, guid: 99f11df84afdff144846054a3ae5309f, type: 3}
+    Fit: 6
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - curtain
+    Exclude: []
+    Prefabs:
+    - {fileID: 1292610970914132, guid: ee8aa082388dd6940ae76719a1055cb8, type: 3}
+    Fit: 6
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - ladder
+    Exclude: []
+    Prefabs:
+    - {fileID: 1130256405483234, guid: 344342993375e8149b7a797437c860a7, type: 3}
+    Fit: 0
+    AgainstWall: 1
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - hay
+    Exclude: []
+    Prefabs:
+    - {fileID: 1527947260719730, guid: 26fb16f6113ff3e46a3413791e6792a4, type: 3}
+    - {fileID: 1315058372290604, guid: 05118414abab4284a8fb8889bbb58ab7, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - rope
+    Exclude: []
+    Prefabs:
+    - {fileID: 4483551530821011083, guid: 3ada364af1fef304e888c5bca2824b66, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - cannon
+    Exclude:
+    - cannon ball
+    Prefabs:
+    - {fileID: 1721797142143904, guid: 3da9fd16f2d6c67468ca9222d4abf72f, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0
+  - Names:
+    - anchor
+    Exclude: []
+    Prefabs:
+    - {fileID: 6980190743637777153, guid: 59ed5b7d941d7a44dac45574eba49ebc, type: 3}
+    Fit: 0
+    AgainstWall: 0
+    FaceTable: 0
+    Footprint: 1
+    MaxHeight: 0

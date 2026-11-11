@@ -9,7 +9,9 @@ The new game, played on the real server, by you and your friends. It started 202
 - **Channel `live`:** version 0.1.0, about 2.6 GB installed, 2.1 GB to download.
 - **Signing:** the patch is signed with the updater's patch key. GameUpdater checks every file it downloads, so a
   tampered download is rejected.
-- **For friends:** `SeriousFun-Playtest.zip` (46 MB) on the patch host. It holds GameUpdater, set up for this channel.
+- **For friends:** GameUpdater from the updater's GitHub releases
+  (`https://github.com/Phoenix-Forge-Games/UO-Unity-Updater/releases/latest`). Since v0.2.0 its built-in channel is
+  this patch host, so it needs no settings file.
 
 **This build is for friends only.** Its paid art (Synty, BK) is in ordinary Unity data files, not encrypted, because
 the secure-art pipeline isn't finished ([SecureArt.md](SecureArt.md)). It lives only on the private patch host.
@@ -31,13 +33,15 @@ Do these once, so friends outside your home network can reach the patch host:
    - UDP 7770 (the game)
 3. **Testing from inside your network:** use the server's LAN address, because the router may not loop the public
    name back to you.
-   - In `GameUpdater.json`, set `channelUrl` to `http://192.168.68.91:7780/live/channel.json`.
+   - Put a `GameUpdater.json` beside `GameUpdater.exe` containing
+     `{ "channelUrl": "http://192.168.68.91:7780/live/channel.json" }`.
    - In the game's connect screen, set the server to `192.168.68.91`.
 
 ## For your friends
 
-1. Download `http://seriousfun.tplinkdns.com:7780/SeriousFun-Playtest.zip` and unzip it into a folder of its own.
-2. Run `GameUpdater.exe`.
+1. Download `GameUpdater.exe` from
+   `https://github.com/Phoenix-Forge-Games/UO-Unity-Updater/releases/latest` and put it in a folder of its own.
+2. Run it.
    - Windows may warn that it's an unrecognised app: choose **More info**, then **Run anyway**.
    - It downloads the game (about 2 GB the first time) into `Game\` beside it, then starts it.
 3. In the game:
@@ -81,7 +85,7 @@ When something is wrong, note what you did and roughly when. The server's log ke
    ./tools/deploy-patches.ps1 -HostRoot "G:\Ultima Online\PatchHost" -Destination "\\phoenix-server\GameServers\Patches"
    ```
 
-   Don't use `-Purge` without care: the host folder also holds `web.config` (file types) and the playtest zip.
+   Don't use `-Purge` without care: the host folder also holds `web.config` (file types).
 
 A change to the network protocol or the content files means the server and the client go out together: deploy the
 server, then publish the client.

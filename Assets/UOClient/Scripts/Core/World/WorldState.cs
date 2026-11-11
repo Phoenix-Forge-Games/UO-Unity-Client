@@ -10,7 +10,7 @@ namespace UOClient.World
     /// only touched from the thread that polls the session. Events fire synchronously from
     /// <see cref="Handle"/>.
     /// </summary>
-    public sealed class WorldState
+    public sealed partial class WorldState
     {
         public event Action<Mobile> MobileUpdated;
         public event Action<uint> MobileRemoved;
@@ -26,7 +26,10 @@ namespace UOClient.World
         public WorldState(Action<PacketWriter> send)
         {
             Walker = new Walker(this, send);
+            _send = send;
         }
+
+        private readonly Action<PacketWriter> _send;
 
         public Mobile Player { get; private set; }
         public int Facet { get; private set; } = 1;
@@ -37,6 +40,8 @@ namespace UOClient.World
         {
             Mobiles.Clear();
             Items.Clear();
+            ResetSocial();
+            ResetItems();
             Player = new Mobile
             {
                 Serial = confirm.Serial,
@@ -63,6 +68,33 @@ namespace UOClient.World
                 case 0xF3: HandleWorldItem(packet); break;
                 case 0x2E: HandleEquip(packet); break;
                 case 0x11: HandleStatus(packet); break;
+                case 0x1C: HandleAsciiMessage(packet); break;
+                case 0xAE: HandleUnicodeMessage(packet); break;
+                case 0xC1: HandleClilocMessage(packet, false); break;
+                case 0xCC: HandleClilocMessage(packet, true); break;
+                case 0xA1: HandleStat(packet, StatKind.Hits); break;
+                case 0xA2: HandleStat(packet, StatKind.Mana); break;
+                case 0xA3: HandleStat(packet, StatKind.Stamina); break;
+                case 0x2D: HandleAttributes(packet); break;
+                case 0x72: HandleWarMode(packet); break;
+                case 0xAA: HandleCombatant(packet); break;
+                case 0x0B: HandleDamage(packet); break;
+                case 0x98: HandleName(packet); break;
+                case 0x24: HandleOpenContainer(packet); break;
+                case 0x3C: HandleContainerContents(packet); break;
+                case 0x25: HandleContainedItem(packet); break;
+                case 0x27: HandleDragRejected(packet); break;
+                case 0xDC: HandlePropertyRevision(packet); break;
+                case 0xD6: HandleProperties(packet); break;
+                case 0x3A: HandleSkills(packet); break;
+                case 0x74: HandleBuyList(packet); break;
+                case 0x6C: HandleTargetRequest(packet); break;
+                case 0x99: HandleMultiPlacement(packet); break;
+                case 0xD8: HandleHouseDesign(packet); break;
+                case 0xB0: HandleGump(packet); break;
+                case 0xDF: HandleBuff(packet); break;
+                case 0xDD: HandleGump(packet); break;
+                case 0x9E: HandleSellList(packet); break;
                 case 0x21: Walker.OnDenied(packet); break;
                 case 0x22: Walker.OnConfirmed(packet); break;
                 case 0xBF: HandleExtended(packet); break;
@@ -171,6 +203,9 @@ namespace UOClient.World
             {
                 ItemRemoved?.Invoke(serial);
             }
+            else if (RemoveContained(serial))
+            {
+            }
             else
             {
                 // A worn item taken off: the server deletes it from the wearer.
@@ -212,6 +247,7 @@ namespace UOClient.World
             item.IsMulti = type == 2;
 
             Items[item.Serial] = item;
+            RemoveContained(item.Serial); // dropped out of a container onto the ground
             ItemUpdated?.Invoke(item);
         }
 
@@ -223,18 +259,10 @@ namespace UOClient.World
             uint owner = packet.ReadUInt32();
             item.Hue = packet.ReadUInt16();
 
+            OnEquipped(item.Serial);
             if (Mobiles.TryGetValue(owner, out Mobile mobile))
             {
                 mobile.Equipment[item.Layer] = item;
-                MobileUpdated?.Invoke(mobile);
-            }
-        }
-
-        private void HandleStatus(PacketReader packet)
-        {
-            if (Mobiles.TryGetValue(packet.ReadUInt32(), out Mobile mobile))
-            {
-                mobile.Name = packet.ReadAscii(30);
                 MobileUpdated?.Invoke(mobile);
             }
         }
@@ -257,6 +285,18 @@ namespace UOClient.World
                 case 0x08:
                     Facet = packet.ReadByte();
                     FacetChanged?.Invoke(Facet);
+                    break;
+                case 0x14:
+                    HandleContextMenu(packet);
+                    break;
+                case 0x1B:
+                    HandleSpellbookContent(packet);
+                    break;
+                case 0x21:
+                    HandleAbilityCleared();
+                    break;
+                case 0x1D:
+                    HandleDesignRevision(packet);
                     break;
             }
         }

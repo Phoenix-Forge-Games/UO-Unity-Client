@@ -1,0 +1,1033 @@
+{
+ "Places": [
+  {
+   "Name": "Heartwood",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 6984,
+   "Y": 337
+  },
+  {
+   "Name": "Sanctuary",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 6173,
+   "Y": 23
+  },
+  {
+   "Name": "Painted Caves",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 6308,
+   "Y": 892
+  },
+  {
+   "Name": "Prism of Light",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 6474,
+   "Y": 188
+  },
+  {
+   "Name": "Blighted Grove",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 6478,
+   "Y": 863
+  },
+  {
+   "Name": "Palace of Paroxysmus",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 6222,
+   "Y": 335
+  },
+  {
+   "Name": "Cove",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 2275,
+   "Y": 1210
+  },
+  {
+   "Name": "Britain",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 1495,
+   "Y": 1629
+  },
+  {
+   "Name": "Jhelom",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 1383,
+   "Y": 3815
+  },
+  {
+   "Name": "Minoc",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 2466,
+   "Y": 544
+  },
+  {
+   "Name": "Ocllo",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 3650,
+   "Y": 2519
+  },
+  {
+   "Name": "Trinsic",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 1867,
+   "Y": 2780
+  },
+  {
+   "Name": "Vesper",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 2899,
+   "Y": 676
+  },
+  {
+   "Name": "Yew",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 546,
+   "Y": 992
+  },
+  {
+   "Name": "Wind",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 5223,
+   "Y": 190
+  },
+  {
+   "Name": "Serpent's Hold",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 3010,
+   "Y": 3371
+  },
+  {
+   "Name": "Skara Brae",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 632,
+   "Y": 2233
+  },
+  {
+   "Name": "Nujel'm",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 3732,
+   "Y": 1279
+  },
+  {
+   "Name": "Moonglow",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 4442,
+   "Y": 1172
+  },
+  {
+   "Name": "Magincia",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 3714,
+   "Y": 2220
+  },
+  {
+   "Name": "Buccaneer's Den",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 2706,
+   "Y": 2163
+  },
+  {
+   "Name": "Covetous",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5456,
+   "Y": 1862
+  },
+  {
+   "Name": "Deceit",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5187,
+   "Y": 635
+  },
+  {
+   "Name": "Despise",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5501,
+   "Y": 570
+  },
+  {
+   "Name": "Destard",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5243,
+   "Y": 1004
+  },
+  {
+   "Name": "Hythloth",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5905,
+   "Y": 22
+  },
+  {
+   "Name": "Khaldun",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5571,
+   "Y": 1302
+  },
+  {
+   "Name": "Green Acres",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 5445,
+   "Y": 1153
+  },
+  {
+   "Name": "Shame",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5395,
+   "Y": 126
+  },
+  {
+   "Name": "Wrong",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5825,
+   "Y": 599
+  },
+  {
+   "Name": "Terathan Keep",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5451,
+   "Y": 3143
+  },
+  {
+   "Name": "Fire",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5760,
+   "Y": 2908
+  },
+  {
+   "Name": "Ice",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5210,
+   "Y": 2322
+  },
+  {
+   "Name": "BlackthornDungeon",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 6430,
+   "Y": 2678
+  },
+  {
+   "Name": "Delucia",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 5228,
+   "Y": 3978
+  },
+  {
+   "Name": "Papua",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 5769,
+   "Y": 3176
+  },
+  {
+   "Name": "Misc Dungeons",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 6032,
+   "Y": 1499
+  },
+  {
+   "Name": "Orc Cave",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5137,
+   "Y": 2015
+  },
+  {
+   "Name": "Paroxysmus Exit",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 5623,
+   "Y": 3038
+  },
+  {
+   "Name": "Sanctuary Entrance",
+   "Kind": "place",
+   "Facet": 0,
+   "X": 762,
+   "Y": 1645
+  },
+  {
+   "Name": "Solen Hives",
+   "Kind": "dungeon",
+   "Facet": 0,
+   "X": 5774,
+   "Y": 1896
+  },
+  {
+   "Name": "Sea Market",
+   "Kind": "town",
+   "Facet": 0,
+   "X": 4550,
+   "Y": 2317
+  },
+  {
+   "Name": "Khaldun",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5571,
+   "Y": 1302
+  },
+  {
+   "Name": "Heartwood",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 6984,
+   "Y": 337
+  },
+  {
+   "Name": "Sanctuary",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 6173,
+   "Y": 23
+  },
+  {
+   "Name": "Painted Caves",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 6308,
+   "Y": 892
+  },
+  {
+   "Name": "Prism of Light",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 6474,
+   "Y": 188
+  },
+  {
+   "Name": "Blighted Grove",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 6478,
+   "Y": 863
+  },
+  {
+   "Name": "Palace of Paroxysmus",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 6222,
+   "Y": 335
+  },
+  {
+   "Name": "Cove",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 2275,
+   "Y": 1210
+  },
+  {
+   "Name": "Britain",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 1495,
+   "Y": 1629
+  },
+  {
+   "Name": "Jhelom",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 1383,
+   "Y": 3815
+  },
+  {
+   "Name": "Minoc",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 2466,
+   "Y": 544
+  },
+  {
+   "Name": "New Haven",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 3503,
+   "Y": 2574
+  },
+  {
+   "Name": "Trinsic",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 1867,
+   "Y": 2780
+  },
+  {
+   "Name": "Vesper",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 2899,
+   "Y": 676
+  },
+  {
+   "Name": "Yew",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 546,
+   "Y": 992
+  },
+  {
+   "Name": "Wind",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 5223,
+   "Y": 190
+  },
+  {
+   "Name": "Serpent's Hold",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 3010,
+   "Y": 3371
+  },
+  {
+   "Name": "Skara Brae",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 632,
+   "Y": 2233
+  },
+  {
+   "Name": "Nujel'm",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 3732,
+   "Y": 1279
+  },
+  {
+   "Name": "Moonglow",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 4442,
+   "Y": 1172
+  },
+  {
+   "Name": "Magincia",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 3714,
+   "Y": 2220
+  },
+  {
+   "Name": "Buccaneer's Den",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 2706,
+   "Y": 2163
+  },
+  {
+   "Name": "Covetous",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5456,
+   "Y": 1862
+  },
+  {
+   "Name": "Deceit",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5187,
+   "Y": 635
+  },
+  {
+   "Name": "Despise",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5501,
+   "Y": 570
+  },
+  {
+   "Name": "Destard",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5243,
+   "Y": 1004
+  },
+  {
+   "Name": "Hythloth",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5905,
+   "Y": 22
+  },
+  {
+   "Name": "Green Acres",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 5445,
+   "Y": 1153
+  },
+  {
+   "Name": "Shame",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5395,
+   "Y": 126
+  },
+  {
+   "Name": "Wrong",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5825,
+   "Y": 599
+  },
+  {
+   "Name": "Terathan Keep",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5451,
+   "Y": 3143
+  },
+  {
+   "Name": "Fire",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5760,
+   "Y": 2908
+  },
+  {
+   "Name": "Ice",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5210,
+   "Y": 2322
+  },
+  {
+   "Name": "BlackthornDungeon",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 6430,
+   "Y": 2678
+  },
+  {
+   "Name": "Blackthorn Castle",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 1529,
+   "Y": 1477
+  },
+  {
+   "Name": "Delucia",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 5228,
+   "Y": 3978
+  },
+  {
+   "Name": "Papua",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 5769,
+   "Y": 3176
+  },
+  {
+   "Name": "Misc Dungeons",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 6032,
+   "Y": 1499
+  },
+  {
+   "Name": "Orc Cave",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5137,
+   "Y": 2015
+  },
+  {
+   "Name": "Paroxysmus Exit",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 5623,
+   "Y": 3038
+  },
+  {
+   "Name": "Sanctuary Entrance",
+   "Kind": "place",
+   "Facet": 1,
+   "X": 762,
+   "Y": 1645
+  },
+  {
+   "Name": "Solen Hives",
+   "Kind": "dungeon",
+   "Facet": 1,
+   "X": 5774,
+   "Y": 1896
+  },
+  {
+   "Name": "Sea Market",
+   "Kind": "town",
+   "Facet": 1,
+   "X": 4550,
+   "Y": 2317
+  },
+  {
+   "Name": "Twisted Weald",
+   "Kind": "place",
+   "Facet": 2,
+   "X": 2189,
+   "Y": 1253
+  },
+  {
+   "Name": "Twisted Weald Desert",
+   "Kind": "place",
+   "Facet": 2,
+   "X": 2207,
+   "Y": 1188
+  },
+  {
+   "Name": "Ver Lor Reg",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 840,
+   "Y": 571
+  },
+  {
+   "Name": "Montor",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1646,
+   "Y": 319
+  },
+  {
+   "Name": "Ancient Citadel",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1516,
+   "Y": 542
+  },
+  {
+   "Name": "Alexandretta's Bowl",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1396,
+   "Y": 432
+  },
+  {
+   "Name": "Rock Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 2187,
+   "Y": 316
+  },
+  {
+   "Name": "Lenmir Anfinmotas",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1673,
+   "Y": 876
+  },
+  {
+   "Name": "Spider Cave",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 1785,
+   "Y": 991
+  },
+  {
+   "Name": "Reg Volon",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1363,
+   "Y": 1055
+  },
+  {
+   "Name": "Spectre Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 1983,
+   "Y": 1107
+  },
+  {
+   "Name": "Blood Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 2114,
+   "Y": 839
+  },
+  {
+   "Name": "Lake Shire",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1212,
+   "Y": 1144
+  },
+  {
+   "Name": "Bet-Lem Reg",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 1238,
+   "Y": 974
+  },
+  {
+   "Name": "Mistas",
+   "Kind": "town",
+   "Facet": 2,
+   "X": 818,
+   "Y": 1073
+  },
+  {
+   "Name": "Ankh Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 156,
+   "Y": 1484
+  },
+  {
+   "Name": "Wisp Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 628,
+   "Y": 1524
+  },
+  {
+   "Name": "Exodus Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 1966,
+   "Y": 117
+  },
+  {
+   "Name": "Sorcerer's Dungeon",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 429,
+   "Y": 108
+  },
+  {
+   "Name": "Ancient Lair",
+   "Kind": "dungeon",
+   "Facet": 2,
+   "X": 86,
+   "Y": 744
+  },
+  {
+   "Name": "Gravewater Lake [Underwater]",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 1700,
+   "Y": 1640
+  },
+  {
+   "Name": "Gravewater Dock",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 1700,
+   "Y": 1559
+  },
+  {
+   "Name": "Bedlam",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 117,
+   "Y": 1681
+  },
+  {
+   "Name": "Labyrinth",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 331,
+   "Y": 1973
+  },
+  {
+   "Name": "TheCitadel",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 106,
+   "Y": 1884
+  },
+  {
+   "Name": "Luna",
+   "Kind": "town",
+   "Facet": 3,
+   "X": 989,
+   "Y": 520
+  },
+  {
+   "Name": "Umbra",
+   "Kind": "town",
+   "Facet": 3,
+   "X": 2049,
+   "Y": 1344
+  },
+  {
+   "Name": "Doom",
+   "Kind": "dungeon",
+   "Facet": 3,
+   "X": 2366,
+   "Y": 1268
+  },
+  {
+   "Name": "Doom Guardian Room",
+   "Kind": "place",
+   "Facet": 3,
+   "X": 365,
+   "Y": 15
+  },
+  {
+   "Name": "Doom Gauntlet",
+   "Kind": "dungeon",
+   "Facet": 3,
+   "X": 429,
+   "Y": 340
+  },
+  {
+   "Name": "Yomotsu Mines",
+   "Kind": "dungeon",
+   "Facet": 3,
+   "X": 6,
+   "Y": 118
+  },
+  {
+   "Name": "Fan Dancer's Dojo",
+   "Kind": "dungeon",
+   "Facet": 3,
+   "X": 71,
+   "Y": 337
+  },
+  {
+   "Name": "Zento",
+   "Kind": "town",
+   "Facet": 4,
+   "X": 736,
+   "Y": 1256
+  },
+  {
+   "Name": "Tokuno Docks",
+   "Kind": "town",
+   "Facet": 4,
+   "X": 713,
+   "Y": 1360
+  },
+  {
+   "Name": "Abyss",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 946,
+   "Y": 72
+  },
+  {
+   "Name": "Underworld",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 1128,
+   "Y": 1207
+  },
+  {
+   "Name": "Atoll Bend",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 1118,
+   "Y": 3408
+  },
+  {
+   "Name": "Chicken Chase",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 560,
+   "Y": 3412
+  },
+  {
+   "Name": "Fishermans Reach",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 631,
+   "Y": 3035
+  },
+  {
+   "Name": "Gated Isle",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 703,
+   "Y": 3934
+  },
+  {
+   "Name": "High Plain",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 863,
+   "Y": 2931
+  },
+  {
+   "Name": "Kepetch Waste",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 447,
+   "Y": 3188
+  },
+  {
+   "Name": "Lost Settlement",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 526,
+   "Y": 3822
+  },
+  {
+   "Name": "Northern Steppes",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 822,
+   "Y": 3063
+  },
+  {
+   "Name": "Raptor Island",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 816,
+   "Y": 3778
+  },
+  {
+   "Name": "Royal City",
+   "Kind": "town",
+   "Facet": 5,
+   "X": 750,
+   "Y": 3440
+  },
+  {
+   "Name": "Royal Park",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 711,
+   "Y": 3255
+  },
+  {
+   "Name": "Slith Valley",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 1078,
+   "Y": 3331
+  },
+  {
+   "Name": "Spider Island",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 1115,
+   "Y": 3730
+  },
+  {
+   "Name": "StygianDragonLair",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 367,
+   "Y": 155
+  },
+  {
+   "Name": "Talon Point",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 676,
+   "Y": 3831
+  },
+  {
+   "Name": "Toxic Desert",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 1047,
+   "Y": 2980
+  },
+  {
+   "Name": "Void Island",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 440,
+   "Y": 3577
+  },
+  {
+   "Name": "Volcano",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 407,
+   "Y": 3010
+  },
+  {
+   "Name": "Walled Circus",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 370,
+   "Y": 3273
+  },
+  {
+   "Name": "Waterfall Point",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 661,
+   "Y": 2894
+  },
+  {
+   "Name": "Tomb of Kings",
+   "Kind": "place",
+   "Facet": 5,
+   "X": 35,
+   "Y": 236
+  },
+  {
+   "Name": "ToK Bridge",
+   "Kind": "place",
+   "Facet": 5,
+   "X": 37,
+   "Y": 33
+  },
+  {
+   "Name": "GreatApeLair",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 926,
+   "Y": 1464
+  },
+  {
+   "Name": "ZipactriotlLair",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 896,
+   "Y": 2304
+  },
+  {
+   "Name": "MyrmidexQueenLair",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 766,
+   "Y": 2306
+  },
+  {
+   "Name": "KotlCity",
+   "Kind": "dungeon",
+   "Facet": 5,
+   "X": 542,
+   "Y": 2473
+  }
+ ]
+}

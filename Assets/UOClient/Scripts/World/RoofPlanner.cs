@@ -13,7 +13,7 @@ namespace UOClient
     /// </summary>
     public sealed class RoofPlanner
     {
-        public const float PitchScale = 2.2f;
+        public const float PitchScale = 2.2f * WorldSpace.TileScale; // the same pitch on bigger tiles
         private const int NeighbourZRange = 12;
         private const int DefaultStep = 3;
         private const int MaxEaveSearch = 24;

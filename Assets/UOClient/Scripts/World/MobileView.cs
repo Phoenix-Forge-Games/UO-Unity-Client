@@ -43,6 +43,11 @@ namespace UOClient
 
         public void Bind(Mobile mobile, Animator animator)
         {
+            if (GetComponent<GrassPusher>() == null)
+            {
+                gameObject.AddComponent<GrassPusher>(); // walking through grass pushes it aside
+            }
+
             _mobile = mobile;
             _animator = animator;
             Refresh();
@@ -50,7 +55,43 @@ namespace UOClient
         }
 
         /// <summary>Swaps the Animator driven by movement (the model was rebuilt with new clothes).</summary>
-        public void SetAnimator(Animator animator) => _animator = animator;
+        public void SetAnimator(Animator animator)
+        {
+            _animator = animator;
+            _shown = null; // a rebuilt model: apply visibility to its renderers again
+        }
+
+        /// <summary>
+        /// Whether a mobile is drawn: everyone, except ghosts, which only their own player sees, and others only
+        /// while the ghost is in war mode (as in UO, a ghost "manifests" in war mode).
+        /// </summary>
+        public static bool IsVisible(Mobile mobile)
+        {
+            Mobile player = UoClientRuntime.Instance != null ? UoClientRuntime.Instance.World.Player : null;
+            return !mobile.IsGhost || mobile == player || mobile.WarMode;
+        }
+
+        private bool? _shown;
+
+        private void ApplyVisibility()
+        {
+            bool visible = IsVisible(_mobile);
+            if (_shown == visible)
+            {
+                return;
+            }
+
+            _shown = visible;
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                r.enabled = visible;
+            }
+
+            foreach (Collider c in GetComponents<Collider>())
+            {
+                c.enabled = visible;
+            }
+        }
 
         /// <summary>Re-reads position and facing from the mobile.</summary>
         public void Refresh()
@@ -95,6 +136,7 @@ namespace UOClient
             }
 
             UpdateAnimator();
+            ApplyVisibility();
         }
 
         private void UpdateAnimator()

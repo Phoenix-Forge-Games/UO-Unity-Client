@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="GameHud.uss" />
+    <ui:VisualElement name="root" class="hud" picking-mode="Ignore">
+        <ui:VisualElement name="nameplates" class="nameplates" picking-mode="Ignore" />
+        <ui:VisualElement name="chat" class="chat" picking-mode="Ignore">
+            <ui:ScrollView name="chat-log" class="chat-log" picking-mode="Ignore" />
+            <ui:TextField name="chat-input" class="chat-input hidden" max-length="200" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

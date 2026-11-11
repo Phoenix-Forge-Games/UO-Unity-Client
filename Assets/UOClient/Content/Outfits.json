@@ -1,0 +1,769 @@
+{
+ "Source": "ServUO scripts: shared NPC outfits (a creature's Outfit {\"Base\": name} means this outfit plus its own Items, with its own Female/Skin/Hair/Beard replacing these); HueRules and HairStyles migrated from ServUO's Utility hue and race rules",
+ "Outfits": {
+  "Brigand": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Hair": "Random",
+   "Items": [
+    {
+     "IfFemale": [
+      {
+       "Type": "Skirt",
+       "Hue": "Neutral"
+      }
+     ],
+     "IfMale": [
+      {
+       "Type": "ShortPants",
+       "Hue": "Neutral"
+      }
+     ]
+    },
+    {
+     "Type": "Boots",
+     "Hue": "Neutral"
+    },
+    {
+     "Type": "FancyShirt"
+    },
+    {
+     "Type": "Bandana"
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "Longsword"
+      },
+      {
+       "Type": "Cutlass"
+      },
+      {
+       "Type": "Broadsword"
+      },
+      {
+       "Type": "Axe"
+      },
+      {
+       "Type": "Club"
+      },
+      {
+       "Type": "Dagger"
+      },
+      {
+       "Type": "Spear"
+      }
+     ]
+    }
+   ]
+  },
+  "CasinoDealer": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Hair": {
+    "ItemID": "Random"
+   },
+   "Beard": {
+    "ItemID": "Random"
+   },
+   "Items": [
+    {
+     "Type": "FancyShirt",
+     "Hue": 1169
+    },
+    {
+     "Type": "Shoes",
+     "Hue": 1169
+    },
+    {
+     "Type": "LongPants",
+     "Hue": 1910,
+     "Name": "Elven Pants"
+    }
+   ]
+  },
+  "Dummy": {
+   "Skin": "Random",
+   "Hair": {
+    "ItemID": "Random",
+    "Hue": null
+   },
+   "Items": [
+    {
+     "Type": "LeatherGloves",
+     "Hue": null
+    }
+   ],
+   "OutfitUnparsed": [
+    "value: 20 + Team * 40",
+    "value: 20 + Team * 40"
+   ]
+  },
+  "FactionVendor": {
+   "Base": "Vendor",
+   "Female": false
+  },
+  "Healer": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Hair": "Random",
+   "Beard": {
+    "ItemID": "Random",
+    "Hue": "MatchHair"
+   },
+   "Items": [
+    {
+     "OneOf": [
+      {
+       "Type": "FancyShirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Doublet",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Shirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "Type": "Sandals",
+     "Hue": {
+      "OneOf": [
+       0,
+       "Neutral"
+      ],
+      "Weights": [
+       1,
+       9
+      ]
+     }
+    },
+    {
+     "IfFemale": [
+      {
+       "OneOf": [
+        {
+         "Type": "ShortPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "Kilt",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "Skirt",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        }
+       ],
+       "Weights": [
+        1,
+        2,
+        3
+       ]
+      }
+     ],
+     "IfMale": [
+      {
+       "OneOf": [
+        {
+         "Type": "LongPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "ShortPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "Type": "Robe",
+     "Hue": "Yellow"
+    }
+   ]
+  },
+  "MondainQuester": {
+   "Skin": "Random",
+   "Hair": "Random",
+   "Beard": {
+    "ItemID": "Random",
+    "Hue": "MatchHair"
+   },
+   "Items": [
+    {
+     "OneOf": [
+      {
+       "Type": "FancyShirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Doublet",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Shirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "Type": "Shoes",
+     "Hue": {
+      "OneOf": [
+       0,
+       "Neutral"
+      ],
+      "Weights": [
+       1,
+       9
+      ]
+     }
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "LongPants",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "ShortPants",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "Vendor": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Hair": "Random",
+   "Beard": {
+    "ItemID": "Random",
+    "Hue": "MatchHair"
+   },
+   "Items": [
+    {
+     "OneOf": [
+      {
+       "Type": "FancyShirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Doublet",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      },
+      {
+       "Type": "Shirt",
+       "Hue": {
+        "OneOf": [
+         "Blue",
+         "Green",
+         "Red",
+         "Yellow",
+         "Neutral"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "Type": "Shoes",
+     "Hue": {
+      "OneOf": [
+       0,
+       "Neutral"
+      ],
+      "Weights": [
+       1,
+       9
+      ]
+     }
+    },
+    {
+     "IfFemale": [
+      {
+       "OneOf": [
+        {
+         "Type": "ShortPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "Kilt",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "Skirt",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        }
+       ],
+       "Weights": [
+        1,
+        2,
+        3
+       ]
+      }
+     ],
+     "IfMale": [
+      {
+       "OneOf": [
+        {
+         "Type": "LongPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        },
+        {
+         "Type": "ShortPants",
+         "Hue": {
+          "OneOf": [
+           "Blue",
+           "Green",
+           "Red",
+           "Yellow",
+           "Neutral"
+          ]
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "ArcherGuard": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Items": [
+    {
+     "Type": "StuddedChest"
+    },
+    {
+     "Type": "StuddedArms"
+    },
+    {
+     "Type": "StuddedGloves"
+    },
+    {
+     "Type": "StuddedGorget"
+    },
+    {
+     "Type": "StuddedLegs"
+    },
+    {
+     "Type": "Boots"
+    },
+    {
+     "Type": "SkullCap"
+    },
+    {
+     "Type": "Bow"
+    }
+   ]
+  },
+  "WarriorGuard": {
+   "Female": "Random",
+   "Skin": "Random",
+   "Hair": "Random",
+   "Beard": {
+    "Chance": 50,
+    "Then": {
+     "ItemID": "Random",
+     "Hue": "MatchHair"
+    },
+    "Else": "None"
+   },
+   "Items": [
+    {
+     "IfFemale": [
+      {
+       "OneOf": [
+        {
+         "Type": "LeatherSkirt"
+        },
+        {
+         "Type": "LeatherShorts"
+        }
+       ]
+      },
+      {
+       "OneOf": [
+        {
+         "Type": "FemaleLeatherChest"
+        },
+        {
+         "Type": "FemaleStuddedChest"
+        },
+        {
+         "Type": "LeatherBustierArms"
+        },
+        {
+         "Type": "StuddedBustierArms"
+        },
+        {
+         "Type": "FemalePlateChest"
+        }
+       ]
+      }
+     ],
+     "IfMale": [
+      {
+       "Type": "PlateChest"
+      },
+      {
+       "Type": "PlateArms"
+      },
+      {
+       "Type": "PlateLegs"
+      },
+      {
+       "OneOf": [
+        {
+         "Type": "Doublet",
+         "Hue": "Nondyed"
+        },
+        {
+         "Type": "Tunic",
+         "Hue": "Nondyed"
+        },
+        {
+         "Type": "BodySash",
+         "Hue": "Nondyed"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "Type": "Halberd"
+    }
+   ]
+  },
+  "Gargoyle": {
+   "Female": "Random",
+   "Skin": "Neutral",
+   "Hair": "None",
+   "Items": [
+    {
+     "Type": "Kilt"
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "Cutlass"
+      },
+      {
+       "Type": "Scimitar"
+      },
+      {
+       "Type": "Club"
+      },
+      {
+       "Type": "Mace"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "HueRules": {
+  "Pink": {
+   "Min": 1201,
+   "Count": 54
+  },
+  "Blue": {
+   "Min": 1301,
+   "Count": 54
+  },
+  "Green": {
+   "Min": 1401,
+   "Count": 54
+  },
+  "Orange": {
+   "Min": 1501,
+   "Count": 54
+  },
+  "Red": {
+   "Min": 1601,
+   "Count": 54
+  },
+  "Yellow": {
+   "Min": 1701,
+   "Count": 54
+  },
+  "Neutral": {
+   "Min": 1801,
+   "Count": 108
+  },
+  "Snake": {
+   "Min": 2001,
+   "Count": 18
+  },
+  "Bird": {
+   "Min": 2101,
+   "Count": 30
+  },
+  "Slime": {
+   "Min": 2201,
+   "Count": 24
+  },
+  "Animal": {
+   "Min": 2301,
+   "Count": 18
+  },
+  "Metal": {
+   "Min": 2401,
+   "Count": 30
+  },
+  "Dyed": {
+   "Min": 2,
+   "Count": 1000
+  },
+  "Random": {
+   "Min": 2,
+   "Count": 1000
+  },
+  "Skin": {
+   "Min": 1002,
+   "Count": 57
+  },
+  "Hair": {
+   "Min": 1102,
+   "Count": 48
+  },
+  "Nondyed": {
+   "OneOf": [
+    "Pink",
+    "Blue",
+    "Green",
+    "Orange",
+    "Red",
+    "Yellow"
+   ]
+  },
+  "Bright": {
+   "Chance": 10,
+   "Then": {
+    "List": [
+     98,
+     113
+    ]
+   },
+   "Else": {
+    "List": [
+     3,
+     13,
+     19,
+     28,
+     33,
+     48,
+     55,
+     58,
+     68,
+     89
+    ]
+   }
+  },
+  "GargoyleSkin": {
+   "Min": 957,
+   "Count": 33
+  }
+ },
+ "HairStyles": {
+  "Human": {
+   "Hair": [
+    8251,
+    8252,
+    8253,
+    8260,
+    8261,
+    8263,
+    8265,
+    8266
+   ],
+   "FemaleExtra": 8262,
+   "MaleExtra": 8264,
+   "Beards": [
+    8254,
+    8255,
+    8256,
+    8257,
+    8267,
+    8268,
+    8269
+   ],
+   "Names": {
+    "8251": "Short",
+    "8252": "Long",
+    "8253": "Ponytail",
+    "8260": "Mohawk",
+    "8261": "Pageboy",
+    "8262": "Buns",
+    "8263": "Afro",
+    "8264": "Receding",
+    "8265": "Pigtails",
+    "8266": "Krisna",
+    "8254": "Long beard",
+    "8255": "Short beard",
+    "8256": "Goatee",
+    "8257": "Moustache",
+    "8267": "Short beard and moustache",
+    "8268": "Long beard and moustache",
+    "8269": "Vandyke"
+   }
+  }
+ }
+}

@@ -45,6 +45,21 @@ namespace UOClient.EditorTools
 
         public void OnPreprocessBuild(BuildReport report)
         {
+            // A dedicated server build is never handed to players (it runs on our own server), so it may carry the
+            // art it needs for world collision as-is. Client builds still have to go through the release pipeline.
+            if (report.summary.GetSubtarget<StandaloneBuildSubtarget>() == StandaloneBuildSubtarget.Server)
+            {
+                UnityEngine.Debug.Log("[Release] Dedicated server build: not for distribution; the release guard doesn't apply.");
+                return;
+            }
+
+            if (PlaytestBuilder.Active)
+            {
+                UnityEngine.Debug.LogWarning("[Release] Playtest build: the paid art is in ordinary Unity data files (not encrypted). " +
+                                             "For friends' playtests from the private patch host only; never publish it.");
+                return;
+            }
+
             if (!ReleaseBuilder.Active)
             {
                 throw new BuildFailedException(

@@ -48,6 +48,17 @@ namespace UOClient
             }
         }
 
+        /// <summary>Logs out: tells the server, closes the connection and goes back to the login screen.</summary>
+        public void LogOut()
+        {
+            World.Logout();
+            Session.Disconnect();
+            if (SceneManager.GetActiveScene().name != LoginScene)
+            {
+                SceneManager.LoadScene(LoginScene);
+            }
+        }
+
         private void OnEnteredWorld(LoginConfirm confirm)
         {
             World.Begin(confirm);

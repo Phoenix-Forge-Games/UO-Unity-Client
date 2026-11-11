@@ -27,7 +27,6 @@ namespace UOClient
             }
 
             SyntyBuildingGenerator.DressingEnabled = false;
-            SyntyBuildingGenerator.SquashPlainHalves = true;
             SyntyBuildingGenerator.ResetDoors();
             GameObject root;
             try

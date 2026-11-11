@@ -41,7 +41,7 @@ namespace UOClient.EditorTools
         /// <summary>Folders whose contents may only ship inside the encrypted pack.</summary>
         public static readonly string[] ProtectedRoots =
         {
-            "Assets/Synty/", "Assets/BK/", "Assets/UOClient/Materials/SyntyWalls/",
+            "Assets/Synty/", "Assets/BK/", "Assets/Secure/", "Assets/UOClient/Materials/SyntyWalls/", // Assets/Secure: paid packs and icons (Docs/SecureArt.md)
         };
 
         /// <summary>Where the house generator's by-name lookups resolve from, later folders winning.</summary>

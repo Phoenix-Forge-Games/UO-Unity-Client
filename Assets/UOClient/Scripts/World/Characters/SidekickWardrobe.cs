@@ -29,6 +29,19 @@ namespace UOClient
         Crown,
     }
 
+    /// <summary>How a held item sits in the hand.</summary>
+    public enum Grip
+    {
+        /// <summary>Right hand, pointing forward and a little up out of the fist (swords, axes, maces, daggers).</summary>
+        Blade,
+        /// <summary>Right hand, carried level and pointing forward, held at the middle (staffs, spears, polearms, tools).</summary>
+        Upright,
+        /// <summary>Left forearm, facing front-left.</summary>
+        Shield,
+        /// <summary>Left hand, level, string up toward the armpit (bows).</summary>
+        Bow,
+    }
+
     /// <summary>
     /// The Sidekick parts the client dresses humanoids from: a naked human, face variants, hair and beard
     /// styles keyed by UO graphic, and whole outfits tagged by what they're made of. Filled from the
@@ -49,6 +62,8 @@ namespace UOClient
             public bool LongHips;
             [Tooltip("Its back attachment is a cape or cloak (not a quiver, pack or shield).")]
             public bool Cape;
+            [Tooltip("Made for elves: elf bodies prefer these, humans skip them.")]
+            public bool Elven;
             public GameObject[] Parts;
         }
 
@@ -71,8 +86,38 @@ namespace UOClient
         public GameObject[] Body;
         [Tooltip("Nose, ear and eyebrow variants, picked per character.")]
         public GameObject[] Faces;
+        [Tooltip("A complete unclothed elf, for elf bodies (605-608).")]
+        public GameObject[] ElfBody;
+        [Tooltip("Elf nose and ear variants.")]
+        public GameObject[] ElfFaces;
+        [Serializable]
+        public sealed class Held
+        {
+            [Tooltip("Words in the UO item name, separated by |; the first entry that matches wins.")]
+            public string Names;
+            [Tooltip("Words that rule an item out (|-separated).")]
+            public string Exclude;
+            public Grip Grip;
+            [Tooltip("Slides the item along its own axes so the fist closes on its handle (metres; +Y towards the blade).")]
+            public Vector3 Offset;
+            [Tooltip("Extra turn in the hand (degrees, the item's own axes), for a model that sits differently.")]
+            public Vector3 Turn;
+            [Tooltip("Models to pick from, the same one for every copy of an item.")]
+            public GameObject[] Prefabs;
+        }
+
+        [Header("Gargoyles")]
+        [Tooltip("The rigged wing (Wing_Gargoyle_Rig); skinned to the Sidekick skin cells so skin hue tints it. One is placed per side, the left mirrored.")]
+        public GameObject GargoyleWing;
+        [Tooltip("Drives the wing: Spread (open) and Flap (beating) bools.")]
+        public RuntimeAnimatorController GargoyleWingController;
+        [Tooltip("Wing size next to the Synty gargoyle it came from (a 2.2 m monster) for a 1.8 m Sidekick.")]
+        public float GargoyleWingScale = 0.85f;
+
         public Style[] Hair;
         public Style[] Beards;
         public Outfit[] Outfits;
+        [Tooltip("Weapons, shields and tools held in the hands (UO layers 1 and 2), matched by item name.")]
+        public Held[] Weapons;
     }
 }

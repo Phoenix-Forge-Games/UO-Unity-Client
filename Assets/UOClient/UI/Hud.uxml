@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Hud.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <!-- Name plates, speech and damage numbers over the world; positioned every frame. -->
+        <ui:VisualElement name="overhead-layer" class="overhead-layer" picking-mode="Ignore" />
+
+        <!-- The player: name, war mode, hits / mana / stamina. -->
+        <ui:VisualElement name="player-frame" class="unit-frame player-frame">
+            <ui:VisualElement class="frame-header">
+                <ui:Label name="player-name" class="frame-name" />
+                <ui:Label name="war-badge" text="WAR" class="war-badge hidden" />
+            </ui:VisualElement>
+            <ui:VisualElement name="player-hits" class="bar bar-hits"><ui:VisualElement class="bar-fill" /><ui:Label class="bar-text" /></ui:VisualElement>
+            <ui:VisualElement name="player-mana" class="bar bar-mana"><ui:VisualElement class="bar-fill" /><ui:Label class="bar-text" /></ui:VisualElement>
+            <ui:VisualElement name="player-stamina" class="bar bar-stamina"><ui:VisualElement class="bar-fill" /><ui:Label class="bar-text" /></ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- The current target. -->
+        <ui:VisualElement name="target-frame" class="unit-frame target-frame hidden">
+            <ui:VisualElement class="frame-header">
+                <ui:Label name="target-name" class="frame-name" />
+                <ui:Label name="target-fighting" text="FIGHTING" class="war-badge hidden" />
+            </ui:VisualElement>
+            <ui:VisualElement name="target-hits" class="bar bar-hits"><ui:VisualElement class="bar-fill" /><ui:Label class="bar-text" /></ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Chat: the log, and an input line that opens with Enter. -->
+        <ui:VisualElement name="chat" class="chat">
+            <ui:ScrollView name="chat-log" class="chat-log" />
+            <ui:TextField name="chat-input" class="chat-input hidden" />
+        </ui:VisualElement>
+
+        <ui:Label name="controls-hint" class="controls-hint" text="WASD move · Shift run · RMB look · Click select · Tab target · E interact · R attack · ` war mode · Enter chat · B backpack · C character · Esc menu" />
+
+        <!-- Windows (backpack, character, containers, dialogue, menu), then tooltips, drag ghost and context menus above them. -->
+        <ui:VisualElement name="window-layer" class="layer" picking-mode="Ignore" />
+        <ui:VisualElement name="overlay-layer" class="layer" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

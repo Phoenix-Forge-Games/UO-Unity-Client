@@ -36,12 +36,26 @@ namespace UOClient.World
         public bool Running;
         public readonly Dictionary<byte, EquippedItem> Equipment = new Dictionary<byte, EquippedItem>();
 
+        /// <summary>
+        /// Hit points, mana and stamina. For the player these are real values; for others the server usually
+        /// sends a fraction out of 25 (HitsMax 25). 0 max means unknown.
+        /// </summary>
+        public int Hits, HitsMax, Mana, ManaMax, Stamina, StaminaMax;
+
+        public bool WarMode => (Flags & 0x40) != 0;
+
+        /// <summary>0..1 health, or -1 if unknown.</summary>
+        public float HealthFraction => HitsMax > 0 ? (float)Hits / HitsMax : -1f;
+
         /// <summary>Human, elf and gargoyle bodies, which get a Sidekick model.</summary>
         public bool IsHumanoid =>
             Body == 400 || Body == 401 || Body == 402 || Body == 403 ||
             Body == 605 || Body == 606 || Body == 607 || Body == 608 ||
             Body == 666 || Body == 667 || Body == 694 || Body == 695 ||
             Body == 0x3DB || Body == 0x3DF;
+
+        /// <summary>A dead player or NPC (human, elf or gargoyle ghost body).</summary>
+        public bool IsGhost => Body == 402 || Body == 403 || Body == 607 || Body == 608 || Body == 694 || Body == 695;
 
         public bool IsFemale => Body == 401 || Body == 403 || Body == 606 || Body == 608 || Body == 667 || Body == 695;
     }

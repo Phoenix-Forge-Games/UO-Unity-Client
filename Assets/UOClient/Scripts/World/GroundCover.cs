@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UOClient.Data;
@@ -222,7 +223,14 @@ namespace UOClient
         /// (floors, roads, walls, roofs), land kinds with no ground cover (paving, water, snow...),
         /// and tiles too steep to hold grass.
         /// </summary>
-        private bool[,] FindBareTiles(MapFacet map, int originX, int originY, int chunkTiles)
+        /// <summary>
+        /// Tiles nothing should grow on (floors, roads, walls, roofs), with a one-tile border. Steep drops count
+        /// only when `steep` is set: the terrain's detail grass leans off them, the VFX grass leans with the ground.
+        /// </summary>
+        public bool[,] BareTiles(MapFacet map, int originX, int originY, int chunkTiles, bool steep = false) =>
+            FindBareTiles(map, originX, originY, chunkTiles, steep);
+
+        private bool[,] FindBareTiles(MapFacet map, int originX, int originY, int chunkTiles, bool steep = true)
         {
             int size = chunkTiles + 2;
             var bare = new bool[size, size];
@@ -234,13 +242,13 @@ namespace UOClient
                     LandKind kind = LandClassifier.Get(map.GetLand(x, y).TileId);
                     Cover cover = CoverFor(kind);
                     bool noCover = cover.Grass <= 0f && cover.Flowers <= 0f && cover.Fern <= 0f;
-                    bare[ty + 1, tx + 1] = noCover || IsSteep(map, x, y);
+                    bare[ty + 1, tx + 1] = noCover || (steep && IsSteep(map, x, y));
                 }
             }
 
             // Grass beside a steep drop overhangs it (blades lean out over the edge), so those tiles stay bare too.
             var nearSteep = new bool[size, size];
-            for (int ty = -1; ty <= chunkTiles; ty++)
+            for (int ty = -1; steep && ty <= chunkTiles; ty++)
             {
                 for (int tx = -1; tx <= chunkTiles; tx++)
                 {
@@ -300,8 +308,27 @@ namespace UOClient
                 }
             }
 
+            // Water, flooded gaps and the bank tiles sloping into them stay bare: the terrain dips under the water
+            // there, and plants would stand in it or hang over it.
+            if (NearWater != null)
+            {
+                for (int ty = -1; ty <= chunkTiles; ty++)
+                {
+                    for (int tx = -1; tx <= chunkTiles; tx++)
+                    {
+                        if (NearWater(originX + tx, originY + ty))
+                        {
+                            bare[ty + 1, tx + 1] = true;
+                        }
+                    }
+                }
+            }
+
             return bare;
         }
+
+        /// <summary>Optional: whether a tile is water or beside it (set by the terrain streamer).</summary>
+        public Func<int, int, bool> NearWater { get; set; }
 
         private static bool IsSteep(MapFacet map, int x, int y)
         {

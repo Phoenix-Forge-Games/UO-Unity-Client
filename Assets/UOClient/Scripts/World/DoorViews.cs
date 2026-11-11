@@ -15,7 +15,7 @@ namespace UOClient
     public sealed class DoorViews
     {
         /// <summary>How far (metres, across the ground) a door item may be from the generated door it drives.</summary>
-        private const float BindReach = 2.6f;
+        private const float BindReach = 2.6f * WorldSpace.TileScale; // about two tiles
         private const float BindHeight = 2.5f;
 
         /// <summary>

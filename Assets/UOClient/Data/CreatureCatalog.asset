@@ -1,0 +1,548 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5162a726c779695419606856538e9027, type: 3}
+  m_Name: CreatureCatalog
+  m_EditorClassIdentifier: UOClient::UOClient.CreatureCatalog
+  Entries:
+  - Name: timber wolves
+    Bodies: e100t
+    Prefab: {fileID: 3112539015633480544, guid: 124eaf1613f08af408ff81d78f284efc, type: 3}
+    Height: 0.95
+    Tint: {r: 0.85, g: 0.78, b: 0.68, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: grey wolves
+    Bodies: 1900t
+    Prefab: {fileID: 3112539015633480544, guid: 124eaf1613f08af408ff81d78f284efc, type: 3}
+    Height: 0.9
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: dire wolves
+    Bodies: 1700t
+    Prefab: {fileID: 3112539015633480544, guid: 124eaf1613f08af408ff81d78f284efc, type: 3}
+    Height: 1.15
+    Tint: {r: 0.5, g: 0.45, b: 0.45, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: white wolves
+    Bodies: 2200t
+    Prefab: {fileID: 5070970555905534327, guid: 5a5c50529ffc22c44a46697d7437a32a, type: 3}
+    Height: 0.95
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: tsuki wolves
+    Bodies: fa00t
+    Prefab: {fileID: 3112539015633480544, guid: 124eaf1613f08af408ff81d78f284efc, type: 3}
+    Height: 1.1
+    Tint: {r: 0.55, g: 0.55, b: 0.75, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: dogs
+    Bodies: d900t
+    Prefab: {fileID: 7144499433319541931, guid: a255fcf633ed9cc458469318d3f7c20c, type: 3}
+    Height: 0.75
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: hellhounds
+    Bodies: 6200t
+    Prefab: {fileID: 6465848613317568473, guid: 93b055cb6d6acc94abfd0cc43ad589af, type: 3}
+    Height: 1.1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
+    Hide: []
+  - Name: orcs
+    Bodies: 1100t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 1.95
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: orc captains
+    Bodies: 0700t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 2.05
+    Tint: {r: 0.85, g: 0.8, b: 0.8, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: orcish lords
+    Bodies: 8a00t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 2.15
+    Tint: {r: 0.75, g: 0.7, b: 0.7, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: orc brutes
+    Bodies: bd00t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 2.6
+    Tint: {r: 0.7, g: 0.6, b: 0.55, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: orcish mages
+    Bodies: 8c00t
+    Prefab: {fileID: 1042931328060984, guid: 7161ed0803b6af44eba14325b62837de, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: orc scouts and bombers
+    Bodies: b500b600t
+    Prefab: {fileID: 1475337874035606, guid: c4e3b5d3572bced46ab0fdb482897812, type: 3}
+    Height: 1.7
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: goblins
+    Bodies: d302t
+    Prefab: {fileID: 1387492477484550, guid: 7ee713c854e6be5469a1372d66b7bc40, type: 3}
+    Height: 1.35
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ogres
+    Bodies: 0100t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 2.9
+    Tint: {r: 0.8, g: 0.75, b: 0.6, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ogre lords
+    Bodies: 5300t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 3.2
+    Tint: {r: 0.7, g: 0.6, b: 0.5, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: arctic ogre lords
+    Bodies: 8700t
+    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Height: 3.2
+    Tint: {r: 0.75, g: 0.85, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ettins
+    Bodies: 1200t
+    Prefab: {fileID: 1652650793432430, guid: d9162a78a8deb714a9bddd8038021008, type: 3}
+    Height: 3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: cyclopes
+    Bodies: 4b00t
+    Prefab: {fileID: 8819096054705208385, guid: fbb5143a88cef74478e1577026fe00bd, type: 3}
+    Height: 3.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: titans
+    Bodies: 4c00t
+    Prefab: {fileID: 3248205564461915851, guid: 33b484149d027ed4699f85cc7b99b1b0, type: 3}
+    Height: 3.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: trolls
+    Bodies: 35003600t
+    Prefab: {fileID: 1473157611212552, guid: 2250a4a4fc528684c85ba955eb992ec6, type: 3}
+    Height: 2.5
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: frost trolls
+    Bodies: 3700t
+    Prefab: {fileID: 3733808366589169053, guid: 1d4c9650214c5de44bbbb96cb76e407e, type: 3}
+    Height: 2.6
+    Tint: {r: 0.75, g: 0.85, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: daemons
+    Bodies: 0900t
+    Prefab: {fileID: 1248874732774416, guid: 3c9c85e47d53d1f4aaa97330d98c0680, type: 3}
+    Height: 2.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: balrons
+    Bodies: 2800t
+    Prefab: {fileID: 1314014854321362, guid: 13087e211b7388945b22bab7dd93cb8f, type: 3}
+    Height: 3.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: chaos daemons
+    Bodies: 1803t
+    Prefab: {fileID: 8441074245178239377, guid: 052a4d6f692dfd04cafe4b85b10af89a, type: 3}
+    Height: 2.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: imps
+    Bodies: 4a00t
+    Prefab: {fileID: 4022236762757211066, guid: b6de10cf9adbb5f4bb72a98a89b1c12e, type: 3}
+    Height: 1.1
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: succubi
+    Bodies: 9500t
+    Prefab: {fileID: 1997296248483302, guid: 9984be23625843a48a44d88aae5669f2, type: 3}
+    Height: 2.2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ice fiends
+    Bodies: 2b00t
+    Prefab: {fileID: 8392575543211945509, guid: 656bc1d66d8580f4c8f0c1d907913285, type: 3}
+    Height: 3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: molochs
+    Bodies: 1103t
+    Prefab: {fileID: 2620694511148753105, guid: fa02fa322a7855f4fbae4ee61a93f737, type: 3}
+    Height: 3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: earth elementals
+    Bodies: 0e00t
+    Prefab: {fileID: 1293082480778088, guid: beba2944035d3c54abd09d3d023aa9a8, type: 3}
+    Height: 2.3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: golems
+    Bodies: f002t
+    Prefab: {fileID: 1170732337855516, guid: 5aed7f791a03c2a4ba0040d2fa161639, type: 3}
+    Height: 2.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: water elementals
+    Bodies: 1000t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.45, g: 0.65, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: air elementals
+    Bodies: 0d00t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.85, g: 0.92, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: fire elementals
+    Bodies: 0f00t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 1, g: 0.55, b: 0.3, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: poison elementals
+    Bodies: 9e00a200t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.55, g: 0.9, b: 0.4, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: blood elementals
+    Bodies: 9f00t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.85, g: 0.25, b: 0.25, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ice and snow elementals
+    Bodies: a100a300t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.9, g: 0.95, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: crystal elementals
+    Bodies: 2c01t
+    Prefab: {fileID: 1334977650429898, guid: 93c0dd75ddc1c9f4dabe9f061ef19748, type: 3}
+    Height: 2.4
+    Tint: {r: 0.8, g: 0.6, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: dull copper elementals
+    Bodies: 6e00t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.8, g: 0.6, b: 0.5, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: copper elementals
+    Bodies: 6d00t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.9, g: 0.55, b: 0.35, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: bronze elementals
+    Bodies: 6c00t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.85, g: 0.6, b: 0.3, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: shadow iron elementals
+    Bodies: 6f00t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.45, g: 0.45, b: 0.5, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: gold elementals
+    Bodies: a600t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 1, g: 0.85, b: 0.35, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: agapite elementals
+    Bodies: 6b00t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.85, g: 0.45, b: 0.45, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: verite elementals
+    Bodies: 7100t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.5, g: 0.8, b: 0.5, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: valorite elementals
+    Bodies: 7000t
+    Prefab: {fileID: 1691206179217438, guid: fe16b94572a04254e9757241e9e92235, type: 3}
+    Height: 2.3
+    Tint: {r: 0.45, g: 0.6, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: gargoyles
+    Bodies: 0400t
+    Prefab: {fileID: 9020730524547166879, guid: 2e019375636fea1468f45103b4ad73b4, type: 3}
+    Height: 2.2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: stone gargoyles
+    Bodies: 4300t
+    Prefab: {fileID: 9020730524547166879, guid: 2e019375636fea1468f45103b4ad73b4, type: 3}
+    Height: 2.6
+    Tint: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: fire gargoyles
+    Bodies: 8200t
+    Prefab: {fileID: 9020730524547166879, guid: 2e019375636fea1468f45103b4ad73b4, type: 3}
+    Height: 2.3
+    Tint: {r: 1, g: 0.6, b: 0.4, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: skeletons
+    Bodies: 3200t
+    Prefab: {fileID: 8146240625886029692, guid: 15f1b724e0139c5428bff76a4ad9bffe, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: skeletal knights
+    Bodies: 9300t
+    Prefab: {fileID: 1438608989707952, guid: f6362dc4479aaf549a3fdaedef699623, type: 3}
+    Height: 2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: bone knights
+    Bodies: 3900t
+    Prefab: {fileID: 4376708952660885327, guid: 7472f1051c156254781f50ed411e09f1, type: 3}
+    Height: 2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: skeletal mages
+    Bodies: 9400t
+    Prefab: {fileID: 1064298965650098, guid: 1e1312b383a084a42a9930f135c39ff7, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: patchwork skeletons
+    Bodies: 3501t
+    Prefab: {fileID: 213336293066786039, guid: 191ab4327a71e6e46aaea0d91fcc2102, type: 3}
+    Height: 1.9
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: zombies
+    Bodies: 0300t
+    Prefab: {fileID: 1420721924255983016, guid: 3efcb189e3b848043b96e3d600fe4504, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ghouls
+    Bodies: 9900t
+    Prefab: {fileID: 1624297157784127137, guid: e2e9ebda41fe88348b74410cf89e3dd8, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: rotting corpses
+    Bodies: 9b00t
+    Prefab: {fileID: 7976083042693861270, guid: 84fd498bca734894596614dddee5417b, type: 3}
+    Height: 1.9
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: spectres and wraiths
+    Bodies: 1a00t
+    Prefab: {fileID: 5410729976943279606, guid: e11ce839d96dc92419d0914c5be330e4, type: 3}
+    Height: 2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: headless ones
+    Bodies: 1f00t
+    Prefab: {fileID: 1877307886535162, guid: fda5edc93819a5946901f75bc534ac54, type: 3}
+    Height: 1.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: restless souls
+    Bodies: ca03t
+    Prefab: {fileID: 1084090695722338, guid: fca0db359d6a91b4c8c39324d314cd2e, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: spectral armour
+    Bodies: 7d02t
+    Prefab: {fileID: 1246891314395918, guid: cb4ff29f6f657bc4d94ed49c50a70be2, type: 3}
+    Height: 2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: liches
+    Bodies: 1800t
+    Prefab: {fileID: 4738084445078591851, guid: a19d87296d55e45438e553a58dd8f5aa, type: 3}
+    Height: 1.9
+    Tint: {r: 0.8, g: 0.85, b: 0.8, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: lich lords
+    Bodies: 4f00t
+    Prefab: {fileID: 7930512639828504110, guid: 0ce77ee7957dac142ba8cce765767015, type: 3}
+    Height: 2.2
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: ancient liches
+    Bodies: 4e00t
+    Prefab: {fileID: 7930512639828504110, guid: 0ce77ee7957dac142ba8cce765767015, type: 3}
+    Height: 2.6
+    Tint: {r: 0.7, g: 0.75, b: 0.9, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: evil mages
+    Bodies: 7c007d00t
+    Prefab: {fileID: 4738084445078591851, guid: a19d87296d55e45438e553a58dd8f5aa, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: mummies
+    Bodies: 9a00t
+    Prefab: {fileID: 4831699300985857885, guid: c26d7f0281c0d9543bd19a0cbe6bd907, type: 3}
+    Height: 1.9
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: flesh golems
+    Bodies: 3001t
+    Prefab: {fileID: 1397897947513670, guid: 602e2bafea94085478f3eb9b58f4f7b6, type: 3}
+    Height: 2.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: plague beasts
+    Bodies: 0703t
+    Prefab: {fileID: 1658146812600542, guid: 574d3bbe7d1c8684f9101c2b823c5770, type: 3}
+    Height: 2.4
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: boglings
+    Bodies: 0b03t
+    Prefab: {fileID: 1960997148460282, guid: a3029e28af10f4f458f5d25d6118a906, type: 3}
+    Height: 1.5
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: bog things
+    Bodies: 0c03t
+    Prefab: {fileID: 1389694247779218, guid: 6e6f4b3417a0abb45b1cce8fdf021eb5, type: 3}
+    Height: 2.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: devourers
+    Bodies: 2f01t
+    Prefab: {fileID: 3436719966032767522, guid: c16308caeec590b4cb7f4fa3b22c701a, type: 3}
+    Height: 2.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: reapers
+    Bodies: 2f00t
+    Prefab: {fileID: 1520184032351820, guid: eda5ef8bfa1b36842be7b6d0ddc57616, type: 3}
+    Height: 3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: lizardmen
+    Bodies: 2300t
+    Prefab: {fileID: 8269532300110413247, guid: 29a00fdfaae276b4ba15f832b103b986, type: 3}
+    Height: 1.9
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: gorillas
+    Bodies: 1d00t
+    Prefab: {fileID: 9216226554741251741, guid: a8de8b9022f877e428726eb12a253ecf, type: 3}
+    Height: 1.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide:
+    - SM_Chr_Kaiju_04_Tail_01
+  - Name: savages
+    Bodies: b800t
+    Prefab: {fileID: 5065931336289498697, guid: 0a59082416d6783408dfbc27326fe595, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: savage shamans
+    Bodies: ba00t
+    Prefab: {fileID: 4418210032240382735, guid: b5f2bce7d55bde3429daba88414a8ac9, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []

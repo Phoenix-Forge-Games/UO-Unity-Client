@@ -46,11 +46,18 @@ namespace UOClient.Buildings.Synty
     {
         // ---------------------------------------------------------------- measured dimensions
 
-        /// <summary>Full wall module, and the cell the specs are written in.</summary>
+        /// <summary>Full wall module: the width of a whole panel, door, window, roof bay or floor slab.</summary>
         public const float Cell = 2.5f;
 
         /// <summary>The only sub-division the kit ships. A run that needs 0.5 m cannot be closed.</summary>
         public const float Half = 1.25f;
+
+        /// <summary>
+        /// The PLAN unit the specs are written in: one UO tile, 1.25 m. Plans are drawn on this grid so a house
+        /// keeps its exact UO footprint, and every run is closed with true-size pieces — whole 2.5 m modules plus
+        /// a 1.25 m half where a length is odd. Nothing is ever scaled to fit.
+        /// </summary>
+        public const float Unit = 1.25f;
 
         /// <summary>Top of the base plinth = the ground-floor datum. Measured off `Base_Wall_01` (0 → 1.253).</summary>
         public const float BaseTop = 1.25f;

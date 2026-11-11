@@ -92,8 +92,85 @@ namespace UOClient.Data
             var block = new MapBlock();
             ReadLand(blockNumber, block);
             ReadStatics(blockNumber, block);
+            AddOverlays(blockNumber, block);
             _cache[blockNumber] = block;
             return block;
+        }
+
+        // ---- Multis laid over the map ----
+
+        /// <summary>Tiles of server multis (houses, boats), by block number, so they read like map statics.</summary>
+        private readonly Dictionary<int, List<(uint Owner, StaticTile Tile)>> _overlays = new Dictionary<int, List<(uint, StaticTile)>>();
+
+        /// <summary>
+        /// Lays a multi's tiles (at its centre x, y, z) over the map. Replaces any earlier tiles of the same owner.
+        /// Returns the blocks whose contents changed.
+        /// </summary>
+        public HashSet<(int BlockX, int BlockY)> SetOverlay(uint owner, int x, int y, int z, IEnumerable<MultiTile> tiles)
+        {
+            HashSet<(int, int)> changed = RemoveOverlay(owner);
+            foreach (MultiTile tile in tiles)
+            {
+                int tx = x + tile.X, ty = y + tile.Y;
+                int bx = tx >> 3, by = ty >> 3;
+                if (tx < 0 || ty < 0 || bx >= BlocksWide || by >= BlocksHigh)
+                {
+                    continue;
+                }
+
+                int number = bx * BlocksHigh + by;
+                if (!_overlays.TryGetValue(number, out List<(uint, StaticTile)> list))
+                {
+                    _overlays[number] = list = new List<(uint, StaticTile)>();
+                }
+
+                list.Add((owner, new StaticTile { Graphic = tile.Graphic, X = (byte)(tx & 7), Y = (byte)(ty & 7), Z = (sbyte)Math.Max(sbyte.MinValue, Math.Min(sbyte.MaxValue, z + tile.Z)) }));
+                changed.Add((bx, by));
+            }
+
+            foreach ((int bx, int by) in changed)
+            {
+                _cache.Remove(bx * BlocksHigh + by);
+            }
+
+            return changed;
+        }
+
+        /// <summary>Takes a multi's tiles off the map. Returns the blocks whose contents changed.</summary>
+        public HashSet<(int BlockX, int BlockY)> RemoveOverlay(uint owner)
+        {
+            var changed = new HashSet<(int, int)>();
+            foreach (KeyValuePair<int, List<(uint Owner, StaticTile Tile)>> pair in _overlays)
+            {
+                if (pair.Value.RemoveAll(t => t.Owner == owner) > 0)
+                {
+                    changed.Add((pair.Key / BlocksHigh, pair.Key % BlocksHigh));
+                }
+            }
+
+            foreach ((int bx, int by) in changed)
+            {
+                _cache.Remove(bx * BlocksHigh + by);
+            }
+
+            return changed;
+        }
+
+        private void AddOverlays(int blockNumber, MapBlock block)
+        {
+            if (!_overlays.TryGetValue(blockNumber, out List<(uint Owner, StaticTile Tile)> list) || list.Count == 0)
+            {
+                return;
+            }
+
+            var statics = new StaticTile[block.Statics.Length + list.Count];
+            Array.Copy(block.Statics, statics, block.Statics.Length);
+            for (int i = 0; i < list.Count; i++)
+            {
+                statics[block.Statics.Length + i] = list[i].Tile;
+            }
+
+            block.Statics = statics;
         }
 
         public LandCell GetLand(int x, int y)

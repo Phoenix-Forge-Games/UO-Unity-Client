@@ -100,6 +100,9 @@ namespace UOClient
     /// <summary>Collects prefab copies for one map block and bakes them into one mesh per material.</summary>
     public sealed class MergedPrefabBuilder
     {
+        /// <summary>Set by the world baker: each merged object also gets a <see cref="MergedParts"/>.</summary>
+        public static bool KeepParts { get; set; }
+
         private readonly Dictionary<Material, List<CombineInstance>> _byMaterial =
             new Dictionary<Material, List<CombineInstance>>();
 
@@ -148,6 +151,12 @@ namespace UOClient
                 go.AddComponent<MeshFilter>().sharedMesh = mesh;
                 go.AddComponent<MeshRenderer>().sharedMaterial = pair.Key;
                 go.AddComponent<MeshCollider>().sharedMesh = mesh; // camera obstacle avoidance
+                if (KeepParts)
+                {
+                    MergedParts parts = go.AddComponent<MergedParts>();
+                    parts.Material = pair.Key;
+                    parts.Parts.AddRange(pair.Value);
+                }
             }
         }
     }

@@ -58,6 +58,17 @@ namespace UOClient.Net
             WriteByte(0);
         }
 
+        /// <summary>Writes NUL-terminated big-endian UTF-16 text.</summary>
+        public void WriteUnicodeNullTerminated(string value)
+        {
+            foreach (char c in value ?? string.Empty)
+            {
+                WriteUInt16(c);
+            }
+
+            WriteUInt16(0);
+        }
+
         public void WriteZero(int count)
         {
             for (int i = 0; i < count; i++)

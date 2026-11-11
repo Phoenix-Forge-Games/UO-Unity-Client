@@ -67,8 +67,11 @@ namespace UOClient
 
         /// <summary>
         /// Places the prop for tiles (x0, y0)-(x1, y1) (inclusive; one tile unless grouped) standing at z.
+        /// <paramref name="serverItem"/>: a server item, not a map static (tables among them are remembered for seats;
+        /// map tables are read from the map, so the result never depends on which block was built first).
         /// </summary>
-        public GameObject Place(Transform parent, PropCatalog.Entry entry, ushort graphic, int x0, int y0, int x1, int y1, int z)
+        public GameObject Place(Transform parent, PropCatalog.Entry entry, ushort graphic, int x0, int y0, int x1, int y1, int z,
+            bool serverItem = false)
         {
             uint hash = Hash(x0, y0, graphic);
             GameObject prefab = entry.Prefabs[(int)(hash % (uint)entry.Prefabs.Length)];
@@ -164,6 +167,23 @@ namespace UOClient
                     break;
                 }
 
+                case PropFit.Bracket:
+                {
+                    (bool found, float wallYaw, Vector3 onWall) = WallBeside(x0, y0, z);
+                    if (!found)
+                    {
+                        goto default;
+                    }
+
+                    // wallYaw turns a prop's +z away from the wall; a quarter turn more points the arm (-x) out.
+                    yaw = wallYaw + 90f;
+                    Vector3 outward = Quaternion.Euler(0f, wallYaw, 0f) * Vector3.forward;
+                    float top = (WallTopBeside(x0, y0, z) ?? z + 20) * WorldSpace.ZScale - HangBelowEaves;
+                    scale = Vector3.one;
+                    centre = new Vector3(onWall.x, top - b.size.y, onWall.z) + outward * (b.size.x * 0.5f);
+                    break;
+                }
+
                 case PropFit.Block:
                 {
                     // Exactly the tile's footprint and UO height, so walkable blocks and steps match the server,
@@ -227,7 +247,7 @@ namespace UOClient
 
             GameObject placed = Spawn(parent, prefab, b, Quaternion.Euler(0f, yaw, 0f), scale, centre);
             StaticTileInfo placedInfo = _tiles.GetStatic(graphic);
-            if (placedInfo.Is(TileFlag.Surface) && placedInfo.Is(TileFlag.Impassable) && !placedInfo.Is(TileFlag.Bridge))
+            if (serverItem && IsTable(placedInfo))
             {
                 for (int ty = y0; ty <= y1; ty++)
                 {
@@ -437,6 +457,9 @@ namespace UOClient
             return false;
         }
 
+        /// <summary>Pitch of a stair flight (degrees) where the run is long enough for it.</summary>
+        private const float StairPitch = 35f;
+
         /// <summary>
         /// Places one flight for a run of UO stair tiles (x0, y0)-(x1, y1), from the lowest step's base
         /// <paramref name="bottomZ"/> up to <paramref name="topZ"/>, climbing toward <paramref name="climb"/>
@@ -453,15 +476,31 @@ namespace UOClient
 
             Bounds b = LocalBounds(prefab);
             bool alongX = climb.Dx != 0;
-            float length = (alongX ? x1 - x0 + 1 : y1 - y0 + 1) * WorldSpace.TileSize;
+            float run = (alongX ? x1 - x0 + 1 : y1 - y0 + 1) * WorldSpace.TileSize;
             float width = (alongX ? y1 - y0 + 1 : x1 - x0 + 1) * WorldSpace.TileSize;
+            float rise = Mathf.Max(topZ - bottomZ, 1) * WorldSpace.ZScale;
+            // UO climbs about 5 Z per tile, which on 2.5 m tiles is a 14 degree ramp; a flight takes a natural pitch
+            // instead, as long as the run allows, standing against the top step so it still meets the landing (the
+            // run's lower tiles are floor).
+            float length = Mathf.Clamp(rise / Mathf.Tan(StairPitch * Mathf.Deg2Rad), WorldSpace.TileSize * 0.5f, run);
+            float half = length * 0.5f / WorldSpace.TileSize; // in tiles
             // Synty flights climb toward their local -x: east 180, west 0, north (Unity +z) 90, south -90.
             float yaw = climb.Dx > 0 ? 180f : climb.Dx < 0 ? 0f : climb.Dy < 0 ? 90f : -90f;
             var scale = new Vector3(
                 length / Mathf.Max(b.size.x, 0.01f),
-                Mathf.Max(topZ - bottomZ, 1) * WorldSpace.ZScale / Mathf.Max(b.size.y, 0.01f),
+                rise / Mathf.Max(b.size.y, 0.01f),
                 width / Mathf.Max(b.size.z, 0.01f));
-            var centre = new Vector3(WorldSpace.X((x0 + x1 + 1) * 0.5f), bottomZ * WorldSpace.ZScale, WorldSpace.Z((y0 + y1 + 1) * 0.5f));
+            float cx = (x0 + x1 + 1) * 0.5f, cy = (y0 + y1 + 1) * 0.5f;
+            if (alongX)
+            {
+                cx = (climb.Dx > 0 ? x1 + 1 : x0) - climb.Dx * half; // back from the high end
+            }
+            else
+            {
+                cy = (climb.Dy < 0 ? y0 : y1 + 1) - climb.Dy * half;
+            }
+
+            var centre = new Vector3(WorldSpace.X(cx), bottomZ * WorldSpace.ZScale, WorldSpace.Z(cy));
 
             return Spawn(parent, prefab, b, Quaternion.Euler(0f, yaw, 0f), scale, centre);
         }
@@ -504,7 +543,7 @@ namespace UOClient
         {
             foreach (Collider collider in instance.GetComponentsInChildren<Collider>(true))
             {
-                Object.Destroy(collider);
+                Object.DestroyImmediate(collider); // now, not at frame end: the world bake records this frame
             }
 
             if (_layer >= 0)
@@ -692,6 +731,10 @@ namespace UOClient
             return null;
         }
 
+        /// <summary>Something to sit at: a surface you can't walk through (tables, counters, desks).</summary>
+        private static bool IsTable(StaticTileInfo info) =>
+            info.Is(TileFlag.Surface) && info.Is(TileFlag.Impassable) && !info.Is(TileFlag.Bridge);
+
         private bool TableStaticAt(int x, int y, int z)
         {
             MapBlock block = Map?.GetBlock(x >> 3, y >> 3);
@@ -707,8 +750,7 @@ namespace UOClient
                     continue;
                 }
 
-                StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
-                if (info.Is(TileFlag.Surface) && info.Is(TileFlag.Impassable) && !info.Is(TileFlag.Bridge) && info.Height >= 3)
+                if (IsTable(_tiles.GetStatic(tile.Graphic)))
                 {
                     return true;
                 }

@@ -1,6 +1,5 @@
 using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace UOClient
 {
@@ -55,20 +54,15 @@ namespace UOClient
 
         private void ReadInput()
         {
-            Mouse mouse = Mouse.current;
-            if (mouse == null)
+            if (GameInput.Gameplay.LookHold.IsPressed())
             {
-                return;
-            }
-
-            if (mouse.rightButton.isPressed)
-            {
-                Vector2 delta = mouse.delta.ReadValue();
+                Vector2 delta = GameInput.Gameplay.Look.ReadValue<Vector2>();
                 _yaw += delta.x * _lookSensitivity;
                 _pitch = Mathf.Clamp(_pitch - delta.y * _lookSensitivity, _minPitch, _maxPitch);
             }
 
-            float scroll = mouse.scroll.ReadValue().y;
+            // Scrolling over the HUD (chat log) scrolls the UI, not the camera.
+            float scroll = GameInput.IsPointerOverUI(GameInput.Gameplay.Point.ReadValue<Vector2>()) ? 0f : GameInput.Gameplay.Zoom.ReadValue<float>();
             if (_follow != null && Mathf.Abs(scroll) > 0.01f)
             {
                 float factor = scroll > 0 ? 1f - _zoomStep : 1f + _zoomStep;

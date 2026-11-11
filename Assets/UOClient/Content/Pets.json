@@ -1,0 +1,166 @@
+{
+ "Source": "ServUO Skills/AnimalTaming.cs, Mobiles/Normal/BaseCreature.cs, Mobiles/NPCs/AnimalTrainer.cs, Server/Mobile.cs; UO's Cliloc.enu for the coaxing lines (one-time migration; this file is canonical now)",
+ "Followers": {
+  "Max": 5,
+  "Text": "Control slots a character may have in followers (each creature's ControlSlots)."
+ },
+ "Taming": {
+  "Reach": 3,
+  "KeepReach": 7,
+  "TickSeconds": 3.0,
+  "Ticks": [
+   3,
+   4
+  ],
+  "AngerChance": 0.95,
+  "OwnerPenalty": 6.0,
+  "MaxOwners": 5,
+  "SubdueTo": 0.1,
+  "Check": {
+   "Min": "Tame + Owners * 6 - 0.1",
+   "Max": "Tame + Owners * 6 + 49.9"
+  },
+  "SkillScale": {
+   "FirstTame": 0.9,
+   "Paralyzed": 0.86,
+   "Retame": 0.9
+  },
+  "LoreGain": [
+   0.0,
+   120.0
+  ],
+  "Lines": [
+   "Will you be my friend?",
+   "I've always wanted a pet like you.",
+   "Don't be afraid.",
+   "I won't hurt you.",
+   "I promise to take good care of you.",
+   "I've been searching for a companion like you.",
+   "Will you travel with me, noble creature?",
+   "If you accompany me, we will protect one another.",
+   "I can protect you from the dangers of this world.",
+   "It would be mutually beneficial if we were to join forces.",
+   "Here...",
+   "Nice...",
+   "Good...",
+   "Come here..."
+  ],
+  "Text": "Use Animal Taming with a tamable creature targeted, within Reach tiles. The tamer coaxes it every TickSeconds for 3-4 ticks (a line each tick, an Animal Lore gain check each tick); it fails if they move past KeepReach, die, lose sight of it, or it's hurt. Creatures with CanAngerOnTame turn on the tamer AngerChance of the time instead. Some must be beaten below SubdueTo of their hits first (SubdueBeforeTame). The tamer must have at least the creature's MinTameSkill to try. The last tick is an Animal Taming check across Check.Min..Check.Max; success makes the tamer its master and scales its skills (SkillScale; a creature tamed before keeps getting scaled). Retaming a creature you once owned always works. A creature can't have more than MaxOwners different owners."
+ },
+ "Control": {
+  "Easy": 29.1,
+  "Formula": "((700 + ((Taming - Tame) * 10 * (Taming < Tame ? 28 : 6) + (Lore - Tame) * 10 * (Lore < Tame ? 14 : 6)) / 2) < 0 ? (700 + ((Taming - Tame) * 10 * (Taming < Tame ? 28 : 6) + (Lore - Tame) * 10 * (Lore < Tame ? 14 : 6)) / 2) : clamp(700 + ((Taming - Tame) * 10 * (Taming < Tame ? 28 : 6) + (Lore - Tame) * 10 * (Lore < Tame ? 14 : 6)) / 2, 200, 990)) - (100 - Loyalty) * 10",
+  "Scale": 1000,
+  "Text": "Chance an order is obeyed, out of Scale: the ML formula (Taming and Lore are the owner's skills, Tame the creature's taming requirement). Below 0 stays below 0 (never obeys); otherwise clamped to 200..990. Always obeyed when Tame <= Easy, and by summons."
+ },
+ "Loyalty": {
+  "Max": 100,
+  "LossPerHour": 10,
+  "WarnBelow": 10,
+  "Text": "Pets lose LossPerHour loyalty every hour; below WarnBelow they look around desperately, at 0 they go wild. Feeding the food they like brings loyalty back to Max."
+ },
+ "Bonding": {
+  "Days": 7.0,
+  "AbandonDays": 1.0,
+  "Text": "The owner feeding a pet (with Animal Taming at least its requirement, or any pet easier than 29.1) starts bonding; fed again after Days it bonds. A bonded pet that dies becomes a ghost that follows its owner and can be brought back (Veterinary, Resurrection); left more than AbandonDays away from its owner it's gone."
+ },
+ "Foods": {
+  "Meat": [
+   "Bacon",
+   "CookedBird",
+   "Sausage",
+   "Ham",
+   "Ribs",
+   "LambLeg",
+   "ChickenLeg",
+   "RawBird",
+   "RawRibs",
+   "RawLambLeg",
+   "RawChickenLeg",
+   "Head",
+   "LeftArm",
+   "LeftLeg",
+   "Torso",
+   "RightArm",
+   "RightLeg"
+  ],
+  "FruitsAndVegies": [
+   "HoneydewMelon",
+   "YellowGourd",
+   "GreenGourd",
+   "Banana",
+   "Bananas",
+   "Lemon",
+   "Lime",
+   "Dates",
+   "Grapes",
+   "Peach",
+   "Pear",
+   "Apple",
+   "Watermelon",
+   "Squash",
+   "Cantaloupe",
+   "Carrot",
+   "Cabbage",
+   "Onion",
+   "Lettuce",
+   "Pumpkin"
+  ],
+  "GrainsAndHay": [
+   "BreadLoaf",
+   "FrenchBread",
+   "SheafOfHay"
+  ],
+  "Fish": [
+   "FishSteak",
+   "RawFishSteak"
+  ],
+  "Eggs": [
+   "FriedEggs",
+   "Eggs"
+  ],
+  "Metal": [
+   "IronIngot",
+   "DullCopperIngot",
+   "ShadowIronIngot",
+   "CopperIngot",
+   "BronzeIngot",
+   "GoldIngot",
+   "AgapiteIngot",
+   "VeriteIngot",
+   "ValoriteIngot"
+  ],
+  "BlackrockStew": [
+   "BowlOfBlackrockStew"
+  ],
+  "Gold": [
+   "Gold"
+  ]
+ },
+ "FoodsText": "Item types each food preference accepts (a creature's FavoriteFood, from Creatures.json Overrides; several joined with |).",
+ "Stable": {
+  "Fee": 30,
+  "Stalls": "(Taming + Lore + Veterinary >= 240 ? 5 : Taming + Lore + Veterinary >= 200 ? 4 : Taming + Lore + Veterinary >= 160 ? 3 : 2) + 2 + 2 + (Taming >= 100 ? trunc((Taming - 90) / 10) : 0)",
+  "Text": "An animal trainer keeps pets for Fee gold each (paid when stabled; UO charged it per real week, here once). Stalls: how many pets a character may stable (skill-based, plus the SA and TOL bonus stalls)."
+ },
+ "Mount": {
+  "WalkSpeed": 2.0,
+  "RunSpeed": 2.0,
+  "Text": "Riding multiplies walking and running speed (UO: 400/200 ms a tile on foot, 200/100 mounted). Mount from the Pets window beside the mount; it's carried while ridden (not attackable) and comes back beside you when you get off or die."
+ },
+ "Pack": {
+  "MaxWeight": 1600,
+  "Text": "Pack animals (pack horses, pack llamas) carry a pack holding up to MaxWeight stones (StrongBackpack)."
+ },
+ "Orders": {
+  "List": [
+   "Follow",
+   "Stay",
+   "Guard",
+   "Attack",
+   "Stop",
+   "Release"
+  ],
+  "Text": "UO's spoken orders become buttons (no targeting cursor): Follow (its owner), Stay (where it is), Guard (attacks whatever attacks its owner), Attack (the owner's current target), Stop (stops fighting, waits), Release (goes wild for good). Each order is checked against the control chance."
+ }
+}

@@ -1,0 +1,1646 @@
+{
+ "Source": "ServUO Scripts/Misc/CharacterCreation.cs (human branches; expansions on, Siege off)",
+ "Stats": {
+  "Total": 90,
+  "Min": 10,
+  "Max": 60,
+  "LegacyTotal": 80,
+  "Invalid": {
+   "Str": 10,
+   "Dex": 10,
+   "Int": 10
+  },
+  "Normalize": "Advanced profession only. With v = stat - 10 (floored at 0) and target = Total - 30: if the v's sum to neither 0 nor target, each v = floor(v * target / sum), then Str, Dex, Int in turn absorb the remaining difference (each clamped 0..target). Stats = v + 10. If any stat is then outside Min..Max or the sum isn't Total, all stats become Invalid."
+ },
+ "Skills": {
+  "MaxEach": 50,
+  "Totals": [
+   100,
+   120
+  ],
+  "MaxCount": 4,
+  "LegacyMaxCount": 3,
+  "Excluded": [
+   "RemoveTrap",
+   "Spellweaving"
+  ],
+  "ExcludedExceptProfession": {
+   "Stealth": 7
+  },
+  "Invalid": "Advanced profession only: each value must be 0..MaxEach, no skill twice (with value > 0), and the values must total one of Totals; otherwise the character gets no skills and no skill items. A skill with value 0 is ignored. Excluded skills are never set and give no items (Stealth is allowed only for the profession id given). Totals: 100 came from the old 3-skill packet, 120 from the 4-skill one; the server accepts either."
+ },
+ "StartingGold": 1000,
+ "Backpack": [
+  {
+   "Type": "RedBook",
+   "Title": "a book",
+   "Author": "<CharacterName>",
+   "Pages": 20,
+   "Writable": true
+  },
+  {
+   "Type": "Gold",
+   "Amount": 1000
+  },
+  {
+   "Type": "Candle"
+  },
+  {
+   "Type": "Dagger"
+  }
+ ],
+ "Clothes": [
+  {
+   "OneOf": [
+    {
+     "Type": "Shirt",
+     "Hue": {
+      "Player": "Shirt",
+      "Min": 2,
+      "Max": 1001
+     }
+    },
+    {
+     "Type": "FancyShirt",
+     "Hue": {
+      "Player": "Shirt",
+      "Min": 2,
+      "Max": 1001
+     }
+    },
+    {
+     "Type": "Doublet",
+     "Hue": {
+      "Player": "Shirt",
+      "Min": 2,
+      "Max": 1001
+     }
+    }
+   ]
+  },
+  {
+   "IfFemale": [
+    {
+     "OneOf": [
+      {
+       "Type": "Skirt",
+       "Hue": {
+        "Player": "Pants",
+        "Min": 2,
+        "Max": 1001
+       }
+      },
+      {
+       "Type": "Kilt",
+       "Hue": {
+        "Player": "Pants",
+        "Min": 2,
+        "Max": 1001
+       }
+      }
+     ]
+    }
+   ],
+   "IfMale": [
+    {
+     "OneOf": [
+      {
+       "Type": "LongPants",
+       "Hue": {
+        "Player": "Pants",
+        "Min": 2,
+        "Max": 1001
+       }
+      },
+      {
+       "Type": "ShortPants",
+       "Hue": {
+        "Player": "Pants",
+        "Min": 2,
+        "Max": 1001
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "Type": "Shoes",
+   "Hue": "Yellow"
+  }
+ ],
+ "ClothesForProfessions": [
+  0,
+  1,
+  2,
+  3
+ ],
+ "Professions": [
+  {
+   "Id": 0,
+   "Name": "Advanced",
+   "Custom": true,
+   "SkipSkillItems": false,
+   "Notes": "The player picks stats and skills (see Stats/Skills rules). Any unknown profession id becomes 0."
+  },
+  {
+   "Id": 1,
+   "Name": "Warrior",
+   "Stats": {
+    "Str": 45,
+    "Dex": 35,
+    "Int": 10
+   },
+   "Skills": [
+    {
+     "Skill": "Anatomy",
+     "Value": 30
+    },
+    {
+     "Skill": "Healing",
+     "Value": 30
+    },
+    {
+     "Skill": "Swords",
+     "Value": 30
+    },
+    {
+     "Skill": "Tactics",
+     "Value": 30
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "LeatherChest"
+    }
+   ],
+   "Pack": [],
+   "SkipSkillItems": false
+  },
+  {
+   "Id": 2,
+   "Name": "Magician",
+   "Stats": {
+    "Str": 25,
+    "Dex": 20,
+    "Int": 45
+   },
+   "Skills": [
+    {
+     "Skill": "EvalInt",
+     "Value": 30
+    },
+    {
+     "Skill": "Wrestling",
+     "Value": 30
+    },
+    {
+     "Skill": "Magery",
+     "Value": 30
+    },
+    {
+     "Skill": "Meditation",
+     "Value": 30
+    }
+   ],
+   "Equip": [],
+   "Pack": [],
+   "SkipSkillItems": false
+  },
+  {
+   "Id": 3,
+   "Name": "Blacksmith",
+   "Stats": {
+    "Str": 60,
+    "Dex": 15,
+    "Int": 15
+   },
+   "Skills": [
+    {
+     "Skill": "Mining",
+     "Value": 30
+    },
+    {
+     "Skill": "ArmsLore",
+     "Value": 30
+    },
+    {
+     "Skill": "Blacksmith",
+     "Value": 30
+    },
+    {
+     "Skill": "Tinkering",
+     "Value": 30
+    }
+   ],
+   "Equip": [],
+   "Pack": [],
+   "SkipSkillItems": false
+  },
+  {
+   "Id": 4,
+   "Name": "Necromancer",
+   "Stats": {
+    "Str": 25,
+    "Dex": 20,
+    "Int": 45
+   },
+   "Skills": [
+    {
+     "Skill": "Necromancy",
+     "Value": 30
+    },
+    {
+     "Skill": "SpiritSpeak",
+     "Value": 30
+    },
+    {
+     "Skill": "Swords",
+     "Value": 30
+    },
+    {
+     "Skill": "Meditation",
+     "Value": 20
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "BoneHelm"
+    },
+    {
+     "Type": "BoneHarvester"
+    },
+    {
+     "Type": "LeatherChest",
+     "Hue": 707
+    },
+    {
+     "Type": "LeatherArms",
+     "Hue": 707
+    },
+    {
+     "Type": "LeatherGloves",
+     "Hue": 707
+    },
+    {
+     "Type": "LeatherGorget",
+     "Hue": 707
+    },
+    {
+     "Type": "LeatherLegs",
+     "Hue": 707
+    },
+    {
+     "Type": "Skirt",
+     "Hue": 707
+    },
+    {
+     "Type": "Sandals",
+     "Hue": 2301
+    }
+   ],
+   "Pack": [
+    {
+     "Type": "BagOfNecroReagents",
+     "Contents": [
+      {
+       "Type": "BatWing",
+       "Amount": 50
+      },
+      {
+       "Type": "GraveDust",
+       "Amount": 50
+      },
+      {
+       "Type": "DaemonBlood",
+       "Amount": 50
+      },
+      {
+       "Type": "NoxCrystal",
+       "Amount": 50
+      },
+      {
+       "Type": "PigIron",
+       "Amount": 50
+      }
+     ],
+     "LootType": "Regular"
+    },
+    {
+     "Type": "NecromancerSpellbook",
+     "Content": 35201,
+     "Spells": [
+      "AnimateDead",
+      "MindRot",
+      "PainSpike",
+      "SummonFamiliar",
+      "WraithForm"
+     ],
+     "LootType": "Blessed"
+    }
+   ],
+   "SkipSkillItems": true,
+   "Notes": "The reagent bag is packed before the equipment, the spellbook after it."
+  },
+  {
+   "Id": 5,
+   "Name": "Paladin",
+   "Stats": {
+    "Str": 45,
+    "Dex": 20,
+    "Int": 25
+   },
+   "Skills": [
+    {
+     "Skill": "Chivalry",
+     "Value": 30
+    },
+    {
+     "Skill": "Swords",
+     "Value": 30
+    },
+    {
+     "Skill": "Focus",
+     "Value": 30
+    },
+    {
+     "Skill": "Tactics",
+     "Value": 30
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Broadsword"
+    },
+    {
+     "Type": "Helmet"
+    },
+    {
+     "Type": "PlateGorget"
+    },
+    {
+     "Type": "RingmailArms"
+    },
+    {
+     "Type": "RingmailChest"
+    },
+    {
+     "Type": "RingmailLegs"
+    },
+    {
+     "Type": "ThighBoots",
+     "Hue": 1864
+    },
+    {
+     "Type": "Cloak",
+     "Hue": 207
+    },
+    {
+     "Type": "BodySash",
+     "Hue": 207
+    }
+   ],
+   "Pack": [
+    {
+     "Type": "BookOfChivalry",
+     "Content": 1023,
+     "Spells": [
+      "CleanseByFire",
+      "CloseWounds",
+      "ConsecrateWeapon",
+      "DispelEvil",
+      "DivineFury",
+      "EnemyOfOne",
+      "HolyLight",
+      "NobleSacrifice",
+      "RemoveCurse",
+      "SacredJourney"
+     ],
+     "LootType": "Blessed"
+    }
+   ],
+   "SkipSkillItems": true
+  },
+  {
+   "Id": 6,
+   "Name": "Samurai",
+   "Stats": {
+    "Str": 40,
+    "Dex": 30,
+    "Int": 20
+   },
+   "Skills": [
+    {
+     "Skill": "Bushido",
+     "Value": 30
+    },
+    {
+     "Skill": "Swords",
+     "Value": 30
+    },
+    {
+     "Skill": "Anatomy",
+     "Value": 30
+    },
+    {
+     "Skill": "Healing",
+     "Value": 30
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "HakamaShita",
+     "Hue": 707
+    },
+    {
+     "Type": "Hakama",
+     "Hue": 707
+    },
+    {
+     "Type": "SamuraiTabi",
+     "Hue": 707
+    },
+    {
+     "Type": "TattsukeHakama",
+     "Hue": 557
+    },
+    {
+     "Type": "Bokuto"
+    },
+    {
+     "Type": "LeatherJingasa"
+    }
+   ],
+   "Pack": [
+    {
+     "Type": "Scissors"
+    },
+    {
+     "Type": "Bandage",
+     "Amount": 50
+    },
+    {
+     "Type": "BookOfBushido",
+     "Content": 63,
+     "Spells": [
+      "HonorableExecution",
+      "Confidence",
+      "Evasion",
+      "CounterAttack",
+      "LightningStrike",
+      "MomentumStrike"
+     ]
+    }
+   ],
+   "SkipSkillItems": true
+  },
+  {
+   "Id": 7,
+   "Name": "Ninja",
+   "Stats": {
+    "Str": 40,
+    "Dex": 30,
+    "Int": 20
+   },
+   "Skills": [
+    {
+     "Skill": "Ninjitsu",
+     "Value": 30
+    },
+    {
+     "Skill": "Hiding",
+     "Value": 30
+    },
+    {
+     "Skill": "Fencing",
+     "Value": 30
+    },
+    {
+     "Skill": "Stealth",
+     "Value": 30
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Kasa"
+    },
+    {
+     "Type": "TattsukeHakama",
+     "Hue": {
+      "OneOf": [
+       424,
+       236,
+       153,
+       144,
+       181,
+       822,
+       137
+      ]
+     }
+    },
+    {
+     "Type": "HakamaShita",
+     "Hue": 707
+    },
+    {
+     "Type": "NinjaTabi",
+     "Hue": 707
+    },
+    {
+     "Type": "Tekagi"
+    }
+   ],
+   "Pack": [
+    {
+     "Type": "SmokeBomb"
+    },
+    {
+     "Type": "BookOfNinjitsu",
+     "Content": 255,
+     "Spells": [
+      "FocusAttack",
+      "DeathStrike",
+      "AnimalForm",
+      "KiAttack",
+      "SurpriseAttack",
+      "Backstab",
+      "Shadowjump",
+      "MirrorImage"
+     ]
+    }
+   ],
+   "SkipSkillItems": true
+  }
+ ],
+ "SkillItems": {
+  "Alchemy": {
+   "Pack": [
+    {
+     "Type": "Bottle",
+     "Amount": 4
+    },
+    {
+     "Type": "MortarPestle"
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Robe",
+     "Hue": "Pink"
+    }
+   ]
+  },
+  "Anatomy": {
+   "Pack": [
+    {
+     "Type": "Bandage",
+     "Amount": 3
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Robe",
+     "Hue": "Yellow"
+    }
+   ]
+  },
+  "AnimalLore": {
+   "Equip": [
+    {
+     "Type": "ShepherdsCrook"
+    },
+    {
+     "Type": "Robe",
+     "Hue": "Blue"
+    }
+   ]
+  },
+  "Archery": {
+   "Pack": [
+    {
+     "Type": "Arrow",
+     "Amount": 25
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Bow"
+    }
+   ]
+  },
+  "ArmsLore": {
+   "Equip": [
+    {
+     "OneOf": [
+      {
+       "Type": "Kryss"
+      },
+      {
+       "Type": "Katana"
+      },
+      {
+       "Type": "Club"
+      }
+     ]
+    }
+   ]
+  },
+  "Begging": {
+   "Equip": [
+    {
+     "Type": "GnarledStaff"
+    }
+   ]
+  },
+  "Blacksmith": {
+   "Pack": [
+    {
+     "Type": "Tongs"
+    },
+    {
+     "Type": "Pickaxe",
+     "Count": 2
+    },
+    {
+     "Type": "IronIngot",
+     "Amount": 50
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "HalfApron",
+     "Hue": "Yellow"
+    }
+   ]
+  },
+  "Bushido": {
+   "Equip": [
+    {
+     "Type": "Hakama"
+    },
+    {
+     "Type": "Kasa"
+    },
+    {
+     "Type": "BookOfBushido",
+     "Content": 63,
+     "Spells": [
+      "HonorableExecution",
+      "Confidence",
+      "Evasion",
+      "CounterAttack",
+      "LightningStrike",
+      "MomentumStrike"
+     ]
+    }
+   ]
+  },
+  "Camping": {
+   "Pack": [
+    {
+     "Type": "Bedroll"
+    },
+    {
+     "Type": "Kindling",
+     "Amount": 5
+    }
+   ]
+  },
+  "Carpentry": {
+   "Pack": [
+    {
+     "Type": "Board",
+     "Amount": 10
+    },
+    {
+     "Type": "Saw"
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "HalfApron",
+     "Hue": "Yellow"
+    }
+   ]
+  },
+  "Cartography": {
+   "Pack": [
+    {
+     "Type": "BlankMap",
+     "Count": 4
+    },
+    {
+     "Type": "Sextant"
+    }
+   ]
+  },
+  "Chivalry": {
+   "Pack": [
+    {
+     "Type": "BookOfChivalry",
+     "Content": 1023,
+     "Spells": [
+      "CleanseByFire",
+      "CloseWounds",
+      "ConsecrateWeapon",
+      "DispelEvil",
+      "DivineFury",
+      "EnemyOfOne",
+      "HolyLight",
+      "NobleSacrifice",
+      "RemoveCurse",
+      "SacredJourney"
+     ]
+    }
+   ]
+  },
+  "Cooking": {
+   "Pack": [
+    {
+     "Type": "Kindling",
+     "Amount": 2
+    },
+    {
+     "Type": "RawLambLeg"
+    },
+    {
+     "Type": "RawChickenLeg"
+    },
+    {
+     "Type": "RawFishSteak"
+    },
+    {
+     "Type": "SackFlour"
+    },
+    {
+     "Type": "Pitcher",
+     "Beverage": "Water"
+    }
+   ]
+  },
+  "DetectHidden": {
+   "Equip": [
+    {
+     "Type": "Cloak",
+     "Hue": 1109
+    }
+   ]
+  },
+  "Discordance": {
+   "Pack": [
+    {
+     "OneOf": [
+      {
+       "Type": "Drums"
+      },
+      {
+       "Type": "Harp"
+      },
+      {
+       "Type": "LapHarp"
+      },
+      {
+       "Type": "Lute"
+      },
+      {
+       "Type": "Tambourine"
+      },
+      {
+       "Type": "TambourineTassel"
+      }
+     ]
+    }
+   ]
+  },
+  "Fencing": {
+   "Equip": [
+    {
+     "Type": "Kryss"
+    }
+   ]
+  },
+  "Fishing": {
+   "Equip": [
+    {
+     "Type": "FishingPole"
+    },
+    {
+     "Type": "FloppyHat",
+     "Hue": "Yellow"
+    }
+   ]
+  },
+  "Fletching": {
+   "Pack": [
+    {
+     "Type": "Board",
+     "Amount": 14
+    },
+    {
+     "Type": "Feather",
+     "Amount": 5
+    },
+    {
+     "Type": "Shaft",
+     "Amount": 5
+    }
+   ]
+  },
+  "Healing": {
+   "Pack": [
+    {
+     "Type": "Bandage",
+     "Amount": 50
+    },
+    {
+     "Type": "Scissors"
+    }
+   ]
+  },
+  "Herding": {
+   "Equip": [
+    {
+     "Type": "ShepherdsCrook"
+    }
+   ]
+  },
+  "Hiding": {
+   "Equip": [
+    {
+     "Type": "Cloak",
+     "Hue": 1109
+    }
+   ]
+  },
+  "Inscribe": {
+   "Pack": [
+    {
+     "Type": "BlankScroll",
+     "Amount": 2
+    },
+    {
+     "Type": "BlueBook"
+    }
+   ]
+  },
+  "ItemID": {
+   "Equip": [
+    {
+     "Type": "GnarledStaff"
+    }
+   ]
+  },
+  "Lockpicking": {
+   "Pack": [
+    {
+     "Type": "Lockpick",
+     "Amount": 20
+    }
+   ]
+  },
+  "Lumberjacking": {
+   "Equip": [
+    {
+     "Type": "Hatchet"
+    }
+   ]
+  },
+  "Macing": {
+   "Equip": [
+    {
+     "Type": "Club"
+    }
+   ]
+  },
+  "Magery": {
+   "Pack": [
+    {
+     "Type": "BagOfReagents",
+     "Contents": [
+      {
+       "Type": "BlackPearl",
+       "Amount": 50
+      },
+      {
+       "Type": "Bloodmoss",
+       "Amount": 50
+      },
+      {
+       "Type": "Garlic",
+       "Amount": 50
+      },
+      {
+       "Type": "Ginseng",
+       "Amount": 50
+      },
+      {
+       "Type": "MandrakeRoot",
+       "Amount": 50
+      },
+      {
+       "Type": "Nightshade",
+       "Amount": 50
+      },
+      {
+       "Type": "SulfurousAsh",
+       "Amount": 50
+      },
+      {
+       "Type": "SpidersSilk",
+       "Amount": 50
+      }
+     ],
+     "LootType": "Regular"
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "ClumsyScroll"
+      },
+      {
+       "Type": "CreateFoodScroll"
+      },
+      {
+       "Type": "FeeblemindScroll"
+      },
+      {
+       "Type": "HealScroll"
+      },
+      {
+       "Type": "MagicArrowScroll"
+      },
+      {
+       "Type": "NightSightScroll"
+      },
+      {
+       "Type": "ReactiveArmorScroll"
+      },
+      {
+       "Type": "WeakenScroll"
+      }
+     ]
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "ClumsyScroll"
+      },
+      {
+       "Type": "FeeblemindScroll"
+      },
+      {
+       "Type": "MagicArrowScroll"
+      },
+      {
+       "Type": "ReactiveArmorScroll"
+      },
+      {
+       "Type": "AgilityScroll"
+      },
+      {
+       "Type": "CureScroll"
+      },
+      {
+       "Type": "MagicTrapScroll"
+      },
+      {
+       "Type": "ProtectionScroll"
+      }
+     ]
+    },
+    {
+     "OneOf": [
+      {
+       "Type": "ClumsyScroll"
+      },
+      {
+       "Type": "HealScroll"
+      },
+      {
+       "Type": "ReactiveArmorScroll"
+      },
+      {
+       "Type": "CunningScroll"
+      },
+      {
+       "Type": "MagicTrapScroll"
+      },
+      {
+       "Type": "StrengthScroll"
+      },
+      {
+       "Type": "MagicLockScroll"
+      },
+      {
+       "Type": "TeleportScroll"
+      }
+     ]
+    }
+   ],
+   "Equip": [
+    {
+     "Type": "Spellbook",
+     "Content": 942312504,
+     "Spells": [
+      "Heal",
+      "MagicArrow",
+      "NightSight",
+      "Cure",
+      "Harm",
+      "Strength",
+      "Fireball",
+      "Poison",
+      "Teleport",
+      "FireField",
+      "GreaterHeal",
+      "Lightning"
+     ],
+     "LootType": "Blessed"
+    },
+    {
+     "Type": "WizardsHat"
+    },
+    {
+     "Type": "Robe",
+     "Hue": "Blue"
+    }
+   ],
+   "Notes": "Three random scrolls from PackScroll(0), (1), (2). ServUO's switch is on Random(8) * (circle + 1), so circles 1 and 2 only reach every 2nd / 3rd scroll of circles 1-3; the OneOf lists are exactly what that code can give."
+  },
+  "Mining": {
+   "Pack": [
+    {
+     "Type": "Pickaxe"
+    }
+   ]
+  },
+  "Musicianship": {
+   "Pack": [
+    {
+     "OneOf": [
+      {
+       "Type": "Drums"
+      },
+      {
+       "Type": "Harp"
+      },
+      {
+       "Type": "LapHarp"
+      },
+      {
+       "Type": "Lute"
+      },
+      {
+       "Type": "Tambourine"
+      },
+      {
+       "Type": "TambourineTassel"
+      }
+     ]
+    }
+   ]
+  },
+  "Mysticism": {
+   "Pack": [
+    {
+     "Type": "MysticBook",
+     "Content": 171,
+     "Spells": [
+      "NetherBolt",
+      "HealingStone",
+      "Enchant",
+      "EagleStrike",
+      "StoneForm"
+     ]
+    }
+   ]
+  },
+  "Necromancy": {
+   "Pack": [
+    {
+     "Type": "BagOfNecroReagents",
+     "Contents": [
+      {
+       "Type": "BatWing",
+       "Amount": 50
+      },
+      {
+       "Type": "GraveDust",
+       "Amount": 50
+      },
+      {
+       "Type": "DaemonBlood",
+       "Amount": 50
+      },
+      {
+       "Type": "NoxCrystal",
+       "Amount": 50
+      },
+      {
+       "Type": "PigIron",
+       "Amount": 50
+      }
+     ],
+     "LootType": "Regular"
+    },
+    {
+     "Type": "NecromancerSpellbook",
+     "Content": 35201,
+     "Spells": [
+      "AnimateDead",
+      "MindRot",
+      "PainSpike",
+      "SummonFamiliar",
+      "WraithForm"
+     ],
+     "LootType": "Blessed"
+    }
+   ]
+  },
+  "Ninjitsu": {
+   "Equip": [
+    {
+     "Type": "Hakama",
+     "Hue": 707
+    },
+    {
+     "Type": "Kasa"
+    },
+    {
+     "Type": "BookOfNinjitsu",
+     "Content": 255,
+     "Spells": [
+      "FocusAttack",
+      "DeathStrike",
+      "AnimalForm",
+      "KiAttack",
+      "SurpriseAttack",
+      "Backstab",
+      "Shadowjump",
+      "MirrorImage"
+     ]
+    }
+   ]
+  },
+  "Parry": {
+   "Equip": [
+    {
+     "Type": "WoodenShield"
+    }
+   ]
+  },
+  "Peacemaking": {
+   "Pack": [
+    {
+     "OneOf": [
+      {
+       "Type": "Drums"
+      },
+      {
+       "Type": "Harp"
+      },
+      {
+       "Type": "LapHarp"
+      },
+      {
+       "Type": "Lute"
+      },
+      {
+       "Type": "Tambourine"
+      },
+      {
+       "Type": "TambourineTassel"
+      }
+     ]
+    }
+   ]
+  },
+  "Poisoning": {
+   "Pack": [
+    {
+     "Type": "LesserPoisonPotion",
+     "Count": 2
+    }
+   ]
+  },
+  "Provocation": {
+   "Pack": [
+    {
+     "OneOf": [
+      {
+       "Type": "Drums"
+      },
+      {
+       "Type": "Harp"
+      },
+      {
+       "Type": "LapHarp"
+      },
+      {
+       "Type": "Lute"
+      },
+      {
+       "Type": "Tambourine"
+      },
+      {
+       "Type": "TambourineTassel"
+      }
+     ]
+    }
+   ]
+  },
+  "Snooping": {
+   "Pack": [
+    {
+     "Type": "Lockpick",
+     "Amount": 20
+    }
+   ]
+  },
+  "SpiritSpeak": {
+   "Equip": [
+    {
+     "Type": "Cloak",
+     "Hue": 1109
+    }
+   ]
+  },
+  "Stealing": {
+   "Pack": [
+    {
+     "Type": "Lockpick",
+     "Amount": 20
+    }
+   ]
+  },
+  "Swords": {
+   "Equip": [
+    {
+     "Type": "Katana"
+    }
+   ]
+  },
+  "Tactics": {
+   "Equip": [
+    {
+     "Type": "Katana"
+    }
+   ]
+  },
+  "Tailoring": {
+   "Pack": [
+    {
+     "Type": "BoltOfCloth"
+    },
+    {
+     "Type": "SewingKit"
+    }
+   ]
+  },
+  "Tinkering": {
+   "Pack": [
+    {
+     "Type": "TinkerTools"
+    },
+    {
+     "Type": "IronIngot",
+     "Amount": 50
+    },
+    {
+     "Type": "Axle"
+    },
+    {
+     "Type": "AxleGears"
+    },
+    {
+     "Type": "Springs"
+    },
+    {
+     "Type": "ClockFrame"
+    }
+   ]
+  },
+  "Tracking": {
+   "Equip": [
+    {
+     "Type": "Boots",
+     "Hue": "Yellow"
+    },
+    {
+     "Type": "SkinningKnife"
+    }
+   ],
+   "RemoveLayer": "Shoes",
+   "Notes": "Deletes whatever is on the Shoes layer before equipping the boots. Skill items are given before the default clothes, so in practice the boots stay and the default Shoes are not given."
+  },
+  "Veterinary": {
+   "Pack": [
+    {
+     "Type": "Bandage",
+     "Amount": 5
+    },
+    {
+     "Type": "Scissors"
+    }
+   ]
+  },
+  "Wrestling": {
+   "Equip": [
+    {
+     "Type": "LeatherGloves"
+    }
+   ]
+  }
+ },
+ "Character": {
+  "Hunger": 20,
+  "AutoRenewInsurance": true,
+  "SkillCap": "Skills.json Defaults.Cap for every skill",
+  "Young": {
+   "When": "the account is Young",
+   "Bank": [
+    {
+     "Type": "NewPlayerTicket"
+    }
+   ],
+   "Notes": "The ticket's Owner is the new character."
+  },
+  "Name": {
+   "MinLength": 2,
+   "MaxLength": 16,
+   "Letters": true,
+   "Digits": false,
+   "Separators": [
+    " ",
+    "-",
+    ".",
+    "'"
+   ],
+   "NoSeparatorAtStart": true,
+   "MaxSeparatorsInARow": 1,
+   "Disallowed": [
+    "jigaboo",
+    "chigaboo",
+    "wop",
+    "kyke",
+    "kike",
+    "tit",
+    "spic",
+    "prick",
+    "piss",
+    "lezbo",
+    "lesbo",
+    "felatio",
+    "dyke",
+    "dildo",
+    "chinc",
+    "chink",
+    "cunnilingus",
+    "cum",
+    "cocksucker",
+    "cock",
+    "clitoris",
+    "clit",
+    "ass",
+    "hitler",
+    "penis",
+    "nigga",
+    "nigger",
+    "klit",
+    "kunt",
+    "jiz",
+    "jism",
+    "jerkoff",
+    "jackoff",
+    "goddamn",
+    "fag",
+    "blowjob",
+    "bitch",
+    "asshole",
+    "dick",
+    "pussy",
+    "snatch",
+    "cunt",
+    "twat",
+    "shit",
+    "fuck",
+    "tailor",
+    "smith",
+    "scholar",
+    "rogue",
+    "novice",
+    "neophyte",
+    "merchant",
+    "medium",
+    "master",
+    "mage",
+    "lb",
+    "journeyman",
+    "grandmaster",
+    "fisherman",
+    "expert",
+    "chef",
+    "carpenter",
+    "british",
+    "blackthorne",
+    "blackthorn",
+    "beggar",
+    "archer",
+    "apprentice",
+    "adept",
+    "gamemaster",
+    "frozen",
+    "squelched",
+    "invulnerable",
+    "osi",
+    "origin"
+   ],
+   "StartDisallowed": [
+    "seer",
+    "counselor",
+    "gm",
+    "admin",
+    "lady",
+    "lord"
+   ],
+   "Fallback": "Generic Player",
+   "Notes": "Name is trimmed first. Letters a-z (case-insensitive) plus the separators; a separator may not start the name and never two in a row. A Disallowed word is rejected when it stands alone (bounded by the start/end of the name or a separator); a name starting with a StartDisallowed word is rejected. An invalid name becomes Fallback."
+  },
+  "Appearance": {
+   "Body": {
+    "Male": 400,
+    "Female": 401
+   },
+   "Skin": {
+    "Flag": 32768,
+    "RaceRange": [
+     1002,
+     1058
+    ],
+    "Notes": "Character creation sets the body hue to the player's pick | 0x8000 without clamping; the human race's own skin range (ClipSkinHue/RandomSkinHue) is RaceRange."
+   },
+   "Hair": {
+    "Valid": [
+     8251,
+     8252,
+     8253,
+     8260,
+     8261,
+     8262,
+     8263,
+     8264,
+     8265,
+     8266
+    ],
+    "NotFemale": [
+     8264
+    ],
+    "NotMale": [
+     8262
+    ],
+    "None": 0,
+    "HueRange": [
+     1102,
+     1149
+    ],
+    "Random": {
+     "Pick": [
+      8251,
+      8252,
+      8253,
+      8260,
+      8261,
+      8263,
+      8265,
+      8266
+     ],
+     "Last": {
+      "IfFemale": 8262,
+      "IfMale": 8264
+     },
+     "Notes": "Utility.Random(9): one of Pick or Last, each 1/9 (no baldness)."
+    },
+    "Notes": "An invalid pick leaves the character bald. The hair hue is the player's pick, not clamped (HueRange is the race's ClipHairHue/RandomHairHue range). 0x2048 receding (male only), 0x2046 buns (female only)."
+   },
+   "Beard": {
+    "Valid": [
+     8254,
+     8255,
+     8256,
+     8257,
+     8267,
+     8268,
+     8269
+    ],
+    "None": 0,
+    "FemaleAllowed": false,
+    "Notes": "Same handling as hair; females can only have none."
+   },
+   "Face": {
+    "Valid": [
+     15172,
+     15181
+    ],
+    "RandomRange": [
+     15172,
+     15180
+    ],
+    "Notes": "Valid is an inclusive ItemID range. A missing or invalid face gets a random one from RandomRange (inclusive) with the skin hue; a valid pick keeps the player's face hue."
+   }
+  },
+  "StartLocation": "The city the player picked from the server's start-city list (not part of this file)."
+ },
+ "Rules": {
+  "Order": [
+   "Backpack",
+   "profession Equip/Pack (in listed order)",
+   "SkillItems for each chosen skill, in the order the skills were chosen",
+   "Clothes"
+  ],
+  "SkillItemsWhen": "the skill's starting value is > 0 and the profession doesn't SkipSkillItems",
+  "Equip": "Equip entries go on the character; if the layer is taken they go into the backpack instead.",
+  "Clothes": "Clothes are only equipped into a free layer; if the layer is taken the item is not given.",
+  "Pack": "Pack entries go into the backpack.",
+  "Duplicates": "Skills with the same item (Swords and Tactics both give a Katana; two robes) give both: the second one lands in the backpack because its layer is taken.",
+  "LootType": "Items are Regular unless the entry says otherwise (spellbooks marked Blessed by the code; the item's own default otherwise)."
+ },
+ "Dropped": "Elf and gargoyle branches (race items, GargishDagger, elven robes...), Throwing's item (gargoyle only), TestCenter bank filling, Siege map rules, pre-AOS Newbied loot types.",
+ "StartCities": {
+  "Source": "ServUO Scripts/Accounting/AccountHandler.cs StartingCities (Royal City is on Ter Mur, which isn't in the world yet)",
+  "Default": "Britain",
+  "Cities": [
+   {
+    "Name": "New Haven",
+    "Place": "New Haven Bank",
+    "Cliloc": 1150168,
+    "X": 3503,
+    "Y": 2574,
+    "Z": 14
+   },
+   {
+    "Name": "Yew",
+    "Place": "The Empath Abbey",
+    "Cliloc": 1075072,
+    "X": 633,
+    "Y": 858,
+    "Z": 0
+   },
+   {
+    "Name": "Minoc",
+    "Place": "The Barnacle",
+    "Cliloc": 1075073,
+    "X": 2476,
+    "Y": 413,
+    "Z": 15
+   },
+   {
+    "Name": "Britain",
+    "Place": "The Wayfarer's Inn",
+    "Cliloc": 1075074,
+    "X": 1602,
+    "Y": 1591,
+    "Z": 20
+   },
+   {
+    "Name": "Moonglow",
+    "Place": "The Scholars Inn",
+    "Cliloc": 1075075,
+    "X": 4408,
+    "Y": 1168,
+    "Z": 0
+   },
+   {
+    "Name": "Trinsic",
+    "Place": "The Traveler's Inn",
+    "Cliloc": 1075076,
+    "X": 1845,
+    "Y": 2745,
+    "Z": 0
+   },
+   {
+    "Name": "Jhelom",
+    "Place": "The Mercenary Inn",
+    "Cliloc": 1075078,
+    "X": 1374,
+    "Y": 3826,
+    "Z": 0
+   },
+   {
+    "Name": "Skara Brae",
+    "Place": "The Falconer's Inn",
+    "Cliloc": 1075079,
+    "X": 618,
+    "Y": 2234,
+    "Z": 0
+   },
+   {
+    "Name": "Vesper",
+    "Place": "The Ironwood Inn",
+    "Cliloc": 1075080,
+    "X": 2771,
+    "Y": 976,
+    "Z": 0
+   }
+  ]
+ }
+}

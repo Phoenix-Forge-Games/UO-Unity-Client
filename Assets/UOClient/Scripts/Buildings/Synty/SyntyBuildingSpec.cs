@@ -41,7 +41,10 @@ namespace UOClient.Buildings.Synty
     /// </summary>
     public class SyntyStair
     {
-        /// <summary>The cell left unfloored on the storey above. Negative x = let the generator choose.</summary>
+        /// <summary>
+        /// South-west unit of the stairwell void left unfloored on the storey above: the void is 2 x 2 units
+        /// (one 2.5 m module, the flight's own footprint). Negative x = let the generator choose.
+        /// </summary>
         public Vector2Int Cell = new Vector2Int(-1, -1);
 
         /// <summary>0/90/180/270. At yaw 0 the foot exits the void toward +Z and the head toward +X.</summary>
@@ -148,7 +151,7 @@ namespace UOClient.Buildings.Synty
     /// </summary>
     public class SyntyRoofWing
     {
-        /// <summary>Plan rectangle in CELLS. The short axis is the span the 45° slopes descend.</summary>
+        /// <summary>Plan rectangle in UNITS (1.25 m). <see cref="SpanIsX"/> says which axis the 45° slopes descend.</summary>
         public RectInt Rect;
 
         /// <summary>
@@ -163,24 +166,51 @@ namespace UOClient.Buildings.Synty
         public SyntyRoofWing(int x, int z, int w, int d, int storeys)
         { Rect = new RectInt(x, z, w, d); Storeys = storeys; }
 
-        public int SpanCells => Mathf.Min(Rect.width, Rect.height);
-        public int RunCells => Mathf.Max(Rect.width, Rect.height);
+        /// <summary>Units (1.25 m) the slopes descend across.</summary>
+        public int SpanUnits => SpanIsX ? Rect.width : Rect.height;
+
+        /// <summary>Units (1.25 m) along the ridge.</summary>
+        public int RunUnits => SpanIsX ? Rect.height : Rect.width;
 
         /// <summary>True when the slopes descend along X — i.e. the ridge runs along Z.</summary>
-        public bool SpanIsX => Rect.width <= Rect.height;
+        public bool SpanIsX => SpanAlongX(Rect.width, Rect.height);
+
+        /// <summary>
+        /// Which axis a gable over a w x d unit rectangle spans: the shorter one, as a roof usually does. A 45° ridge
+        /// closes on the kit's 1.25 m courses exactly only over an EVEN span, so when exactly one axis is even and
+        /// it's no more than a quarter longer than the other, the gable spans it (its run may be odd: the ridge then
+        /// ends on a half bay). An odd span is built by the centred-overhang fallback (see the generator).
+        /// A one-unit sliver always spans its narrow axis: a ridge across its length would stand a tall gable on
+        /// a strip 1.25 m deep.
+        /// </summary>
+        public static bool SpanAlongX(int w, int d)
+        {
+            if (Mathf.Min(w, d) <= 1) return w <= d;
+            bool wEven = (w & 1) == 0, dEven = (d & 1) == 0;
+            // One even axis: span it only when it isn't much longer than the odd one. Otherwise a long house would
+            // stand one huge gable across its length (user: a 26 x 13 house got a 14 m gable); it spans its short,
+            // odd side instead, with the centred-overhang fallback.
+            if (wEven != dEven)
+            {
+                int even = wEven ? w : d, odd = wEven ? d : w;
+                if (even <= odd * 1.25f) return wEven;
+            }
+
+            return w <= d;
+        }
     }
 
     /// <summary>
-    /// A rectangular room on the 2.5 m CELL grid.
+    /// A rectangular room on the 1.25 m plan grid (<see cref="SyntyKit.Unit"/>, one UO tile).
     ///
-    /// Specs are written in cells, never metres. The kit has no piece narrower than 1.25 m, so a plan authored in
-    /// metres can ask for a wall that cannot be built; a plan authored in cells cannot. This is the single
-    /// biggest structural difference from the Polyperfect specs, which are on a 1 m grid.
+    /// Specs are written in units, never metres. The kit has no piece narrower than 1.25 m, so a plan authored in
+    /// metres can ask for a wall that cannot be built; a plan authored in units cannot: every run closes with
+    /// whole 2.5 m modules and at most one 1.25 m half.
     /// </summary>
     public class SyntyRoom
     {
         public string Name;
-        public int X, Z, W, D;          // cells
+        public int X, Z, W, D;          // units (1.25 m)
 
         /// <summary>Suppress exterior windows on every wall this room owns.</summary>
         public bool NoWindows;

@@ -41,7 +41,7 @@ namespace UOClient.Content
         public static readonly string[] WorldViewFields =
         {
             "_worldMaterial", "_terrainMaterial", "_waterMaterial", "_landLayers", "_vegetation",
-            "_wallKit", "_props", "_humanoidPrefabs", "_humanoidAnimator", "_wardrobe",
+            "_wallKit", "_props", "_humanoidPrefabs", "_humanoidAnimator", "_wardrobe", "_grass", "_creatures", "_boatCatalog",
         };
     }
 }

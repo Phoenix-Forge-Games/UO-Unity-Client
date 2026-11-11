@@ -119,6 +119,122 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &233835272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 233835276}
+  - component: {fileID: 233835275}
+  - component: {fileID: 233835274}
+  - component: {fileID: 233835273}
+  m_Layer: 0
+  m_Name: HUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &233835273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233835272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f470597febf5aed42bb7a7a98b512bff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UOClient::UOClient.HudController
+--- !u!114 &233835274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233835272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37f9c9412b1df3a49a53bbcabcead712, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UOClient::UOClient.Targeting
+--- !u!1931382934 &233835275
+PanelRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233835272}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  serializedVersion: 1
+  m_PanelSettings: {fileID: 11400000, guid: ad15ef0c75bd95d419ba20fc2b7b94b7, type: 2}
+  sourceAsset: {fileID: 9197481963319205126, guid: 25d986dd8ceaea34fb05eefbc6ee559b, type: 3}
+  m_ParentUI: {fileID: 0}
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_Position: 0
+--- !u!4 &233835276
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233835272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &765734739
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,6 +469,7 @@ MonoBehaviour:
   - {fileID: 8574412962073106934, guid: 0ee09df919e207049be7831697d82e38, type: 2}
   _terrainRadiusChunks: 2
   _vegetation: {fileID: 11400000, guid: bb82d77de805d6745a723e52b273ace3, type: 2}
+  _grass: {fileID: 8926484042661614526, guid: 1672a4ef00767534c9f01df01bf6676f, type: 3}
   _wallKit: {fileID: 11400000, guid: 8b3760e13db262e4896d9be8b062a33f, type: 2}
   _props: {fileID: 11400000, guid: daf1a96d8ff022f4ba232d920c405634, type: 2}
   _humanoidPrefabs:
@@ -362,6 +479,8 @@ MonoBehaviour:
   - {fileID: 7732318826184146949, guid: 5edfa4ebcf5404a48a1587c3c9215324, type: 3}
   _humanoidAnimator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
   _wardrobe: {fileID: 11400000, guid: a28025bc8626b614989721ce2a65dc04, type: 2}
+  _creatures: {fileID: 11400000, guid: 3229f1c8404540b4283ab1ecb24e0f06, type: 2}
+  _boatCatalog: {fileID: 11400000, guid: 5944cbab2e6bf1b40a9156bb62d0ae7d, type: 2}
   _cameraTarget: {fileID: 765734741}
   _viewRadiusBlocks: 10
   _generateHouses: 1
@@ -603,3 +722,4 @@ SceneRoots:
   - {fileID: 1293738459}
   - {fileID: 765734740}
   - {fileID: 1492036961}
+  - {fileID: 233835276}

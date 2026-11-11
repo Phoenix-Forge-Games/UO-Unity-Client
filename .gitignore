@@ -62,3 +62,37 @@ Thumbs.db
 /Assets/UOClient/Scripts/Content/ContentKey.Local.cs.meta
 /Assets/UOClient/Generated/
 /Assets/UOClient/Generated.meta
+
+# Baked world: derived from UO data, made on each machine by the import (never commit)
+/WorldData/
+
+# Server accounts and saves (never commit)
+/ServerData/
+/WorldSource/
+
+# Secure art (Docs/SecureArt.md): paid packs and icons moved under Assets/Secure, the Addressables setup that
+# names their assets (re-made by Tools/SecureArt/SetupSecureArt.eval.cs), and the built (encrypted) bundles.
+/Assets/Secure/
+/Assets/Secure.meta
+/Assets/AddressableAssetsData/
+/Assets/AddressableAssetsData.meta
+/AddressableContent/
+
+# Art kept out of the open-source repo (images, models, audio under our own folders, including ones our tools
+# generate: Tools/Game/MakeSky.eval.cs, Tools/VFX). Their .meta files stay, so references hold once the art is back.
+/Assets/UOClient/**/*.png
+/Assets/UOClient/**/*.jpg
+/Assets/UOClient/**/*.tga
+/Assets/UOClient/**/*.psd
+/Assets/UOClient/**/*.exr
+/Assets/UOClient/**/*.fbx
+/Assets/UOClient/**/*.obj
+/Assets/UOClient/**/*.blend
+/Assets/UOClient/**/*.wav
+/Assets/UOClient/**/*.ogg
+/Assets/UOClient/**/*.mp3
+# FishNet's demo scenes (not used by the game; they bring their own sample art).
+/Assets/FishNet/Demos/
+/Assets/FishNet/Demos.meta
+# Working screenshots (they show the paid art).
+/Docs/**/*.png

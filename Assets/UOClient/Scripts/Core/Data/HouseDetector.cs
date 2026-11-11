@@ -14,6 +14,9 @@ namespace UOClient.Data
         private const int StoreyZ = 20;
         /// <summary>Largest floor step inside one storey (a raised dais or platform).</summary>
         private const int StepZ = 12;
+        /// <summary>How far (Z) above the land a walkable surface must be to count as a ceiling over a tile.</summary>
+        private const int CeilingZ = 15;
+
         /// <summary>How far a plain roof overhang (eaves) reaches past the walls.</summary>
         private const int EaveReach = 2;
         private const int MinTiles = 6;
@@ -47,6 +50,24 @@ namespace UOClient.Data
         /// Finds the house whose ground floor includes (x, y), or null when that tile isn't inside one.
         /// Every tile of the house is added to <paramref name="visited"/> so callers skip the rest of it.
         /// </summary>
+        /// <summary>Drops what it remembered about tiles in an area (a multi was added or removed there).</summary>
+        public void Forget(int x0, int y0, int x1, int y1)
+        {
+            var stale = new List<(int X, int Y)>();
+            foreach ((int X, int Y) key in _floorOf.Keys)
+            {
+                if (key.X >= x0 && key.X <= x1 && key.Y >= y0 && key.Y <= y1)
+                {
+                    stale.Add(key);
+                }
+            }
+
+            foreach ((int X, int Y) key in stale)
+            {
+                _floorOf.Remove(key);
+            }
+        }
+
         public HouseLayout Detect(int x, int y, HashSet<(int X, int Y)> visited)
         {
             if (!TryInterior(x, y, out int floorZ))
@@ -130,6 +151,15 @@ namespace UOClient.Data
             }
 
             DecideStyle(layout);
+
+            // A flat "roof" with no door and no window under it is a passage under the city wall's walkway, a
+            // tunnel or a vault, not a building: real flat-roofed buildings (banks, guard posts, keeps) have a way in.
+            if (layout.FlatRoof && layout.Doors.Count == 0 && layout.Windows.Count == 0)
+            {
+                Trace?.Invoke($"{x},{y}: flat roof with no doors or windows at {layout.MinX},{layout.MinY}-{layout.MaxX},{layout.MaxY}");
+                return null;
+            }
+
             FindPorch(layout);
             layout.GroundZ = LowestGroundAround(layout);
             FindHangings(layout);
@@ -503,6 +533,10 @@ namespace UOClient.Data
                 {
                     roof = true;
                 }
+                else if (info.Is(TileFlag.Surface) && info.Height <= 2 && tile.Z >= landZ + CeilingZ && !info.Is(TileFlag.Bridge))
+                {
+                    roof = true; // a ceiling: the floor above, or a flat roof you can walk on
+                }
                 else if (info.Is(TileFlag.Surface) && info.Height <= 2 && tile.Z >= landZ - 4 && tile.Z <= landZ + 12)
                 {
                     // Foundation boards a storey under the land (for uneven terrain) are out of range; the land is the floor there.
@@ -538,14 +572,46 @@ namespace UOClient.Data
                     }
                 }
 
-                // A handful of high floor tiles is a balcony or a loft, not a storey.
-                if (tiles.Count < layout.Ground.Count / 3)
+                // A handful of high floor tiles is a balcony or a loft, not a storey; a floor with no walls
+                // standing on it (only knee-high parapets) is a flat roof.
+                if (tiles.Count < layout.Ground.Count / 3 || TallWallsAt(layout.Ground, want) < MinStoreyWalls)
                 {
                     break;
                 }
 
                 layout.Storeys.Add(tiles);
             }
+        }
+
+        /// <summary>Walls that make a storey: at least this many, at least this tall (parapets are about 5).</summary>
+        private const int MinStoreyWalls = 4;
+        private const int StoreyWallHeight = 10;
+
+        private int TallWallsAt(HashSet<(int X, int Y)> ground, int z)
+        {
+            int count = 0;
+            foreach ((int x, int y) in ground)
+            {
+                MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+                if (block == null)
+                {
+                    continue;
+                }
+
+                foreach (StaticTile tile in block.Statics)
+                {
+                    if (tile.X == (x & 7) && tile.Y == (y & 7) && Math.Abs(tile.Z - z) <= 4)
+                    {
+                        StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
+                        if (info.Is(TileFlag.Wall) && info.Height >= StoreyWallHeight && ++count >= MinStoreyWalls)
+                        {
+                            return count;
+                        }
+                    }
+                }
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -887,6 +953,7 @@ namespace UOClient.Data
 
             layout.Walls = (HouseWalls)best;
             layout.ThatchRoof = thatch > tiled;
+            layout.FlatRoof = thatch + tiled == 0;
         }
 
         private IEnumerable<StaticTile> BlockStaticsAt(int x, int y)

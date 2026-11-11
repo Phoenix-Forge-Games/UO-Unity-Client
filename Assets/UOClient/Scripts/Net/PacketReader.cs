@@ -105,6 +105,25 @@ namespace UOClient.Net
             return builder.ToString();
         }
 
+        /// <summary>Reads a NUL-terminated little-endian UTF-16 string (cliloc arguments in 0xC1).</summary>
+        public string ReadUnicodeLittleEndianNullTerminated()
+        {
+            var builder = new StringBuilder();
+            while (Remaining >= 2)
+            {
+                int low = ReadByte();
+                char c = (char)(low | (ReadByte() << 8));
+                if (c == '\0')
+                {
+                    break;
+                }
+
+                builder.Append(c);
+            }
+
+            return builder.ToString();
+        }
+
         public void Skip(int count) => Position += count;
     }
 }

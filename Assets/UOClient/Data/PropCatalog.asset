@@ -230,7 +230,7 @@ MonoBehaviour:
     - {fileID: 1562408061790668, guid: 98bc07b51cba6ba4cb7ec1ec6b39f3e3, type: 3}
     - {fileID: 1480056583309496, guid: 5b789dd8964709e47a4207ae92b62590, type: 3}
     - {fileID: 1500218450616558, guid: fa7e5ae02c745244c861a2db6ce26057, type: 3}
-    Fit: 0
+    Fit: 7
     AgainstWall: 0
     FaceTable: 0
     Footprint: 1

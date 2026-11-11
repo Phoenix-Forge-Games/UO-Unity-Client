@@ -28,6 +28,46 @@ namespace UOClient
         /// <summary>How near town paving a step must be to be faced with stone rather than left as earth.</summary>
         private const int TerraceTownReach = 2;
 
+        // Slopes blend to rock between these angles (degrees), whatever the ground is, like MicroSplat's slope
+        // texturing: a bank cut into grass or dirt shows rock, not stretched grass.
+        // Tuned on 1.25 m tiles; the same UO heights over bigger tiles are gentler slopes, so the angles are carried
+        // over to keep the same ground rocky.
+        private static readonly float RockStart = Gentler(32f);
+        private static readonly float RockFull = Gentler(45f);
+
+        private static float Gentler(float degrees) =>
+            Mathf.Atan(Mathf.Tan(degrees * Mathf.Deg2Rad) / WorldSpace.TileScale) * Mathf.Rad2Deg;
+
+        /// <summary>How deep (Z) the bed gets under open water, and how much deeper per tile from the shore.</summary>
+        private const int SeabedDepth = 20;
+        private const int SeabedSlope = 4;
+        /// <summary>How far (Z) below the surface the ground is at a shoreline corner, so the bank dips under.</summary>
+        private const int ShoreDip = 12;
+
+        /// <summary>Optional: VFX grass grown on each chunk (instead of the terrain's detail grass).</summary>
+        public GrassField Grass { get; set; }
+
+        /// <summary>Grass is drawn on the player's chunk and this many chunks around it (each chunk is 80 m).</summary>
+        /// <summary>How many chunks around the player grow VFX grass (-1: none).</summary>
+        public int GrassRadiusChunks
+        {
+            get => _grassRadius;
+            set
+            {
+                _grassDirty |= value != _grassRadius;
+                _grassRadius = value;
+            }
+        }
+
+        private int _grassRadius = 1;
+        private bool _grassDirty;
+
+        private Vector2Int _center = new Vector2Int(int.MinValue, int.MinValue);
+
+        /// <summary>Water surface Z per tile for the chunk being built (null: dry), worked out on demand.</summary>
+        private readonly Dictionary<long, int?> _waterZ = new Dictionary<long, int?>();
+        private float[,] _steepness;
+
         /// <summary>Tile kinds of the chunk being built (and a one-tile border), worked out once per chunk.</summary>
         private LandKind[,] _kinds;
         private int _kindsX, _kindsY;
@@ -48,6 +88,7 @@ namespace UOClient
             public GameObject Terrain;
             public TerrainData Data;
             public GameObject Water;
+            public GameObject Grass;
             public Mesh WaterMesh;
         }
 
@@ -68,6 +109,21 @@ namespace UOClient
             _layers = layers;
             _tiles = tiles;
         }
+
+        /// <summary>
+        /// Raised as each chunk finishes, with what it was built from: the chunk, its terrain data, the land kinds its
+        /// layers stand for (in layer order), the grass-free tiles (a one-tile border included, [y + 1, x + 1]) and
+        /// its water (null when dry). The world baker records chunks from this.
+        /// </summary>
+        public event Action<Vector2Int, GameObject, TerrainData, List<LandKind>, bool[,], GameObject> ChunkBuilt;
+
+        /// <summary>Without VFX grass, paint the terrain's own detail grass (the world baker turns this off).</summary>
+        public bool DetailGrass { get; set; } = true;
+
+        /// <summary>Every chunk in range is built (as of the last <see cref="Update"/>).</summary>
+        public bool IsSettled => _map != null && _unbuiltChunks == 0;
+
+        private int _unbuiltChunks;
 
         /// <summary>Chunks kept in each direction from the player's chunk.</summary>
         public int RadiusChunks { get; set; } = 2;
@@ -90,6 +146,19 @@ namespace UOClient
             }
 
             var center = new Vector2Int(centerX / ChunkTiles, centerY / ChunkTiles);
+            if (center != _center || _grassDirty)
+            {
+                _center = center;
+                _grassDirty = false;
+                foreach (KeyValuePair<Vector2Int, Chunk> pair in _chunks)
+                {
+                    if (pair.Value.Grass != null)
+                    {
+                        pair.Value.Grass.SetActive(Mathf.Abs(pair.Key.x - center.x) <= GrassRadiusChunks &&
+                                                   Mathf.Abs(pair.Key.y - center.y) <= GrassRadiusChunks);
+                    }
+                }
+            }
 
             _remove.Clear();
             foreach (Vector2Int key in _chunks.Keys)
@@ -120,6 +189,7 @@ namespace UOClient
                 }
             }
 
+            _unbuiltChunks = Mathf.Max(0, _wanted.Count - 1);
             if (_wanted.Count == 0)
             {
                 return;
@@ -154,12 +224,16 @@ namespace UOClient
             data.SetDetailResolution(32, 8);
             data.size = new Vector3(ChunkTiles * WorldSpace.TileSize, ZRange * WorldSpace.ZScale, ChunkTiles * WorldSpace.TileSize);
 
+            _waterZ.Clear();
             data.SetHeights(0, 0, BuildHeights(originX, originY));
+            _steepness = Steepness(data);
             PrepareKinds(originX, originY);
             List<LandKind> used = FindUsedKinds(originX, originY);
             data.terrainLayers = used.ConvertAll(kind => _layers[(int)kind]).ToArray();
-            data.SetAlphamaps(0, 0, BuildSplat(originX, originY, used));
+            float[,,] splat = BuildSplat(originX, originY, used);
+            data.SetAlphamaps(0, 0, splat);
             _kinds = null;
+            _steepness = null;
             data.SetHoles(0, 0, BuildHoles(originX, originY));
 
             var go = new GameObject($"Terrain {cx},{cy}");
@@ -179,10 +253,36 @@ namespace UOClient
             terrain.basemapDistance = 250f;
             terrain.allowAutoConnect = true;
             go.AddComponent<TerrainCollider>().terrainData = data; // camera obstacle avoidance
-            _groundCover?.Apply(data, terrain, _map, originX, originY, ChunkTiles);
-
             var chunk = new Chunk { Terrain = go, Data = data };
+            bool[,] bare = null;
+            if (Grass != null || ChunkBuilt != null)
+            {
+                // VFX grass replaces the terrain's detail grass: it follows the drawn ground and takes its colour.
+                bare = _groundCover?.BareTiles(_map, originX, originY, ChunkTiles) ?? new bool[ChunkTiles + 2, ChunkTiles + 2];
+                for (int ty = -1; ty <= ChunkTiles; ty++)
+                {
+                    for (int tx = -1; tx <= ChunkTiles; tx++)
+                    {
+                        if (WaterZAt(originX + tx, originY + ty).HasValue)
+                        {
+                            bare[ty + 1, tx + 1] = true; // no grass on the water bed
+                        }
+                    }
+                }
+                chunk.Grass = Grass?.Add(go, data, splat, used, bare, ChunkTiles);
+                if (chunk.Grass != null)
+                {
+                    chunk.Grass.SetActive(Mathf.Abs(cx - _center.x) <= GrassRadiusChunks && Mathf.Abs(cy - _center.y) <= GrassRadiusChunks);
+                }
+            }
+
+            if (Grass == null && DetailGrass)
+            {
+                _groundCover?.Apply(data, terrain, _map, originX, originY, ChunkTiles);
+            }
+
             BuildWater(chunk, originX, originY, cx, cy);
+            ChunkBuilt?.Invoke(new Vector2Int(cx, cy), go, data, used, bare, chunk.Water);
             return chunk;
         }
 
@@ -196,6 +296,7 @@ namespace UOClient
                 for (int col = 0; col < HeightResolution; col++)
                 {
                     int z = CornerZ?.Invoke(originX + col, y) ?? _map.GetLand(originX + col, y).Z;
+                    z = UnderWater(originX + col, y, z);
                     heights[row, col] = (z - MinZ) / ZRange;
                 }
             }
@@ -213,6 +314,18 @@ namespace UOClient
                 for (int x = originX - 1; x <= originX + ChunkTiles; x++)
                 {
                     seen[(int)LayerKindAt(x, y)] = true;
+                }
+            }
+
+            if (_steepness != null && HasLayer(LandKind.Rock))
+            {
+                foreach (float degrees in _steepness)
+                {
+                    if (degrees > RockStart)
+                    {
+                        seen[(int)LandKind.Rock] = true;
+                        break;
+                    }
                 }
             }
 
@@ -310,12 +423,16 @@ namespace UOClient
             _kinds = null;
             var kinds = new LandKind[size, size];
             bool terrace = _layers.Length > (int)LandKind.Terrace && _layers[(int)LandKind.Terrace] != null;
+            bool bed = HasLayer(LandKind.Underwater);
             for (int j = 0; j < size; j++)
             {
                 for (int i = 0; i < size; i++)
                 {
                     int x = _kindsX + i, y = _kindsY + j;
-                    kinds[i, j] = terrace && IsSteep(x, y) && NearTown(x, y) ? LandKind.Terrace : BaseKindAt(x, y);
+                    // Everything under water gets the same bed: UO only puts its underwater ground under sea land,
+                    // so canals and ponds made of water statics would show patches of dirt and grass through it.
+                    kinds[i, j] = bed && WaterZAt(x, y).HasValue ? LandKind.Underwater
+                        : terrace && IsSteep(x, y) && NearTown(x, y) ? LandKind.Terrace : BaseKindAt(x, y);
                 }
             }
 
@@ -402,6 +519,22 @@ namespace UOClient
                         splat[row, col, i] = total > 0f ? weights[i] / total : (i == 0 ? 1f : 0f);
                     }
 
+                    int rock = layerIndex[(int)LandKind.Rock];
+                    if (rock >= 0 && _steepness != null && LayerKindAt(tx, ty) != LandKind.Terrace)
+                    {
+                        float t = Mathf.InverseLerp(RockStart, RockFull, _steepness[row, col]);
+                        t = t * t * (3f - 2f * t);
+                        if (t > 0f)
+                        {
+                            for (int i = 0; i < weights.Length; i++)
+                            {
+                                splat[row, col, i] *= 1f - t;
+                            }
+
+                            splat[row, col, rock] += t;
+                        }
+                    }
+
                     // A steep town tile is rock all over: blending would smear the road's paving up the bank.
                     int terrace = layerIndex[(int)LandKind.Terrace];
                     if (terrace >= 0 && LayerKindAt(tx, ty) == LandKind.Terrace)
@@ -443,6 +576,16 @@ namespace UOClient
             var vertices = new List<Vector3>();
             var uvs = new List<Vector2>();
             var triangles = new List<int>();
+            // One surface per tile: water land often has a water static on it too, and two overlapping
+            // transparent surfaces draw as tile-shaped lighter patches.
+            var done = new HashSet<long>();
+            void Add(int tx, int ty, int z)
+            {
+                if (done.Add(((long)tx << 32) | (uint)ty))
+                {
+                    AddWaterQuad(vertices, uvs, triangles, tx, ty, z);
+                }
+            }
 
             for (int y = originY; y < originY + ChunkTiles; y++)
             {
@@ -451,7 +594,7 @@ namespace UOClient
                     LandCell land = _map.GetLand(x, y);
                     if (LandClassifier.Get(land.TileId) == LandKind.Underwater)
                     {
-                        AddWaterQuad(vertices, uvs, triangles, x, y, land.Z);
+                        Add(x, y, land.Z);
                     }
                 }
             }
@@ -470,8 +613,49 @@ namespace UOClient
                     {
                         if (IsWaterStatic(_tiles.GetStatic(tile.Graphic)))
                         {
-                            AddWaterQuad(vertices, uvs, triangles, (bx << 3) + tile.X, (by << 3) + tile.Y, tile.Z);
+                            Add((bx << 3) + tile.X, (by << 3) + tile.Y, tile.Z);
                         }
+                    }
+                }
+            }
+
+            // Flooded gaps (dry tiles at water level beside water) get a surface too.
+            for (int y = originY; y < originY + ChunkTiles; y++)
+            {
+                for (int x = originX; x < originX + ChunkTiles; x++)
+                {
+                    int? flooded = WaterZAt(x, y);
+                    if (flooded.HasValue && !RawWaterZ(x, y).HasValue)
+                    {
+                        Add(x, y, flooded.Value);
+                    }
+                }
+            }
+
+            // A skirt one tile into the dry ground around the water, at the water's height, running in under the
+            // bank: the shoreline is then wherever the terrain rises out of it, not the square edge of a tile.
+            for (int y = originY; y < originY + ChunkTiles; y++)
+            {
+                for (int x = originX; x < originX + ChunkTiles; x++)
+                {
+                    if (WaterZAt(x, y).HasValue)
+                    {
+                        continue;
+                    }
+
+                    int? surface = null;
+                    for (int dy = -1; dy <= 1 && !surface.HasValue; dy++)
+                    {
+                        for (int dx = -1; dx <= 1 && !surface.HasValue; dx++)
+                        {
+                            surface = WaterZAt(x + dx, y + dy);
+                        }
+                    }
+
+                    // Only where the bank rises above the water: on ground lower than it the skirt would float.
+                    if (surface.HasValue && HighestCorner(x, y) > surface.Value)
+                    {
+                        Add(x, y, surface.Value);
                     }
                 }
             }
@@ -521,6 +705,179 @@ namespace UOClient
             triangles.Add(start);
             triangles.Add(start + 2);
             triangles.Add(start + 3);
+        }
+
+        /// <summary>
+        /// The ground under water: a corner wholly in open water drops to a bed below the surface, a shoreline
+        /// corner dips just under it, so the bank slopes down into the water instead of stopping at its edge.
+        /// Corner (x, y) is shared by tiles (x-1..x, y-1..y).
+        /// </summary>
+        private int UnderWater(int x, int y, int z)
+        {
+            int wet = 0, surface = int.MaxValue;
+            for (int dy = -1; dy <= 0; dy++)
+            {
+                for (int dx = -1; dx <= 0; dx++)
+                {
+                    int? water = WaterZAt(x + dx, y + dy);
+                    if (water.HasValue)
+                    {
+                        wet++;
+                        surface = Math.Min(surface, water.Value);
+                    }
+                }
+            }
+
+            if (wet == 0)
+            {
+                return z;
+            }
+
+            // A bowl: just under the surface at the shore, deepening with distance from dry ground. A sudden drop
+            // shows through the water shader's depth colouring as hard tile-shaped steps.
+            int depth = wet < 4 ? ShoreDip : Math.Min(SeabedDepth, ShoreDip + SeabedSlope * ShoreDistance(x, y));
+            return Math.Min(z, surface - depth);
+        }
+
+        /// <summary>How many tiles (up to 3) from corner (x, y) to the nearest dry tile.</summary>
+        private int ShoreDistance(int x, int y)
+        {
+            for (int r = 1; r <= 3; r++)
+            {
+                for (int dy = -r - 1; dy <= r; dy++)
+                {
+                    for (int dx = -r - 1; dx <= r; dx++)
+                    {
+                        if (!WaterZAt(x + dx, y + dy).HasValue)
+                        {
+                            return r;
+                        }
+                    }
+                }
+            }
+
+            return 3;
+        }
+
+        /// <summary>
+        /// The terrain's height (Z) at corner (x, y) exactly as it is drawn: house flattening and the dip under
+        /// water included, so things seated on the ground (plants, props) sit on what you see.
+        /// </summary>
+        public int SurfaceCornerZ(int x, int y) => UnderWater(x, y, CornerZ?.Invoke(x, y) ?? _map.GetLand(x, y).Z);
+
+        /// <summary>A tile that is water or touches it (including diagonally).</summary>
+        private bool NearWater(int x, int y)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (WaterZAt(x + dx, y + dy).HasValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private int HighestCorner(int x, int y)
+        {
+            int high = int.MinValue;
+            for (int dy = 0; dy <= 1; dy++)
+            {
+                for (int dx = 0; dx <= 1; dx++)
+                {
+                    high = Math.Max(high, CornerZ?.Invoke(x + dx, y + dy) ?? _map.GetLand(x + dx, y + dy).Z);
+                }
+            }
+
+            return high;
+        }
+
+        /// <summary>
+        /// The water surface Z on a tile, or null when it's dry. Water land and water statics are water; so is a dry
+        /// tile lying no higher than the water beside it (UO leaves such gaps in canals and ponds), else it would
+        /// show as a shallow tile-shaped patch in the middle of the water.
+        /// </summary>
+        private int? WaterZAt(int x, int y)
+        {
+            long key = ((long)x << 32) | (uint)y;
+            if (_waterZ.TryGetValue(key, out int? cached))
+            {
+                return cached;
+            }
+
+            int? z = RawWaterZ(x, y);
+            if (!z.HasValue)
+            {
+                int ground = int.MinValue;
+                for (int dy = 0; dy <= 1; dy++)
+                {
+                    for (int dx = 0; dx <= 1; dx++)
+                    {
+                        ground = Math.Max(ground, _map.GetLand(x + dx, y + dy).Z);
+                    }
+                }
+
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        int? beside = (dx != 0 || dy != 0) ? RawWaterZ(x + dx, y + dy) : null;
+                        if (beside.HasValue && ground <= beside.Value + 1)
+                        {
+                            z = z.HasValue ? Math.Max(z.Value, beside.Value) : beside.Value;
+                        }
+                    }
+                }
+            }
+
+            _waterZ[key] = z;
+            return z;
+        }
+
+        private int? RawWaterZ(int x, int y)
+        {
+            int? z = null;
+            LandCell land = _map.GetLand(x, y);
+            if (LandClassifier.Get(land.TileId) == LandKind.Underwater)
+            {
+                z = land.Z;
+            }
+            else
+            {
+                MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+                if (block != null)
+                {
+                    foreach (StaticTile tile in block.Statics)
+                    {
+                        if (tile.X == (x & 7) && tile.Y == (y & 7) && IsWaterStatic(_tiles.GetStatic(tile.Graphic)))
+                        {
+                            z = z.HasValue ? Math.Max(z.Value, tile.Z) : tile.Z;
+                        }
+                    }
+                }
+            }
+
+            return z;
+        }
+
+        /// <summary>The terrain's slope (degrees) at each splat texel, [row, col] like the alphamap.</summary>
+        private static float[,] Steepness(TerrainData data)
+        {
+            var steep = new float[SplatResolution, SplatResolution];
+            for (int row = 0; row < SplatResolution; row++)
+            {
+                float v = (row + 0.5f) / SplatResolution;
+                for (int col = 0; col < SplatResolution; col++)
+                {
+                    steep[row, col] = data.GetSteepness((col + 0.5f) / SplatResolution, v);
+                }
+            }
+
+            return steep;
         }
 
         public static bool IsWaterStatic(StaticTileInfo info) =>

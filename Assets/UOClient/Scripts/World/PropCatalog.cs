@@ -26,6 +26,12 @@ namespace UOClient
         LowWall,
         /// <summary>Hung flat against the wall beside its tile, its bottom at the tile's Z (banners, paintings).</summary>
         Hang,
+        /// <summary>
+        /// Mounted on the wall beside its tile and sticking straight out from it, just under the wall's top: a
+        /// shop's sign bracket (UO's "signpost", which the shop sign hangs from). The prefab's pivot is its wall
+        /// plate and its arm runs along local -x (Synty's sign brackets).
+        /// </summary>
+        Bracket,
     }
 
     /// <summary>

@@ -1,0 +1,179 @@
+{
+ "Source": "Clock and light from ServUO Scripts/Items/Tools/Clocks.cs and Scripts/Misc/LightCycle.cs; night sight from LightCycle.NightSightTimer. Swimming and falling are this game's own (UO has neither): ServerDesign.md decision 5.",
+ "Clock": {
+  "WorldStart": "1997-09-01T00:00:00Z",
+  "SecondsPerMinute": 5,
+  "FacetMinutes": 320,
+  "TilesPerMinute": 16,
+  "Note": "a UO minute is 5 real seconds (a day is 2 real hours); the hour runs a minute later every 16 tiles east, and each facet is 320 minutes on"
+ },
+ "Light": {
+  "Day": 0,
+  "Night": 12,
+  "Dungeon": 26,
+  "Darkest": 30,
+  "NightFrom": 0,
+  "NightTo": 4,
+  "DawnTo": 6,
+  "DuskFrom": 22,
+  "Note": "UO light levels (0 brightest, 30 darkest): night 0:00-4:00, brightening to day by 6:00, darkening from 22:00; dungeons always 26; Night Sight lights you as day"
+ },
+ "Sun": {
+  "Rise": 6,
+  "Set": 20,
+  "MaxElevation": 62,
+  "Note": "The sky's own day (the client's look; UO's light levels above still name how dark it is): the sun rises in the east at Rise, crosses the southern sky to MaxElevation degrees at midday and sets in the west at Set (UO hours), then passes under the world while the moon rides the night sky. Mornings and evenings turn amber as the sun nears the horizon."
+ },
+ "NightSight": {
+  "Minutes": [
+   15,
+   25
+  ]
+ },
+ "Swim": {
+  "Depth": 1.25,
+  "RunSpeed": 3.5,
+  "WalkSpeed": 2,
+  "Rise": 4,
+  "Note": "metres of water above your feet before you swim, held there with your head out; slower than walking on land, mount or not"
+ },
+ "Fall": {
+  "SafeMetres": 5,
+  "PercentPerMetre": 4.5,
+  "Note": "falls longer than 5 m hurt: 4.5% of your most hits per metre beyond it (about 27 m kills); landing in water or flying doesn't"
+ },
+ "Weather": {
+  "PeriodMinutes": 120,
+  "BlendSeconds": 90,
+  "Seed": 1997,
+  "Force": "",
+  "Note": "This game's own (UO's weather was only rain and snow particles). Each period of PeriodMinutes UO minutes (120: ten real minutes) has one kind, picked by Chance from the clock alone, so every client and the server agree with nothing sent; it changes over BlendSeconds. Force names a kind to hold everywhere (a live change, no restart). Values 0..1: Clouds (cover), CloudDark (grey to storm-dark), Fog, Rain, Snow, Wind, Lightning (flashes), Light (how much sun gets through).",
+  "Kinds": {
+   "Clear": {
+    "Chance": 40,
+    "Clouds": 0.12,
+    "CloudDark": 0.0,
+    "Fog": 0.0,
+    "Rain": 0,
+    "Snow": 0,
+    "Wind": 0.25,
+    "Lightning": 0,
+    "Light": 1.0
+   },
+   "Cloudy": {
+    "Chance": 24,
+    "Clouds": 0.45,
+    "CloudDark": 0.1,
+    "Fog": 0.0,
+    "Rain": 0,
+    "Snow": 0,
+    "Wind": 0.4,
+    "Lightning": 0,
+    "Light": 0.9
+   },
+   "Overcast": {
+    "Chance": 12,
+    "Clouds": 0.85,
+    "CloudDark": 0.35,
+    "Fog": 0.05,
+    "Rain": 0,
+    "Snow": 0,
+    "Wind": 0.45,
+    "Lightning": 0,
+    "Light": 0.7
+   },
+   "Fog": {
+    "Chance": 6,
+    "Clouds": 0.6,
+    "CloudDark": 0.2,
+    "Fog": 0.6,
+    "Rain": 0,
+    "Snow": 0,
+    "Wind": 0.1,
+    "Lightning": 0,
+    "Light": 0.75
+   },
+   "Rain": {
+    "Chance": 12,
+    "Clouds": 0.92,
+    "CloudDark": 0.55,
+    "Fog": 0.15,
+    "Rain": 0.6,
+    "Snow": 0,
+    "Wind": 0.6,
+    "Lightning": 0,
+    "Light": 0.6
+   },
+   "Storm": {
+    "Chance": 6,
+    "Clouds": 1.0,
+    "CloudDark": 0.85,
+    "Fog": 0.25,
+    "Rain": 1.0,
+    "Snow": 0,
+    "Wind": 1.0,
+    "Lightning": 0.6,
+    "Light": 0.45
+   },
+   "Snow": {
+    "Chance": 0,
+    "Clouds": 0.9,
+    "CloudDark": 0.3,
+    "Fog": 0.2,
+    "Rain": 0,
+    "Snow": 0.8,
+    "Wind": 0.3,
+    "Lightning": 0,
+    "Light": 0.75
+   }
+  }
+ },
+ "Lights": {
+  "MaxLit": 24,
+  "Note": "Lights in the baked world (the client's look): each prop whose name starts with Match gets a warm point light near its top at night (Range metres, Intensity, Flicker for flames); only the MaxLit nearest the camera are on at once, and they fade out by day.",
+  "Props": [
+   {
+    "Match": "SM_Prop_Street_Lamp",
+    "Range": 11,
+    "Intensity": 3.0,
+    "Flicker": 0.1,
+    "Top": 0.35
+   },
+   {
+    "Match": "SM_Prop_Torch",
+    "Range": 7,
+    "Intensity": 2.4,
+    "Flicker": 1.0,
+    "Top": 0.15
+   },
+   {
+    "Match": "SM_Prop_Brazier",
+    "Range": 8,
+    "Intensity": 2.6,
+    "Flicker": 1.0,
+    "Top": 0.2
+   },
+   {
+    "Match": "SM_Prop_Lantern",
+    "Range": 6,
+    "Intensity": 2.0,
+    "Flicker": 0.15,
+    "Top": 0.4
+   },
+   {
+    "Match": "SM_Prop_Candle",
+    "Range": 3.5,
+    "Intensity": 1.4,
+    "Flicker": 0.8,
+    "Top": 0.05
+   },
+   {
+    "Match": "SM_Prop_Campfire",
+    "Range": 9,
+    "Intensity": 3.0,
+    "Flicker": 1.0,
+    "Top": 0.6
+   }
+  ]
+ }
+}

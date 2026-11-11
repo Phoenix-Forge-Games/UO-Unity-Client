@@ -1,7 +1,16 @@
 {
     "name": "UOClient",
     "rootNamespace": "UOClient",
-    "references": ["UOClient.Net", "UOClient.Core", "UOClient.Buildings", "Unity.InputSystem", "Unity.Cinemachine"],
+    "references": [
+        "UOClient.Net",
+        "UOClient.Core",
+        "UOClient.Buildings",
+        "Unity.InputSystem",
+        "Unity.Cinemachine",
+        "Unity.VisualEffectGraph.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

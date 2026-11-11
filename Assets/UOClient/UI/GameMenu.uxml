@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LoginScreen.uss" />
+    <ui:VisualElement name="root" class="screen">
+        <ui:VisualElement class="panel">
+            <ui:Label text="SeriousFun" class="title" />
+            <ui:Label text="Britannia, in three dimensions" class="subtitle" />
+
+            <ui:VisualElement name="connect-page" class="page">
+                <ui:Button name="solo-button" text="Play Solo" class="primary-button" />
+                <ui:Label text="Online" class="page-heading" />
+                <ui:TextField name="account" label="Account" class="field" />
+                <ui:TextField name="password" label="Password" password="true" class="field" />
+                <ui:TextField name="address" label="Server" value="127.0.0.1" class="field" />
+                <ui:IntegerField name="port" label="Port" value="7770" class="field" />
+                <ui:Button name="join-button" text="Join" class="secondary-button" />
+                <ui:Button name="host-button" text="Host a Game" class="secondary-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="character-page" class="page hidden">
+                <ui:Label text="Choose a character" class="page-heading" />
+                <ui:ScrollView name="character-list" class="choice-list" />
+                <ui:VisualElement name="create-row" class="create-row">
+                    <ui:TextField name="new-character-name" label="New" class="field create-name" />
+                    <ui:Button name="create-button" text="Create" class="secondary-button create-button" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:Label name="status" class="status" />
+            <ui:Button name="back-button" text="Back" class="secondary-button hidden" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

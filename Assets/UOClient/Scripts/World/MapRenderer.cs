@@ -14,7 +14,11 @@ namespace UOClient
     /// </summary>
     public sealed class MapRenderer : IDisposable
     {
-        private const int BuildsPerFrame = 6;
+        /// <summary>Blocks built per <see cref="Update"/> (the world baker raises it).</summary>
+        public int BuildsPerUpdate { get; set; } = 6;
+
+        /// <summary>Blocks the last update wanted but didn't get to.</summary>
+        private int _unbuilt;
         private const float TownTileLift = 0.02f;
         private const float WallThickness = 0.2f;
         private const float PostSize = 0.3f;
@@ -102,16 +106,47 @@ namespace UOClient
             return z * WorldSpace.ZScale;
         }
 
-        private int CornerHeight(int x, int y) => TerrainCornerZ(x, y) ?? _map.GetLand(x, y).Z;
+        private int CornerHeight(int x, int y) => SurfaceCornerZ?.Invoke(x, y) ?? TerrainCornerZ(x, y) ?? _map.GetLand(x, y).Z;
+
+        /// <summary>Optional: the terrain's drawn corner heights (the terrain streamer's), so seating matches it.</summary>
+        public Func<int, int, int> SurfaceCornerZ { get; set; }
 
         /// <summary>Optional: town paving the terrain paints itself, so no flat overlay tile is drawn for it.</summary>
         public Func<LandKind, bool> TerrainPaves { get; set; }
 
+        /// <summary>UO grass statics are skipped (the VFX grass draws grass); flowers and other plants stay.</summary>
+        public static bool SkipGrassStatics { get; set; }
+
         /// <summary>Optional: Synty props for furniture and clutter statics instead of placeholder boxes.</summary>
         public PropPlacer Props { get; set; }
 
+        /// <summary>Raised when the generator gives up on a detected house (its UO statics were claimed, so nothing stands there).</summary>
+        public event Action<HouseLayout> HouseFailed;
+
         /// <summary>Raised with each generated house once it stands in the world.</summary>
         public event Action<GameObject, HouseLayout> HouseBuilt;
+
+        /// <summary>
+        /// Optional: told what each map static became (graphic, x, y, z, outcome), for the world bake's census of
+        /// statics drawn as placeholders or not drawn at all. Outcomes are the <c>Outcome*</c> constants.
+        /// </summary>
+        public Action<ushort, int, int, int, string> Census { get; set; }
+
+        public const string OutcomeVegetation = "vegetation";
+        public const string OutcomeGrassSkipped = "grass (VFX grass instead)";
+        public const string OutcomeFoliageSkipped = "foliage (canopy of a nearby tree)";
+        public const string OutcomeHouse = "drawn by generated house";
+        public const string OutcomeWater = "water (terrain water)";
+        public const string OutcomeNoShape = "NOT DRAWN (no shape)";
+        public const string OutcomePaving = "paving (painted into terrain)";
+        public const string OutcomeLowWall = "low wall prop";
+        public const string OutcomeRoof = "roof";
+        public const string OutcomeWallHidden = "NOT DRAWN (wall under steepened roof)";
+        public const string OutcomeWall = "wall kit";
+        public const string OutcomeStairSupport = "NOT DRAWN (support under a stair flight)";
+        public const string OutcomeProp = "prop";
+        public const string OutcomePropFailed = "NOT DRAWN (prop failed to place)";
+        public const string OutcomeBox = "PLACEHOLDER BOX";
 
         /// <summary>Blocks kept loaded in each direction from the center block.</summary>
         public int RadiusBlocks { get; set; } = 6;
@@ -123,7 +158,7 @@ namespace UOClient
             _roofs = new RoofPlanner(map, _tiles);
             LandZAt = (x, y) => map.GetLand(x, y).Z;
             InHouseSeat = (x, y) => _houses != null && _houses.ClaimsLand(x, y);
-            GroundSeat = (x, y) => GroundY(x + 0.5f, y + 0.5f);
+            GroundSeat = GroundY;
             if (Props != null)
             {
                 Props.Map = map;
@@ -178,6 +213,7 @@ namespace UOClient
             }
 
             BuildNextHouse();
+            _unbuilt = Mathf.Max(0, _missing.Count - BuildsPerUpdate);
             if (_missing.Count == 0)
             {
                 return;
@@ -185,9 +221,33 @@ namespace UOClient
 
             var center = new Vector2Int(cbx, cby);
             _missing.Sort((a, b) => (a - center).sqrMagnitude.CompareTo((b - center).sqrMagnitude));
-            for (int i = 0; i < _missing.Count && i < BuildsPerFrame; i++)
+            for (int i = 0; i < _missing.Count && i < BuildsPerUpdate; i++)
             {
                 _blocks[_missing[i]] = BuildBlock(_missing[i].x, _missing[i].y);
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds the map where its contents changed (a server multi's tiles were laid over or taken off these
+        /// blocks): forgets the houses there and drops the built blocks, which the next updates build again.
+        /// </summary>
+        public void Refresh(HashSet<(int BlockX, int BlockY)> blocks)
+        {
+            if (_map == null || blocks.Count == 0)
+            {
+                return;
+            }
+
+            IEnumerable<(int BlockX, int BlockY)> rebuild = _houses != null ? _houses.Forget(blocks) : (IEnumerable<(int, int)>)blocks;
+            foreach ((int bx, int by) in rebuild)
+            {
+                var key = new Vector2Int(bx, by);
+                if (_blocks.TryGetValue(key, out Block block))
+                {
+                    DestroyBlock(block);
+                    ForgetFlights(key);
+                    _blocks.Remove(key);
+                }
             }
         }
 
@@ -218,7 +278,11 @@ namespace UOClient
                 }
 
                 GameObject built = HouseBuilder.Build(house);
-                if (built != null)
+                if (built == null)
+                {
+                    HouseFailed?.Invoke(house);
+                }
+                else
                 {
                     built.transform.SetParent(block.Object.transform, true);
                     HouseBuilt?.Invoke(built, house);
@@ -229,6 +293,16 @@ namespace UOClient
         }
 
         public void Dispose() => Clear();
+
+        /// <summary>
+        /// Every block in range is built and every queued house stands (as of the last <see cref="Update"/>; a house
+        /// queued by the last block built is still pending, so call Update until this holds).
+        /// </summary>
+        public bool IsSettled => _map != null && _unbuilt == 0 && _pendingHouses.Count == 0;
+
+        /// <summary>A built block's object (statics, props and the houses it owns), or null.</summary>
+        public GameObject BlockObject(int bx, int by) =>
+            _blocks.TryGetValue(new Vector2Int(bx, by), out Block block) ? block.Object : null;
 
         private Block BuildBlock(int bx, int by)
         {
@@ -322,18 +396,28 @@ namespace UOClient
             {
                 StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
                 int x = baseX + tile.X, y = baseY + tile.Y;
-                if (TryQueueVegetation(info, tile, x, y))
+                void Tell(string outcome) => Census?.Invoke(tile.Graphic, x, y, tile.Z, outcome);
+                if (TryQueueVegetation(info, tile, x, y, out string vegetation))
                 {
+                    Tell(vegetation);
                     continue;
                 }
 
                 if (_houses != null && _houses.Claims(info, tile.Graphic, x, y, tile.Z))
                 {
+                    Tell(OutcomeHouse);
                     continue; // drawn by the generated house
                 }
 
-                if (TerrainStreamer.IsWaterStatic(info) || !Palette.TryGetStaticShape(info, out StaticShape shape))
+                if (TerrainStreamer.IsWaterStatic(info))
                 {
+                    Tell(OutcomeWater);
+                    continue;
+                }
+
+                if (!Palette.TryGetStaticShape(info, out StaticShape shape))
+                {
+                    Tell(OutcomeNoShape);
                     continue;
                 }
 
@@ -343,6 +427,7 @@ namespace UOClient
                     LandKind laid = LandClassifier.PavingOfStatic(info);
                     if (laid != LandKind.Town && TerrainPaves(laid))
                     {
+                        Tell(OutcomePaving);
                         continue;
                     }
                 }
@@ -353,11 +438,13 @@ namespace UOClient
                 if (lowWall != null && lowWall.Fit == PropFit.LowWall)
                 {
                     _propTiles.Add(new PropTile { Entry = lowWall, Graphic = tile.Graphic, X = x, Y = y, Z = tile.Z });
+                    Tell(OutcomeLowWall);
                     continue;
                 }
 
                 if (RoofPlanner.IsRoof(info) && TryAddRoof(info, x, y, tile.Z))
                 {
+                    Tell(OutcomeRoof);
                     continue;
                 }
 
@@ -370,6 +457,7 @@ namespace UOClient
                         x, y, tile.Z, info.Height, _walls.Get(tile.Graphic), out float gableBottom, out float gableTop);
                     if (fit == RoofPlanner.WallFit.Hidden)
                     {
+                        Tell(OutcomeWallHidden);
                         continue;
                     }
 
@@ -381,20 +469,25 @@ namespace UOClient
                 }
                 if (IsWallLike(info) && TryAddWall(tile.Graphic, info, x, y, bottom, top, shape.Color))
                 {
+                    Tell(OutcomeWall);
                     continue;
                 }
 
                 PropCatalog.Entry prop = Props?.EntryFor(tile.Graphic);
                 if (prop != null && prop.Fit == PropFit.Block && StairAbove(block, tile.X, tile.Y, tile.Z))
                 {
+                    Tell(OutcomeStairSupport);
                     continue; // a support under stair treads: the flight covers it
                 }
 
                 if (prop != null)
                 {
                     _propTiles.Add(new PropTile { Entry = prop, Graphic = tile.Graphic, X = x, Y = y, Z = tile.Z });
+                    Tell(OutcomeProp);
                     continue;
                 }
+
+                Tell(OutcomeBox);
 
                 float inset = (1f - shape.Footprint) * 0.5f;
                 var min = new Vector3(WorldSpace.X(x + inset), bottom, WorldSpace.Z(y + 1 - inset));
@@ -453,7 +546,10 @@ namespace UOClient
                     }
                 }
 
-                Props.Place(parent, first.Entry, first.Graphic, x0, y0, x1, y1, first.Z);
+                if (Props.Place(parent, first.Entry, first.Graphic, x0, y0, x1, y1, first.Z) == null)
+                {
+                    Census?.Invoke(first.Graphic, first.X, first.Y, first.Z, OutcomePropFailed);
+                }
             }
         }
 
@@ -507,8 +603,10 @@ namespace UOClient
                 }
             }
 
-            // Whichever block holding part of the run is built first places the flight, once.
-            if (_flights.ContainsKey((owner.X, owner.Y, owner.Z)))
+            // Only the block holding the owner tile places the flight (it traces the same run when it's built), so
+            // the flight always belongs to the same block whatever order blocks are built in: the world bake has
+            // to come out identical on every machine. The map stays keyed so a block rebuilt in place doesn't add it twice.
+            if ((owner.X >> 3, owner.Y >> 3) != (first.X >> 3, first.Y >> 3) || _flights.ContainsKey((owner.X, owner.Y, owner.Z)))
             {
                 return;
             }
@@ -833,14 +931,21 @@ namespace UOClient
         }
 
         /// <summary>Queues a prefab for a mapped vegetation static. True when the static needs no box.</summary>
-        private bool TryQueueVegetation(StaticTileInfo info, StaticTile tile, int x, int y)
+        private bool TryQueueVegetation(StaticTileInfo info, StaticTile tile, int x, int y, out string outcome)
         {
+            outcome = OutcomeVegetation;
             if (_vegetation == null)
             {
                 return false;
             }
 
             VegetationKind kind = VegetationClassifier.Classify(info);
+            if (kind == VegetationKind.Grass && SkipGrassStatics)
+            {
+                outcome = OutcomeGrassSkipped;
+                return true; // the VFX grass covers the ground; UO's grass statics would double it up
+            }
+
             if (kind == VegetationKind.None)
             {
                 return false;
@@ -848,6 +953,7 @@ namespace UOClient
 
             if (kind == VegetationKind.Foliage)
             {
+                outcome = OutcomeFoliageSkipped;
                 return true; // the 3D tree on the trunk tile already has its canopy
             }
 
@@ -863,8 +969,11 @@ namespace UOClient
         }
 
         /// <summary>Set per facet: the terrain surface under a tile's middle, for seating ground objects.</summary>
-        private static System.Func<int, int, float> GroundSeat;
+        private static System.Func<float, float, float> GroundSeat;
         private static System.Func<int, int, int> LandZAt = (x, y) => int.MinValue;
+
+        /// <summary>How far (Z) a plant may be from the ground and still count as growing from it.</summary>
+        private const int SeatReachZ = 16;
         private static System.Func<int, int, bool> InHouseSeat;
 
         private static void Place(Transform parent, Placement placement)
@@ -885,36 +994,110 @@ namespace UOClient
             float scale = natural > 0.01f && entry.TargetHeight.y > 0f ? targetHeight / natural : 1f;
             float yaw = ((hash >> 16) & 0x3FF) / 1024f * 360f;
 
-            Vector3 position = WorldSpace.TileCenter(placement.X, placement.Y, placement.Z);
-            if (GroundSeat != null && Mathf.Abs(LandZAt(placement.X, placement.Y) - placement.Z) <= 4 &&
-                (InHouseSeat == null || !InHouseSeat(placement.X, placement.Y)))
+            // Ground cover (grass, flowers, ferns, mushrooms, reeds) is drawn as several smaller plants spread over
+            // the tile instead of one big clump: small plants each seated on the ground under them follow a slope,
+            // where one wide clump hangs off it.
+            bool cover = IsGroundCover(placement.Kind);
+            int copies = cover ? CoverCopies : 1;
+            float size = cover ? CoverScale : 1f;
+            for (int i = 0; i < copies; i++)
             {
-                // Lying on the ground: seat it on the terrain surface under its middle, not at the
-                // UO tile's Z, which is one corner's height and floats on a slope.
-                position.y = GroundSeat(placement.X, placement.Y);
-            }
-            if (IsGroundCover(placement.Kind))
-            {
-                // Scatter small plants inside their tile so a field of grass statics isn't a grid.
-                position.x += (((hash >> 4) & 0xF) / 15f - 0.5f) * 0.6f * WorldSpace.TileSize;
-                position.z += (((hash >> 12) & 0xF) / 15f - 0.5f) * 0.6f * WorldSpace.TileSize;
-            }
-
-            GameObject instance = UnityEngine.Object.Instantiate(prefab, position, Quaternion.Euler(0f, yaw, 0f), parent);
-            instance.transform.localScale = prefab.transform.localScale * scale;
-            foreach (Collider collider in instance.GetComponentsInChildren<Collider>(true))
-            {
-                UnityEngine.Object.Destroy(collider);
-            }
-
-            if (VegetationLayer >= 0)
-            {
-                foreach (Transform child in instance.GetComponentsInChildren<Transform>(true))
+                uint h = i == 0 ? hash : Hash(placement.X * 31 + i, placement.Y * 17 - i, placement.Graphic);
+                Vector3 position = WorldSpace.TileCenter(placement.X, placement.Y, placement.Z);
+                float uoX = placement.X + 0.5f, uoY = placement.Y + 0.5f;
+                if (cover)
                 {
-                    child.gameObject.layer = VegetationLayer;
+                    // Scattered over the tile so a field of grass statics isn't a grid.
+                    float dx = (((h >> 4) & 0xF) / 15f - 0.5f) * 0.8f, dy = (((h >> 12) & 0xF) / 15f - 0.5f) * 0.8f;
+                    position.x += dx * WorldSpace.TileSize;
+                    position.z -= dy * WorldSpace.TileSize;
+                    uoX += dx;
+                    uoY += dy;
+                }
+
+                // A plant growing from the ground follows the terrain: seated on the surface right under it, not at
+                // UO's Z, which is one corner's height and floats on a slope or over a bank that dips into water.
+                // Plants on something (a roof, a planter, a floor in a house) keep their UO height.
+                Quaternion tilt = Quaternion.identity;
+                bool seated = false;
+                float groundY = 0f;
+                if (GroundSeat != null && (InHouseSeat == null || !InHouseSeat(placement.X, placement.Y)))
+                {
+                    float ground = GroundSeat(uoX, uoY);
+                    if (Mathf.Abs(ground / WorldSpace.ZScale - placement.Z) <= SeatReachZ &&
+                        Mathf.Abs(LandZAt(placement.X, placement.Y) - placement.Z) <= SeatReachZ)
+                    {
+                        position.y = ground;
+                        seated = true;
+                        groundY = ground;
+                        if (cover)
+                        {
+                            // Small plants lie along the slope under them (their up is the ground's normal);
+                            // trees and bushes stay upright, as they grow.
+                            const float d = 0.25f;
+                            float east = (GroundSeat(uoX + d, uoY) - GroundSeat(uoX - d, uoY)) / (2f * d * WorldSpace.TileSize);
+                            float south = (GroundSeat(uoX, uoY + d) - GroundSeat(uoX, uoY - d)) / (2f * d * WorldSpace.TileSize);
+                            // World +X is UO east; world +Z is UO north, so the slope along +Z is minus the slope south.
+                            var normal = new Vector3(-east, 1f, south).normalized;
+                            tilt = Quaternion.FromToRotation(Vector3.up, normal);
+                        }
+                    }
+                }
+
+                float spin = i == 0 ? yaw : ((h >> 16) & 0x3FF) / 1024f * 360f;
+                float vary = i == 0 ? 1f : 0.8f + ((h >> 20) & 0xF) / 15f * 0.4f;
+                bool fit = seated && cover;
+                GameObject instance = UnityEngine.Object.Instantiate(prefab, position,
+                    (fit ? Quaternion.identity : tilt) * Quaternion.Euler(0f, spin, 0f), parent);
+                instance.transform.localScale = prefab.transform.localScale * (scale * size * vary);
+                if (fit)
+                {
+                    // Prefab pivots aren't reliably at the plant's base or middle: put the mesh's own footprint
+                    // centre on the spot and its lowest point on the ground, so it stands where UO put it and
+                    // touches the ground instead of hanging off a ledge.
+                    Bounds b = default;
+                    bool any = false;
+                    foreach (Renderer r in instance.GetComponentsInChildren<Renderer>())
+                    {
+                        if (!any)
+                        {
+                            b = r.bounds;
+                            any = true;
+                        }
+                        else
+                        {
+                            b.Encapsulate(r.bounds);
+                        }
+                    }
+
+                    if (any)
+                    {
+                        instance.transform.position += new Vector3(position.x - b.center.x, groundY - b.min.y, position.z - b.center.z);
+                    }
+
+                    // Then lean it with the slope about the point where it meets the ground.
+                    var foot = new Vector3(position.x, groundY, position.z);
+                    instance.transform.position = foot + tilt * (instance.transform.position - foot);
+                    instance.transform.rotation = tilt * instance.transform.rotation;
+                }
+                foreach (Collider collider in instance.GetComponentsInChildren<Collider>(true))
+                {
+                    UnityEngine.Object.DestroyImmediate(collider); // now, not at frame end: the world bake records this frame
+                }
+
+                if (VegetationLayer >= 0)
+                {
+                    foreach (Transform child in instance.GetComponentsInChildren<Transform>(true))
+                    {
+                        child.gameObject.layer = VegetationLayer;
+                    }
                 }
             }
         }
+
+        /// <summary>Ground cover is drawn as this many plants per static, each this much of the catalog's size.</summary>
+        private const int CoverCopies = 5;
+        private const float CoverScale = 0.4f;
 
         /// <summary>
         /// Layer for map vegetation, culled at the fog's end: Pure Nature's far-LOD impostors don't fog

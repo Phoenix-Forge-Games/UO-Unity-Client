@@ -1,0 +1,30 @@
+{
+    "name": "UOClient.SecureArt.Editor",
+    "rootNamespace": "UOClient.EditorTools",
+    "references": [
+        "UOClient",
+        "UOClient.SecureArt.Addressables",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor",
+        "Unity.ResourceManager"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UO_ADDRESSABLES"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.addressables",
+            "expression": "1.21.0",
+            "define": "UO_ADDRESSABLES"
+        }
+    ],
+    "noEngineReferences": false
+}

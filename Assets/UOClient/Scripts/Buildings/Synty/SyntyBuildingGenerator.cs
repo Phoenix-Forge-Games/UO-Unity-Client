@@ -26,8 +26,20 @@ namespace UOClient.Buildings.Synty
     /// </summary>
     public static class SyntyBuildingGenerator
     {
+        /// <summary>A whole kit module, 2.5 m: panel, door, window, roof bay, floor slab.</summary>
         private const float C = SyntyKit.Cell;
+        /// <summary>The kit's half module, 1.25 m.</summary>
         private const float H = SyntyKit.Half;
+        /// <summary>
+        /// The PLAN unit, 1.25 m (one UO tile). Every room, run, stair, roof range and floor in a spec is in
+        /// units; a run of n units is closed by n / 2 whole modules plus one half when n is odd. Numerically the
+        /// same as <see cref="H"/>, but it says "a plan coordinate" where H says "a half piece".
+        ///
+        /// The trade fixtures, dressing, garden planting, signage and heraldry passes further down still place on
+        /// the old 2.5 m cell (`C`); none of them is reachable from the UO house path (`Dress`, `Sign`,
+        /// `Heraldry`, the fixtures and the garden are all off there).
+        /// </summary>
+        private const float U = SyntyKit.Unit;
 
         /// <summary>
         /// The §5c lived-in density lift. Always on in production (this is how the shipped rooms stop reading
@@ -35,14 +47,6 @@ namespace UOClient.Buildings.Synty
         /// same plan with the dressing suppressed. Never write it false from a template or a build path.
         /// </summary>
         public static bool DressingEnabled = true;
-
-        /// <summary>
-        /// UOClient: fill a 1.25 m wall slot with the set's plain 2.5 m panel squashed to half width instead of
-        /// the set's half piece. Half pieces don't match their sets (the wooden set's is a plaster field
-        /// painted with boards, the plaster set's carries an extra rail), and single UO doors leave such
-        /// slots beside them that whole-cell plans never had.
-        /// </summary>
-        public static bool SquashPlainHalves;
 
         /// <summary>
         /// The stair-clearance guard (<see cref="GuardDressingClearance"/>). Always true in production; a test
@@ -253,11 +257,22 @@ namespace UOClient.Buildings.Synty
             openings.Insert(0, new Seg(0, pre, SegKind.Plain));
         }
 
+        /// <summary>
+        /// A unit set in a FIXED order (south to north, then west to east). Every loop whose order reaches the
+        /// output walks one of these rather than a HashSet, so a house builds identically however it was reached.
+        /// </summary>
+        private static List<Vector2Int> Sorted(IEnumerable<Vector2Int> cells)
+        {
+            var list = new List<Vector2Int>(cells);
+            list.Sort((a, b) => a.y != b.y ? a.y.CompareTo(b.y) : a.x.CompareTo(b.x));
+            return list;
+        }
+
         /// <summary>Boundary faces of a cell set: a cell of the set whose neighbour is not.</summary>
         private static List<(Vector2Int Cell, Vector2Int Out)> BoundaryFaces(HashSet<Vector2Int> cells)
         {
             var list = new List<(Vector2Int, Vector2Int)>();
-            foreach (var c in cells)
+            foreach (var c in Sorted(cells))
                 foreach (var d in Dirs)
                     if (!cells.Contains(c + d)) list.Add((c, d));
             return list;
@@ -318,14 +333,14 @@ namespace UOClient.Buildings.Synty
         // ================================================================= runs
 
         /// <summary>
-        /// A merged straight stretch of wall line: the cells it spans and the direction it faces.
-        /// Lengths are in CELLS; the tiler converts to half-modules.
+        /// A merged straight stretch of wall line: the units it spans and the direction it faces.
+        /// Lengths are in UNITS (1.25 m), which is also the tiler's own measure.
         /// </summary>
         private struct Run
         {
             public Vector2Int Out;
-            public int Line;        // the fixed coordinate, in cells (z for horizontal runs, x for vertical)
-            public int From, To;    // along-axis cell range, [From, To)
+            public int Line;        // the fixed coordinate, in units (z for horizontal runs, x for vertical)
+            public int From, To;    // along-axis unit range, [From, To)
             public SyntyRoom Room;  // room that owns it (for style/window rules); first cell's room
         }
 
@@ -368,6 +383,13 @@ namespace UOClient.Buildings.Synty
                     if (i < alongs.Count) { start = alongs[i]; prev = alongs[i]; }
                 }
             }
+
+            // A fixed order, independent of how the dictionary above happened to fill.
+            runs.Sort((a, b) =>
+                a.Out.x != b.Out.x ? a.Out.x.CompareTo(b.Out.x) :
+                a.Out.y != b.Out.y ? a.Out.y.CompareTo(b.Out.y) :
+                a.Line != b.Line ? a.Line.CompareTo(b.Line) :
+                a.From.CompareTo(b.From));
             return runs;
         }
 
@@ -382,8 +404,8 @@ namespace UOClient.Buildings.Synty
             var d = SyntyKit.Dir(outward);
             bool horiz = run.Out.y != 0;
 
-            float lo = run.From * C, hi = run.To * C;
-            float fixedC = run.Line * C;
+            float lo = run.From * U, hi = run.To * U;
+            float fixedC = run.Line * U;
 
             if (horiz)
             {
@@ -417,17 +439,14 @@ namespace UOClient.Buildings.Synty
             foreach (var seg in SyntyTileRun.Tile(lenHalves, openings))
             {
                 if (seg.Kind == SegKind.Open) continue;
-                var p = origin + new Vector3(d.x, 0f, d.y) * (seg.Start * H);
                 var piece = SyntyTileRun.PieceFor(seg, pieces);
-                bool squash = SquashPlainHalves && seg.Len == 1 && seg.Kind == SegKind.Plain && pieces.Plain != null;
-                if (squash) piece = pieces.Plain;
+                // Where the piece's pivot goes so its body covers exactly [Start, Start + Len] of the run, from
+                // its MEASURED bounds: most panels hang off their max-X end, but not all — `Base_Wall_Half_01/02`
+                // hang off their MIN-X end, and `Base_Wall_Half_02` stands above its pivot where the full skirt
+                // hangs below it.
+                var (along, lift) = RunPieceOffset(piece, pieces.Plain);
+                var p = origin + new Vector3(d.x, 0f, d.y) * (seg.Start * H + along) + new Vector3(0f, lift, 0f);
                 var go = SyntyKit.Place(piece, parent, p, yaw, namePrefix + "_" + piece);
-                if (squash && go != null)
-                {
-                    // A full panel runs 2.5 m from its pivot along the run; half its length fills the slot.
-                    var sc = go.transform.localScale;
-                    go.transform.localScale = new Vector3(sc.x * 0.5f, sc.y, sc.z);
-                }
 
                 // A counter window arrives shut. Opening it is the difference between a shop and a shopfront.
                 if (seg.Kind == SegKind.Counter && go != null) OpenCounterShutters(go);
@@ -438,6 +457,97 @@ namespace UOClient.Buildings.Synty
                 // catch the wall pieces whose own names carry "Wall_Door" while holding no leaf.
                 if (seg.Kind == SegKind.Door && go != null) _doorProps.Add(go);
             }
+        }
+
+        private static readonly Dictionary<string, Bounds> _bounds = new Dictionary<string, Bounds>();
+
+        /// <summary>A piece's measured local mesh bounds (<see cref="SyntyKit.LocalBounds"/>), cached.</summary>
+        private static Bounds PieceBounds(string piece)
+        {
+            if (piece == null) return new Bounds();
+            if (!_bounds.TryGetValue(piece, out var b)) _bounds[piece] = b = SyntyKit.LocalBounds(piece);
+            return b;
+        }
+
+        /// <summary>Rounds a measured offset to the kit's 0.625 m lattice, dropping mesh slop (a 2.504 m panel).</summary>
+        private static float Snap(float v) => Mathf.Round(v / (H * 0.5f)) * (H * 0.5f);
+
+        /// <summary>
+        /// How far along the run, and up, a run piece's pivot sits from the start of its slot.
+        ///
+        /// Measured, every wall panel spans local X ∈ [-len, 0] and its body runs along -X, which puts the pivot
+        /// at the slot's start. The base-course halves do not: `Base_Wall_Half_01/02` span X ∈ [0, 1.25], so their
+        /// pivot belongs at the slot's END; and `Base_Wall_Half_02` spans Y ∈ [0, 2.5] where the buried skirt it
+        /// halves spans [-2.5, 0]. Both are read off the meshes here rather than written as exceptions.
+        /// </summary>
+        private static (float Along, float Lift) RunPieceOffset(string piece, string plain)
+        {
+            var b = PieceBounds(piece);
+            float along = Snap(b.max.x);
+            float lift = 0f;
+            if (plain != null && plain != piece)
+                lift = Mathf.Round((PieceBounds(plain).min.y - b.min.y) / H) * H;
+            return (along, lift);
+        }
+
+        /// <summary>
+        /// Place a floor slab so it covers exactly [x0, x0 + w] x [z0, z0 + d] metres of local plan, whatever its
+        /// pivot corner. The yaw is the first of 90/0/180/270 whose MEASURED footprint is w x d, and the pivot is
+        /// solved from the rotated bounds — `Floor_Wood_02/03/04` and `Floor_Stone_01/02/03` use different pivot
+        /// corners, and the half slabs are only w x d at one of two yaws.
+        /// </summary>
+        private static GameObject PlaceSlab(string piece, Transform g, float x0, float z0, float w, float d, float y,
+                                            string name)
+        {
+            var b = PieceBounds(piece);
+            foreach (float yaw in new[] { 90f, 0f, 180f, 270f })
+            {
+                var q = Quaternion.Euler(0f, yaw, 0f);
+                float minX = float.MaxValue, minZ = float.MaxValue, maxX = float.MinValue, maxZ = float.MinValue;
+                for (int c = 0; c < 4; c++)
+                {
+                    var p = q * new Vector3((c & 1) == 0 ? b.min.x : b.max.x, 0f, (c & 2) == 0 ? b.min.z : b.max.z);
+                    minX = Mathf.Min(minX, p.x); maxX = Mathf.Max(maxX, p.x);
+                    minZ = Mathf.Min(minZ, p.z); maxZ = Mathf.Max(maxZ, p.z);
+                }
+                if (Mathf.Abs(maxX - minX - w) > 0.15f || Mathf.Abs(maxZ - minZ - d) > 0.15f) continue;
+                return SyntyKit.Place(piece, g, new Vector3(x0 - Snap(minX), y, z0 - Snap(minZ)), yaw, name);
+            }
+            Debug.LogError($"[SyntyGen] {piece} has no yaw that covers {w:F2} x {d:F2} m.");
+            return null;
+        }
+
+        /// <summary>
+        /// Deck a set of plan units with true-size slabs, largest first: 2 x 2 units with the full slab, then
+        /// 2 x 1 / 1 x 2 with the half slab, then 1 x 1 with the quarter. Walked in a fixed order (south to north,
+        /// west to east), so the same set always lays the same slabs.
+        /// </summary>
+        private static List<GameObject> LaySlabs(IEnumerable<Vector2Int> units, Transform g, float y, bool stone, string name)
+        {
+            string full = stone ? "SM_Bld_House_Floor_Stone_01" : "SM_Bld_House_Floor_Wood_02";
+            string half = stone ? "SM_Bld_House_Floor_Stone_02" : "SM_Bld_House_Floor_Wood_03";
+            string quarter = stone ? "SM_Bld_House_Floor_Stone_03" : "SM_Bld_House_Floor_Wood_04";
+
+            var left = new HashSet<Vector2Int>(units);
+            var placed = new List<GameObject>();
+            foreach (var c in Sorted(left))
+            {
+                if (!left.Contains(c)) continue;
+                var ex = c + new Vector2Int(1, 0);
+                var ez = c + new Vector2Int(0, 1);
+                var exz = c + new Vector2Int(1, 1);
+                int w = 1, d = 1;
+                string piece = quarter;
+                if (left.Contains(ex) && left.Contains(ez) && left.Contains(exz)) { w = 2; d = 2; piece = full; }
+                else if (left.Contains(ex)) { w = 2; piece = half; }
+                else if (left.Contains(ez)) { d = 2; piece = half; }
+
+                for (int dz = 0; dz < d; dz++)
+                    for (int dx = 0; dx < w; dx++) left.Remove(c + new Vector2Int(dx, dz));
+                var go = PlaceSlab(piece, g, c.x * U, c.y * U, w * U, d * U, y, name);
+                if (go != null) placed.Add(go);
+            }
+            return placed;
         }
 
         /// <summary>
@@ -538,7 +648,6 @@ namespace UOClient.Buildings.Synty
         private static void BuildRoomProbes(SyntyBuilding spec, Transform interior)
         {
             var functional = BuildingRoomProbes.Group(interior);
-            const float C = SyntyKit.Cell;
 
             for (int st = 0; st < spec.Storeys; st++)
             {
@@ -546,10 +655,10 @@ namespace UOClient.Buildings.Synty
 
                 foreach (var r in spec.Floor(st))
                 {
-                    var centre = new Vector3((r.X + r.X2) * 0.5f * C,
+                    var centre = new Vector3((r.X + r.X2) * 0.5f * U,
                                              floorY + SyntyKit.Headroom * 0.5f,
-                                             (r.Z + r.Z2) * 0.5f * C);
-                    var size = new Vector3(r.W * C, SyntyKit.Headroom, r.D * C);
+                                             (r.Z + r.Z2) * 0.5f * U);
+                    var size = new Vector3(r.W * U, SyntyKit.Headroom, r.D * U);
 
                     BuildingRoomProbes.Add(functional, $"{r.Name}_{st}", centre, size);
                 }
@@ -622,7 +731,7 @@ namespace UOClient.Buildings.Synty
 
             foreach (var run in runs)
             {
-                int len = (run.To - run.From) * 2;
+                int len = run.To - run.From;   // units: the tiler closes an odd one with a half at the corner
                 if (spec.Plinth)
                     PlaceRun(g, RunOrigin(run, 0f), run.Out, len, null,
                         RunPieces.Course("SM_Bld_House_Base_Wall_01", "SM_Bld_House_Base_Wall_Half_01"), "Base");
@@ -636,15 +745,15 @@ namespace UOClient.Buildings.Synty
             }
 
             // Convex corners only: a cell missing BOTH of two perpendicular neighbours.
-            foreach (var c in cells)
+            foreach (var c in Sorted(cells))
             {
                 foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
                 {
                     var a = new Vector2Int(c.x + dx, c.y);
                     var b = new Vector2Int(c.x, c.y + dz);
                     if (cells.Contains(a) || cells.Contains(b)) continue;
-                    float x = (dx > 0 ? c.x + 1 : c.x) * C;
-                    float z = (dz > 0 ? c.y + 1 : c.y) * C;
+                    float x = (dx > 0 ? c.x + 1 : c.x) * U;
+                    float z = (dz > 0 ? c.y + 1 : c.y) * U;
                     if (spec.Plinth)
                         SyntyKit.Place("SM_Bld_House_Base_Corner_01", g, new Vector3(x, 0f, z), 0f, "Base_Corner");
                     SyntyKit.Place("SM_Bld_House_Base_Corner_02", g, new Vector3(x, 0f, z), 0f, "Base_CornerSkirt");
@@ -657,42 +766,41 @@ namespace UOClient.Buildings.Synty
         // ================================================================= floors
 
         /// <summary>
-        /// One storey's deck. `arriving` is the stair that comes up INTO this storey, and its cell is the one
-        /// slab this deck does not lay — the stairwell void.
+        /// One storey's deck. `arriving` is the stair that comes up INTO this storey, and its 2 x 2 unit void is
+        /// the patch this deck does not lay — the stairwell.
         ///
-        /// The void is exactly one cell, and that is measured rather than chosen: `SM_Bld_House_Stairs_01` is a
-        /// quarter-turn folded into 2.671 x 2.727 m, and `Preset_House_Archway_01` drops it into a single
-        /// missing 2.5 m slab and lets it overhang by 0.15 m. The 0.148 m deck is thin enough that the overhang
-        /// reads as the top tread meeting the floor, which is what it is.
+        /// The deck is laid per room with true-size slabs (<see cref="LaySlabs"/>): whole 2.5 m slabs where the
+        /// plan allows, `Floor_Wood_03` (2.5 x 1.25) and `Floor_Wood_04` (1.25 x 1.25) where an odd room or the
+        /// stairwell leaves a strip. The void is one 2.5 m module, measured rather than chosen:
+        /// `SM_Bld_House_Stairs_01` is a quarter-turn folded into 2.671 x 2.727 m, and `Preset_House_Archway_01`
+        /// drops it into a single missing 2.5 m slab and lets it overhang by 0.15 m.
         /// </summary>
         private static void BuildFloors(SyntyBuilding spec, int storey, Transform parent, SyntyStair arriving)
         {
             var g = SyntyKit.Group($"Floor_{storey}", parent);
             float y = SyntyKit.FloorY(storey, spec.Plinth);
-            bool hasVoid = arriving != null && arriving.Cell.x >= 0;
 
             foreach (var room in spec.Floor(storey))
             {
                 if (room.NoFloor || room.FloorRing == 0) continue;
-                // Measured: Floor_Wood_02 at yaw 90 covers [pivot, pivot + 2.5] in BOTH axes, which is the only
-                // orientation that makes a cell-indexed loop read straight. Floor_Stone_01 has the opposite pivot
-                // corner (max-X/max-Z), so it is placed at the far corner instead — measured, not assumed.
-                string piece = room.StoneFloor ? "SM_Bld_House_Floor_Stone_01" : "SM_Bld_House_Floor_Wood_02";
-                for (int x = room.X; x < room.X2; x++)
-                    for (int z = room.Z; z < room.Z2; z++)
+                var units = new List<Vector2Int>();
+                for (int z = room.Z; z < room.Z2; z++)
+                    for (int x = room.X; x < room.X2; x++)
                     {
-                        if (hasVoid && x == arriving.Cell.x && z == arriving.Cell.y) continue;   // stairwell
-                        if (!FlooredIn(room, new Vector2Int(x, z))) continue;                    // gallery void
-                        var p = room.StoneFloor
-                            ? new Vector3((x + 1) * C, y, (z + 1) * C)
-                            : new Vector3(x * C, y, z * C);
-                        float yaw = room.StoneFloor ? 0f : 90f;
-                        SyntyKit.Place(piece, g, p, yaw, "Floor");
+                        var c = new Vector2Int(x, z);
+                        if (InVoid(arriving, c)) continue;          // stairwell
+                        if (!FlooredIn(room, c)) continue;          // gallery void
+                        units.Add(c);
                     }
+                LaySlabs(units, g, y, room.StoneFloor, "Floor");
             }
 
             BuildJettyApron(spec, storey, g, arriving);
         }
+
+        /// <summary>Is plan unit `c` inside the 2 x 2 unit void of stair `st`?</summary>
+        private static bool InVoid(SyntyStair st, Vector2Int c) =>
+            st != null && st.Cell.x >= 0 && c.x >= st.Cell.x && c.x < st.Cell.x + 2 && c.y >= st.Cell.y && c.y < st.Cell.y + 2;
 
         /// <summary>
         /// The oversailing strip of deck a jetty stands on, and the corners that close it.
@@ -717,9 +825,8 @@ namespace UOClient.Buildings.Synty
             if (storey == 0 || spec.Jetty == Side.None) return;
             var rooms = spec.Floor(storey);
             var cells = Cells(rooms);
-            bool hasVoid = arriving != null && arriving.Cell.x >= 0;
 
-            foreach (var c in cells)
+            foreach (var c in Sorted(cells))
             {
                 var room = RoomAt(rooms, c);
                 if (room == null || !FlooredIn(room, c)) continue;
@@ -728,7 +835,7 @@ namespace UOClient.Buildings.Synty
                 // flight, which the stair check found as 0.93 m of headroom at the void's outer edge. Letting
                 // the hole run out to the oversailed wall is both the fix and the better building: the flight
                 // arrives into the corner of the jetty rather than under a shelf.
-                if (hasVoid && c == arriving.Cell) continue;
+                if (InVoid(arriving, c)) continue;
 
                 foreach (var d in Dirs)
                 {
@@ -739,7 +846,8 @@ namespace UOClient.Buildings.Synty
                     run.Line = horiz ? (d.y > 0 ? c.y + 1 : c.y) : (d.x > 0 ? c.x + 1 : c.x);
                     run.From = horiz ? c.x : c.y;
                     run.To = run.From + 1;
-                    SyntyKit.Place("SM_Bld_House_Floor_Wood_03", g,
+                    // One unit of face, so the quarter slab (same pivot law as the half, 1.25 m along).
+                    SyntyKit.Place("SM_Bld_House_Floor_Wood_04", g,
                                    RunOrigin(run, SyntyKit.FloorY(storey, spec.Plinth)),
                                    SyntyKit.Yaw(new Vector2(d.x, d.y)), "FloorJetty");
                 }
@@ -748,9 +856,9 @@ namespace UOClient.Buildings.Synty
             // Corner squares: only where BOTH faces of the corner oversail, because a corner between a
             // jettied face and a flush one has deck under it already.
             float y = SyntyKit.FloorY(storey, spec.Plinth);
-            foreach (var c in cells)
+            foreach (var c in Sorted(cells))
             {
-                if (hasVoid && c == arriving.Cell) continue;
+                if (InVoid(arriving, c)) continue;
                 foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
                 {
                     var a = new Vector2Int(c.x + dx, c.y);
@@ -764,8 +872,8 @@ namespace UOClient.Buildings.Synty
                     var outDir = dx > 0
                         ? (dz > 0 ? new Vector2Int(1, 0) : new Vector2Int(0, -1))    // NE -> east, SE -> south
                         : (dz > 0 ? new Vector2Int(0, 1) : new Vector2Int(-1, 0));   // NW -> north, SW -> west
-                    float px = (dx > 0 ? c.x + 1 : c.x) * C;
-                    float pz = (dz > 0 ? c.y + 1 : c.y) * C;
+                    float px = (dx > 0 ? c.x + 1 : c.x) * U;
+                    float pz = (dz > 0 ? c.y + 1 : c.y) * U;
                     SyntyKit.Place("SM_Bld_House_Floor_Wood_04", g, new Vector3(px, y, pz),
                                    SyntyKit.Yaw(new Vector2(outDir.x, outDir.y)), "FloorJettyCorner");
                 }
@@ -809,11 +917,15 @@ namespace UOClient.Buildings.Synty
                 var d = SyntyKit.Dir(outward);
                 float yaw = SyntyKit.Yaw(outward) - 90f;
                 var org = RunOrigin(run, y);          // the LOWER wall's line — no jetty shove, by design
-                for (int i = 0; i <= run.To - run.From; i++)
+                // One at every 2.5 m module joint along the face, and at its far end.
+                int len = run.To - run.From;
+                for (int i = 0; i <= len; i += 2)
                 {
-                    var p = org + new Vector3(d.x, 0f, d.y) * (i * C);
+                    var p = org + new Vector3(d.x, 0f, d.y) * (i * U);
                     SyntyKit.Place("SM_Bld_House_Supports_01", g, p, yaw, "Corbel");
                 }
+                if ((len & 1) != 0)
+                    SyntyKit.Place("SM_Bld_House_Supports_01", g, org + new Vector3(d.x, 0f, d.y) * (len * U), yaw, "Corbel");
             }
         }
 
@@ -834,212 +946,348 @@ namespace UOClient.Buildings.Synty
 
             foreach (var run in runs)
             {
-                int len = run.To - run.From;
+                int len = run.To - run.From;          // units
                 var room = run.Room;
+                var face = SideOf(run.Out);
 
-                if (room != null && (room.Open & SideOf(run.Out)) != 0) continue;   // face deliberately absent
+                if (room != null && (room.Open & face) != 0) continue;   // face deliberately absent
 
                 // ---- the jetty, if this storey has one: the line moves out, the run grows at the corners
                 RunEnds(spec, storey, run, cells, out int pre, out int post);
-                int lenHalves = len * 2 + pre + post;
                 var origin = RunOrigin(run, y) + JettyShove(spec, storey, run.Out);
-                {
-                    var dRun = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
-                    origin -= new Vector3(dRun.x, 0f, dRun.y) * (pre * H);
-                }
+                var dRun = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
+                origin -= new Vector3(dRun.x, 0f, dRun.y) * (pre * U);
 
-                var openings = new List<Seg>();
-
-                // The front door: ground storey, an entry face of the entry room. One module wide, centred and
-                // biased to the module boundary so it never lands on a 1.25 offcut — except on a corner plan,
-                // where it goes in the module nearest the corner instead (see `SyntyBuilding.EntrySides`).
-                int doorCell = (len - 1) / 2;
-                var face = SideOf(run.Out);
+                // ---- doors. Each is a whole kit door module (2 units) centred as near its doorway as the grid
+                // allows; where two starts are equally near (a single 1.25 m UO door), the one that keeps the
+                // run's half pieces at its corners wins.
                 bool isEntry = storey == 0 && room != null && room.Name == entry
                                && (spec.EntrySides & face) != 0 && !_entryFaces.Contains(face);
-                if (isEntry) doorCell = CornerDoorCell(spec, run, len, doorCell);
-                int doorHalf = doorCell * 2;
-                var uoDoors = new List<(int Start, int Len)>();
+                var wanted = new List<DoorWant>();
                 if (storey == 0 && spec.EntryPoints.Count > 0)
                 {
-                    // UOClient: open gaps where the source plan's doorways are (see SyntyBuilding.EntryWidths);
-                    // the client hangs the doors in them.
+                    // UOClient: a kit door where each of the source plan's doorways is (see SyntyBuilding.EntryWidths).
                     isEntry = false;
-                    UoDoorways(spec, run, len, uoDoors);
-                    foreach (var (start, width) in uoDoors)
-                    {
-                        for (int h = 0; h < width; h += 2)
-                            openings.Add(new Seg(start + h, Mathf.Min(2, width - h), SegKind.Open));
-                    }
+                    UoDoorways(spec, run, len, wanted);
                 }
-                if (isEntry && len >= 1)
+                else if (isEntry && len >= 2)
+                {
+                    int corner = CornerDoorCell(spec, run, len, -1);
+                    wanted.Add(DoorAt(corner >= 0 ? Mathf.Clamp(corner + 1, 1, len - 1) : len * 0.5f, 1, len));
+                }
+
+                var doors = ChooseDoors(len, wanted);
+                var openings = new List<Seg>();
+                var fixedSpans = new List<(int Start, int Len)>();
+                int doorStart = -1;
+                foreach (var (start, width, door) in doors)
+                {
+                    fixedSpans.Add((start, width));
+                    for (int h = 0; h < width; h += 2)
+                        openings.Add(new Seg(start + h, Mathf.Min(2, width - h),
+                                             door && width - h >= 2 ? SegKind.Door : SegKind.Open));
+                    if (door && doorStart < 0) doorStart = start;
+                }
+                if (isEntry && doorStart < 0) isEntry = false;
+
+                if (isEntry)
                 {
                     _entryFaces.Add(face);
-                    openings.Add(new Seg(doorHalf, 2, SegKind.Door));
 
-                    // Remember where the threshold ended up.
-                    //
-                    // On a plinthed plan the ground floor sits on TOP of the 1.25 m course (measured:
-                    // `Base_Wall_01` occupies 0 -> 1.253), so a front door with nothing under it is a door one
-                    // and a quarter metres up a blank wall. Synty's own presets get away with it because their
-                    // bounds run to y = -2.51 and they are dropped into terrain; a generated building standing
-                    // on flat ground cannot. `BuildEntrySteps` closes it — and on an at-grade plan there is
-                    // nothing to close, which is the cheapest version of solving it.
-                    //
-                    // On a corner plan there are two thresholds and only the FIRST is recorded, because
-                    // everything downstream of this — the entry flight, the sign bracket, `CheckEntryClimb` —
-                    // is about one principal entrance. The second door is a way in, not a second frontage to
-                    // hang a second board over.
-                    var dEntry = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
+                    // Remember where the threshold ended up: every threshold for the entry flights (a plinth is
+                    // 1.25 m under every door), and the first as the principal one for sign, awning and arms.
                     var org = RunOrigin(run, 0f);
-
-                    // EVERY threshold, not just the first. `_entry` below stays the principal one — the sign,
-                    // the awning and the heraldry all belong to one frontage — but a plinth is 1.25 m under
-                    // every door on the building, so the FLIGHTS are per door. Before this list a plinthed
-                    // two-frontage plan built one stoop and left the other door a 1.25 m drop into the street,
-                    // which no check caught because `CheckEntryClimb` only ever looked for one flight and found
-                    // it. The noble house is the first plan here with a garden door as well as a street door.
-                    _doors.Add((org + new Vector3(dEntry.x, 0f, dEntry.y) * ((doorHalf + 1) * H),
-                                new Vector2(run.Out.x, run.Out.y)));
+                    var at = org + new Vector3(dRun.x, 0f, dRun.y) * ((doorStart + 1) * U);
+                    _doors.Add((at, new Vector2(run.Out.x, run.Out.y)));
 
                     if (_entry == null)
                     {
-                        _entry = org + new Vector3(dEntry.x, 0f, dEntry.y) * ((doorHalf + 1) * H);
+                        _entry = at;
                         _entryOut = new Vector2(run.Out.x, run.Out.y);
                         _entryRunOrigin = org;
-                        _entryRunLen = len;
-                        _entryDoorCell = doorCell;
+                        _entryRunLen = len / 2;              // in modules, for the module-based dressing passes
+                        _entryDoorCell = doorStart / 2;
 
-                        // And the module beside it, for a sign on a building that has no serving hatch to hang
-                        // one over. The far side of the door where the frontage has one, so the board is not
-                        // over the stoop; the near side otherwise.
-                        int bay = doorCell + 1 < len ? doorCell + 1 : doorCell - 1;
+                        // And the module beside it, for a sign on a building that has no serving hatch.
+                        int bay = doorStart + 4 <= len ? doorStart + 2 : doorStart - 2;
                         if (bay >= 0)
                         {
-                            _signBay = org + new Vector3(dEntry.x, 0f, dEntry.y) * ((bay + 0.5f) * C);
+                            _signBay = org + new Vector3(dRun.x, 0f, dRun.y) * ((bay + 1) * U);
                             _signBayOut = _entryOut;
                         }
                     }
                 }
 
+                // ---- the run's half pieces (at its corners where it has a choice) and its whole modules
+                var modules = new List<int>();
+                var halves = new List<int>();
+                FillGaps(len, fixedSpans, modules, halves);
+                foreach (int h in halves) openings.Add(new Seg(h, 1, SegKind.Plain));
+
                 // ---- shopfront, which SUBSTITUTES for the window rhythm rather than adding to it
-                bool shopfront = storey == 0 && room != null && (room.Shopfront & SideOf(run.Out)) != 0;
+                bool shopfront = storey == 0 && room != null && (room.Shopfront & face) != 0;
                 if (shopfront)
                 {
                     // Ground storey only (`CheckShopfront` enforces it), so there is never a jetty here.
-                    ComposeShopfront(spec, run, len, isEntry, doorCell, openings);
-                    PlaceRun(gExt, origin, run.Out, lenHalves, openings, Pieces(set), $"Wall{storey}");
+                    ComposeShopfront(spec, run, len, isEntry ? doorStart : -1, modules, openings);
+                    PlaceRun(gExt, origin, run.Out, len, openings, Pieces(set), $"Wall{storey}");
                     continue;
                 }
 
-                bool wantWindows = room == null || (room.BlankSides & SideOf(run.Out)) == 0;
+                bool wantWindows = room == null || (room.BlankSides & face) == 0;
                 if (wantWindows)
                 {
+                    // One window every other 2.5 m slot (doors count as slots) keeps a long wall from reading as a
+                    // barracks block while leaving enough plain wall for the timbering to show. Windows only ever
+                    // take whole modules: the kit's half windows don't match their sets.
                     int bay = HeraldicBay(spec, run, len);
-                    for (int c = 0; c < len; c++)
-                    {
-                        if (isEntry && c * 2 < doorHalf + 2 && doorHalf < c * 2 + 2) continue; // the door's halves
-                        if (Overlaps(uoDoors, c * 2, 2)) continue;                               // a UO doorway
-                        if (storey == 0 && HangsOn(spec, run, c)) continue;                      // a UO banner
-                        if (HearthTakesModule(spec, storey, run, c)) continue;   // no glazing across a chimney breast
-                        // One window every other module keeps a long wall from reading as a barracks block
-                        // while leaving enough plain wall for the timbering to show. Phased off the heraldic
-                        // bay where there is one, off the run's start otherwise.
-                        bool glazed = bay >= 0 ? ((c - bay) & 1) != 0 : c % 2 == 0;
-                        if (!glazed) continue;
-                        openings.Add(new Seg(c * 2, 2, SegKind.Window));
-                    }
+                    // A box window (the plaster sets' `WindowBox_02`) stands 0.6 m proud of its wall up to the wall
+                    // top, so under a roof that overhangs that wall — the centred-overhang fallback — it would
+                    // break up through the eave. Those modules stay plain.
+                    bool projects = PieceBounds(set.Window).max.z > 0.3f;
+                    var slots = new List<(int Start, bool Free)>();
+                    foreach (int m in modules) slots.Add((m, true));
+                    foreach (var (start, width, _) in doors)
+                        for (int h = 0; h + 2 <= width; h += 2) slots.Add((start + h, false));
+                    slots.Sort((a, b) => a.Start.CompareTo(b.Start));
 
-                    // A door that lands on a window's module SWALLOWS that window; give it back next door.
-                    //
-                    // Only visible once a plan got long. On the 3-cell parity cottage the door takes the
-                    // middle module and the windows either side of it are untouched. On the two-storey house
-                    // the frontage is two 2-cell runs, the door takes the entry run's cell 0, and the rhythm
-                    // above then leaves that whole 5 m of wall blank — one window and a door across a 10 m
-                    // elevation. Shifting the lost window one module along costs nothing and is what the
-                    // rhythm was trying to produce in the first place.
-                    //
-                    // Not on a phased frontage: there the door's module is the one the rhythm is anchored to,
-                    // so nothing was swallowed and this would glaze a module that already has a window in it.
-                    if (bay < 0 && isEntry && doorCell % 2 == 0)
+                    for (int k = 0; k < slots.Count; k++)
                     {
-                        int alt = doorCell + 1 < len ? doorCell + 1 : doorCell - 1;
-                        if (alt >= 0 && alt % 2 != 0) openings.Add(new Seg(alt * 2, 2, SegKind.Window));
+                        var (m, free) = slots[k];
+                        if (!free || (k & 1) != 0) continue;
+                        if (bay >= 0 && bay >= m && bay < m + 2) continue;                   // the arms' bay
+                        if (storey == 0 && HangsOn(spec, run, m, 2)) continue;              // a UO banner
+                        if (HearthTakesModule(spec, storey, run, m)) continue;  // no glazing across a chimney breast
+                        if (projects && UnderEave(spec, storey, run, m)) continue;          // a box under the eave
+                        openings.Add(new Seg(m, 2, SegKind.Window));
                     }
                 }
 
                 Rebase(openings, pre);
-                PlaceRun(gExt, origin, run.Out, lenHalves, openings, Pieces(set), $"Wall{storey}");
+                PlaceRun(gExt, origin, run.Out, len + pre + post, openings, Pieces(set), $"Wall{storey}");
             }
 
-            // ---- interior partitions: each boundary between two DIFFERENT rooms, walled once.
-            var done = new HashSet<(Vector2Int, Vector2Int)>();
-            foreach (var c in cells)
+            if (!spec.NoPartitions) BuildPartitions(spec, storey, set, rooms, cells, y, gInt);
+        }
+
+        /// <summary>
+        /// Does a roof hang over the outside of the module starting at unit `m` of this run, low enough that a
+        /// projecting window box there would break through it? Measured off the same surface the roof is built
+        /// from (<see cref="RoofSurfaceAt"/>), 0.45 m out from the wall line.
+        /// </summary>
+        private static bool UnderEave(SyntyBuilding spec, int storey, Run run, int m)
+        {
+            var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
+            var p = RunOrigin(run, 0f) + new Vector3(d.x, 0f, d.y) * ((m + 1) * U)
+                    + new Vector3(run.Out.x, 0f, run.Out.y) * 0.45f;
+            if (!RoofSurfaceAt(spec, p.x, p.z, out float ry)) return false;
+            float wallTop = SyntyKit.EaveY(storey + 1, spec.Plinth);
+            return ry < wallTop + 0.01f && ry > wallTop - 1.5f;
+        }
+
+        /// <summary>
+        /// Interior partitions: each boundary between two DIFFERENT rooms, merged into straight runs and walled
+        /// once, from the west / south room's side.
+        /// </summary>
+        private static void BuildPartitions(SyntyBuilding spec, int storey, SyntyWallSet set, List<SyntyRoom> rooms,
+                                            HashSet<Vector2Int> cells, float y, Transform gInt)
+        {
+            var groups = new List<((int Dx, int Dz, int Line, string Mine, string Theirs) Key, int Along)>();
+            foreach (var c in Sorted(cells))
             {
                 var mine = RoomAt(rooms, c);
-                foreach (var d in Dirs)
+                foreach (var d in new[] { new Vector2Int(1, 0), new Vector2Int(0, 1) })
                 {
                     var n = c + d;
                     if (!cells.Contains(n)) continue;
                     var theirs = RoomAt(rooms, n);
                     if (mine == null || theirs == null || mine == theirs) continue;
                     if (mine.Open == Side.All && theirs.Open == Side.All) continue; // UOClient: one open porch
-                    if (spec.NoPartitions) continue;                                  // UOClient: UO's own walls
-                    if (done.Contains((n, -d))) continue;             // walled from the other side already
-                    done.Add((c, d));
-
-                    var run = new Run { Out = d, Room = mine, From = 0, To = 1 };
                     bool horiz = d.y != 0;
-                    run.Line = horiz ? (d.y > 0 ? c.y + 1 : c.y) : (d.x > 0 ? c.x + 1 : c.x);
-                    run.From = horiz ? c.x : c.y;
-                    run.To = run.From + 1;
-
-                    // A door on every partition cell would perforate the plan; one per room pair is enough and
-                    // is what makes a generated interior walkable at all.
-                    //
-                    // A dwelling unit's landing door is the one exception the generator places by RULE rather
-                    // than by first-come. The flat has exactly one door onto the shared stair (its main room
-                    // against the hall), and where that door lands matters: the front row of the hall is never
-                    // the stairwell void, so pinning the door to the unit's own front cell keeps a flat's door
-                    // from ever opening onto the hole a switchback flight comes up through. The pair is still
-                    // consumed in `done`/`Doored` so no second door is added on another cell of the face.
-                    SyntyRoom unitRoom = UnitDoorRoom(spec, mine, theirs);
-                    bool door;
-                    if (unitRoom != null)
-                    {
-                        FirstPartition(done, mine, theirs);              // consume the pair; ignore the verdict
-                        door = d.x != 0 && c.y == unitRoom.Z;            // its own front cell, on the hall face
-                    }
-                    else
-                    {
-                        door = !done.Contains((new Vector2Int(-999, -999), d)) && FirstPartition(done, mine, theirs);
-                    }
-                    var openings = new List<Seg>();
-                    if (door) openings.Add(new Seg(0, 2, SegKind.Door));
-
-                    // A partition that reaches a JETTIED face has to reach 1.25 m further, or the oversail
-                    // leaves a doorless 1.25 m gap between two rooms at the outside wall. On an inn that gap
-                    // is a hole between two rented bedrooms, which is invisible in every elevation and the
-                    // first thing anyone walking the building would find.
-                    RunEnds(spec, storey, run, cells, out int ppre, out int ppost);
-                    var pOrigin = RunOrigin(run, y);
-                    {
-                        var dRun = SyntyKit.Dir(new Vector2(d.x, d.y));
-                        pOrigin -= new Vector3(dRun.x, 0f, dRun.y) * (ppre * H);
-                    }
-                    Rebase(openings, ppre);
-
-                    var part = Pieces(set);
-                    part.Door = set.InteriorDoor;
-                    part.Window = set.Plain;          // a partition never glazes
-                    int before = _doorProps.Count;
-                    PlaceRun(gInt, pOrigin, d, 2 + ppre + ppost, openings, part, $"Part{storey}");
-
-                    // Tag the flat's landing door so `WireDoors` can name and lock it as one flat's own. A
-                    // partition run carries exactly one door, so the last panel added is it.
-                    if (unitRoom != null && door && _doorProps.Count > before)
-                        _unitDoors[_doorProps[_doorProps.Count - 1]] = unitRoom.Name;
+                    int line = horiz ? c.y + 1 : c.x + 1;
+                    groups.Add(((d.x, d.y, line, mine.Name, theirs.Name), horiz ? c.x : c.y));
                 }
+            }
+            groups.Sort((a, b) =>
+            {
+                int k = a.Key.CompareTo(b.Key);
+                return k != 0 ? k : a.Along.CompareTo(b.Along);
+            });
+
+            int i = 0;
+            while (i < groups.Count)
+            {
+                var key = groups[i].Key;
+                int from = groups[i].Along, to = from + 1;
+                int j = i + 1;
+                while (j < groups.Count && groups[j].Key.Equals(key) && groups[j].Along == to) { to++; j++; }
+                i = j;
+
+                SyntyRoom mine = null, theirs = null;
+                foreach (var r in rooms) { if (r.Name == key.Mine) mine = r; if (r.Name == key.Theirs) theirs = r; }
+                var d = new Vector2Int(key.Dx, key.Dz);
+                var run = new Run { Out = d, Room = mine, Line = key.Line, From = from, To = to };
+                int len = to - from;
+                var dRun = SyntyKit.Dir(new Vector2(d.x, d.y));
+                bool ascending = d.y != 0 ? dRun.x > 0 : dRun.y > 0;
+
+                // One door per pair of rooms, a whole module wide, in the middle of their shared wall — except a
+                // dwelling unit's landing door, which goes at the unit's own front (never over a stair void).
+                SyntyRoom unitRoom = UnitDoorRoom(spec, mine, theirs);
+                bool door = len >= 2 && FirstPartition(null, mine, theirs);
+                int doorAt = (len - 2) / 2;
+                if (unitRoom != null && d.x != 0)
+                {
+                    int front = ascending ? unitRoom.Z - from : to - 1 - unitRoom.Z;
+                    doorAt = Mathf.Clamp(ascending ? front : front - 1, 0, len - 2);
+                }
+
+                var openings = new List<Seg>();
+                var spans = new List<(int Start, int Len)>();
+                if (door) { openings.Add(new Seg(doorAt, 2, SegKind.Door)); spans.Add((doorAt, 2)); }
+                var modules = new List<int>();
+                var halves = new List<int>();
+                FillGaps(len, spans, modules, halves);
+                foreach (int h in halves) openings.Add(new Seg(h, 1, SegKind.Plain));
+
+                // A partition that reaches a JETTIED face has to reach 1.25 m further, or the oversail leaves a
+                // doorless gap between two rooms at the outside wall.
+                RunEnds(spec, storey, run, cells, out int ppre, out int ppost);
+                var pOrigin = RunOrigin(run, y) - new Vector3(dRun.x, 0f, dRun.y) * (ppre * U);
+                Rebase(openings, ppre);
+
+                var part = Pieces(set);
+                part.Door = set.InteriorDoor;
+                part.Window = set.Plain;          // a partition never glazes
+                int before = _doorProps.Count;
+                PlaceRun(gInt, pOrigin, d, len + ppre + ppost, openings, part, $"Part{storey}");
+
+                // Tag the flat's landing door so `WireDoors` can name and lock it as one flat's own.
+                if (unitRoom != null && door && _doorProps.Count > before)
+                    _unitDoors[_doorProps[_doorProps.Count - 1]] = unitRoom.Name;
+            }
+        }
+
+        /// <summary>A doorway on a run: the one or two equally good starts for it, and its width, in units.</summary>
+        private struct DoorWant
+        {
+            public int A, B;      // candidate starts (A == B when one start is nearest)
+            public int Width;     // units the opening takes: a kit door is 2
+            public bool Door;     // false: too short a wall for a kit door, so a plain opening instead
+        }
+
+        /// <summary>
+        /// Where a doorway of `tiles` UO tiles centred at `centre` (units along the run) goes. A kit door is one
+        /// 2.5 m module, so a single UO door (1 tile) gets a 2-unit door centred on it as nearly as the 1.25 m
+        /// grid allows — 0.625 m off, either way, which leaves the choice to <see cref="ChooseDoors"/>. A double
+        /// door (2 tiles) gets a door exactly on it; wider ones get a door per module, rounded up to whole modules.
+        /// </summary>
+        private static DoorWant DoorAt(float centre, int tiles, int len)
+        {
+            int width = tiles <= 1 ? 2 : tiles + (tiles & 1);
+            if (width > len)
+            {
+                // A wall too short for a kit door module: leave the doorway itself open, true to its size.
+                int w = Mathf.Min(Mathf.Max(1, tiles), len);
+                int s = Mathf.Clamp(Mathf.RoundToInt(centre - w * 0.5f), 0, len - w);
+                return new DoorWant { A = s, B = s, Width = w, Door = false };
+            }
+
+            float ideal = centre - width * 0.5f;
+            int lo = Mathf.Clamp(Mathf.FloorToInt(ideal + 0.001f), 0, len - width);
+            int hi = Mathf.Clamp(Mathf.CeilToInt(ideal - 0.001f), 0, len - width);
+            float dl = Mathf.Abs(lo - ideal), dh = Mathf.Abs(hi - ideal);
+            if (Mathf.Abs(dl - dh) > 0.01f) { if (dl < dh) hi = lo; else lo = hi; }
+            return new DoorWant { A = lo, B = hi, Width = width, Door = true };
+        }
+
+        /// <summary>
+        /// Pick each doorway's start so the run closes with the fewest half pieces off its corners: an odd gap
+        /// between openings needs a 1.25 m half, which a corner post hides at the end of a run and nothing hides
+        /// beside a door. Ties keep the lower start, so the answer is fixed for a given plan.
+        /// </summary>
+        private static List<(int Start, int Width, bool Door)> ChooseDoors(int len, List<DoorWant> wanted)
+        {
+            var result = new List<(int Start, int Width, bool Door)>();
+            if (wanted.Count == 0) return result;
+
+            int n = Mathf.Min(wanted.Count, 10);
+            int bestMask = -1, bestCost = int.MaxValue;
+            for (int mask = 0; mask < (1 << n); mask++)
+            {
+                var spans = new List<(int Start, int Len)>();
+                bool ok = true;
+                for (int i = 0; i < n && ok; i++)
+                {
+                    bool b = ((mask >> i) & 1) != 0;
+                    if (b && wanted[i].A == wanted[i].B) ok = false;          // no second choice to take
+                    spans.Add((b ? wanted[i].B : wanted[i].A, wanted[i].Width));
+                }
+                if (!ok) continue;
+                spans.Sort((a, c) => a.Start.CompareTo(c.Start));
+                int cursor = 0, cost = 0;
+                foreach (var (s, l) in spans)
+                {
+                    if (s < cursor) { ok = false; break; }
+                    if (((s - cursor) & 1) != 0) cost += cursor == 0 ? 1 : 10;
+                    cursor = s + l;
+                }
+                if (!ok) continue;
+                if (((len - cursor) & 1) != 0) cost += 1;
+                if (cost < bestCost) { bestCost = cost; bestMask = mask; }
+            }
+
+            if (bestMask >= 0)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    bool b = ((bestMask >> i) & 1) != 0;
+                    result.Add((b ? wanted[i].B : wanted[i].A, wanted[i].Width, wanted[i].Door));
+                }
+            }
+            else
+            {
+                // Doorways that crowd each other: keep each that still fits, first come.
+                var spans = new List<(int Start, int Len)>();
+                for (int i = 0; i < n; i++)
+                {
+                    int s = wanted[i].A;
+                    if (Overlaps(spans, s, wanted[i].Width)) s = wanted[i].B;
+                    if (Overlaps(spans, s, wanted[i].Width)) continue;
+                    spans.Add((s, wanted[i].Width));
+                    result.Add((s, wanted[i].Width, wanted[i].Door));
+                }
+            }
+            result.Sort((a, b) => a.Start.CompareTo(b.Start));
+            return result;
+        }
+
+        /// <summary>
+        /// The whole 2.5 m modules and 1.25 m halves that fill a run of `len` units around fixed openings. An odd
+        /// gap takes its half at the run's corner where it touches one (so the corner post hides the seam), and
+        /// against the next opening otherwise; a run with no openings at all takes it at its far end.
+        /// </summary>
+        private static void FillGaps(int len, List<(int Start, int Len)> fixedSpans, List<int> modules, List<int> halves)
+        {
+            var spans = new List<(int Start, int Len)>(fixedSpans);
+            spans.Sort((a, b) => a.Start.CompareTo(b.Start));
+            int cursor = 0;
+            foreach (var (s, l) in spans)
+            {
+                Gap(cursor, s);
+                cursor = Mathf.Max(cursor, s + l);
+            }
+            Gap(cursor, len);
+
+            void Gap(int a, int b)
+            {
+                if (b - a <= 0) return;
+                int halfAt = -1;
+                if (((b - a) & 1) != 0) halfAt = a == 0 && b != len ? a : b - 1;
+                int first = halfAt == a ? a + 1 : a;
+                int end = halfAt == b - 1 ? b - 1 : b;
+                for (int m = first; m + 2 <= end; m += 2) modules.Add(m);
+                if (halfAt >= 0) halves.Add(halfAt);
             }
         }
 
@@ -1083,7 +1331,7 @@ namespace UOClient.Buildings.Synty
         /// On a one-module frontage the door takes it and there is no shopfront left to compose, which is
         /// correct and is why nothing here assumes a minimum length.
         /// </summary>
-        private static void ComposeShopfront(SyntyBuilding spec, Run run, int len, bool isEntry, int doorCell,
+        private static void ComposeShopfront(SyntyBuilding spec, Run run, int len, int doorStart, List<int> modules,
                                              List<Seg> openings)
         {
             // The caller has already put the door's Seg in `openings`; this only fills what is left.
@@ -1101,18 +1349,26 @@ namespace UOClient.Buildings.Synty
             // with the street so goods and customers can cross it. The at-grade variant is the truer store and
             // the plinthed one is for a sloping site or a grander address — but both are built, because both
             // are legal in the kit and a town needs both.
-            int hatch = spec.Plinth
-                ? -1
-                : isEntry
-                    ? (doorCell + 1 < len ? doorCell + 1 : doorCell - 1)
-                    : len - 1;                                           // a side frontage still serves the street
+            // `modules` are the run's free whole modules (in units from the run origin), the door's already
+            // claimed. The hatch takes the module beside the door, or the last one on a side frontage.
+            bool isEntry = doorStart >= 0;
+            int hatch = -1;
+            if (!spec.Plinth && modules.Count > 0)
+            {
+                hatch = modules[modules.Count - 1];                      // a side frontage still serves the street
+                if (isEntry)
+                {
+                    hatch = -1;
+                    foreach (int m in modules) if (m == doorStart + 2) hatch = m;
+                    if (hatch < 0) foreach (int m in modules) if (m + 2 == doorStart) hatch = m;
+                }
+            }
 
             bool wide = true;
-            for (int c = 0; c < len; c++)
+            foreach (int m in modules)
             {
-                if (isEntry && c == doorCell) continue;                  // the door's module, already claimed
-                if (c == hatch) { openings.Add(new Seg(c * 2, 2, SegKind.Counter)); continue; }
-                openings.Add(new Seg(c * 2, 2, wide ? SegKind.Display : SegKind.DisplayQuiet));
+                if (m == hatch) { openings.Add(new Seg(m, 2, SegKind.Counter)); continue; }
+                openings.Add(new Seg(m, 2, wide ? SegKind.Display : SegKind.DisplayQuiet));
                 wide = !wide;
             }
 
@@ -1120,12 +1376,14 @@ namespace UOClient.Buildings.Synty
             // 0.364 m against a display bay's 1.095 m and a board hung 1.550 m out then has clear air under it;
             // otherwise the module at the far end of the frontage, which is the one furthest from the door's
             // awning and its stoop.
-            int signOn = hatch >= 0 ? hatch : (isEntry && doorCell == len - 1 ? 0 : len - 1);
+            int signOn = hatch >= 0 ? hatch
+                       : modules.Count == 0 ? -1
+                       : isEntry && modules[modules.Count - 1] < doorStart ? modules[0] : modules[modules.Count - 1];
             if (signOn >= 0 && len > 0)
             {
                 var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
                 var org = RunOrigin(run, 0f);
-                _hatch = org + new Vector3(d.x, 0f, d.y) * ((signOn + 0.5f) * C);
+                _hatch = org + new Vector3(d.x, 0f, d.y) * ((signOn + 1) * U);
                 _hatchOut = new Vector2(run.Out.x, run.Out.y);
             }
         }
@@ -1186,54 +1444,42 @@ namespace UOClient.Buildings.Synty
         /// frontages are different lengths and a plan whose corner is not at the origin.
         /// </summary>
         /// <summary>
-        /// UOClient: the half-module of this run where a door centred nearest one of
-        /// <see cref="SyntyBuilding.EntryPoints"/> starts, when one lies on the run's wall line.
+        /// UOClient: the doorways of <see cref="SyntyBuilding.EntryPoints"/> that lie on this run's wall line,
+        /// each with where its kit door may start (see <see cref="DoorAt"/>). A doorway's width is
+        /// <see cref="SyntyBuilding.EntryWidths"/>, in UO tiles = units.
         /// </summary>
-        /// <summary>
-        /// UOClient: the doorways of <see cref="SyntyBuilding.EntryPoints"/> that lie on this run's wall
-        /// line, as (first half-module, width in half-modules), placed so the gap is centred on the point.
-        /// </summary>
-        private static void UoDoorways(SyntyBuilding spec, Run run, int len, List<(int Start, int Len)> into)
+        private static void UoDoorways(SyntyBuilding spec, Run run, int len, List<DoorWant> into)
         {
             var org = RunOrigin(run, 0f);
             var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
+            bool horiz = run.Out.y != 0;
             for (int i = 0; i < spec.EntryPoints.Count; i++)
             {
                 var p = spec.EntryPoints[i];
-                int width = i < spec.EntryWidths.Count ? Mathf.Max(1, spec.EntryWidths[i]) : 2;
-                int bestStart = -1;
-                float best = H * 0.5f;
-                for (int k = 0; k + width <= len * 2; k++)
-                {
-                    var c = org + new Vector3(d.x, 0f, d.y) * ((k + width * 0.5f) * H);
-                    float across = run.Out.y != 0 ? Mathf.Abs(c.z - p.y) : Mathf.Abs(c.x - p.x);
-                    float along = run.Out.y != 0 ? Mathf.Abs(c.x - p.x) : Mathf.Abs(c.z - p.y);
-                    if (across <= H * 0.5f && along < best)
-                    {
-                        best = along;
-                        bestStart = k;
-                    }
-                }
-
-                if (bestStart >= 0 && !Overlaps(into, bestStart, width))
-                {
-                    into.Add((bestStart, width));
-                }
+                int tiles = i < spec.EntryWidths.Count ? Mathf.Max(1, spec.EntryWidths[i]) : 1;
+                float across = horiz ? Mathf.Abs(org.z - p.y) : Mathf.Abs(org.x - p.x);
+                if (across > U * 0.5f) continue;
+                float t = (horiz ? (p.x - org.x) * d.x : (p.y - org.z) * d.y) / U;   // units along the run
+                if (t <= 0.01f || t >= len - 0.01f) continue;
+                into.Add(DoorAt(t, tiles, len));
             }
         }
 
-        /// <summary>UOClient: does one of <see cref="SyntyBuilding.BlankPoints"/> hang on module <paramref name="c"/> of this run?</summary>
-        private static bool HangsOn(SyntyBuilding spec, Run run, int c)
+        /// <summary>
+        /// UOClient: does one of <see cref="SyntyBuilding.BlankPoints"/> hang on the `width` units of this run
+        /// starting at `start`?
+        /// </summary>
+        private static bool HangsOn(SyntyBuilding spec, Run run, int start, int width)
         {
             if (spec.BlankPoints.Count == 0) return false;
             var org = RunOrigin(run, 0f);
             var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
-            var mid = org + new Vector3(d.x, 0f, d.y) * ((c + 0.5f) * C);
+            var mid = org + new Vector3(d.x, 0f, d.y) * ((start + width * 0.5f) * U);
             foreach (var p in spec.BlankPoints)
             {
                 float across = run.Out.y != 0 ? Mathf.Abs(mid.z - p.y) : Mathf.Abs(mid.x - p.x);
                 float along = run.Out.y != 0 ? Mathf.Abs(mid.x - p.x) : Mathf.Abs(mid.z - p.y);
-                if (across <= C && along < C * 0.5f + H * 0.5f) return true;
+                if (across <= C && along < width * U * 0.5f + U * 0.5f) return true;
             }
 
             return false;
@@ -1247,30 +1493,6 @@ namespace UOClient.Buildings.Synty
             }
 
             return false;
-        }
-
-        private static bool NearestEntryHalf(SyntyBuilding spec, Run run, int len, out int half)
-        {
-            half = 0;
-            var org = RunOrigin(run, 0f);
-            var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
-            float best = H;
-            foreach (var p in spec.EntryPoints)
-            {
-                for (int k = 0; k + 2 <= len * 2; k++)
-                {
-                    var c = org + new Vector3(d.x, 0f, d.y) * ((k + 1) * H);
-                    float across = run.Out.y != 0 ? Mathf.Abs(c.z - p.y) : Mathf.Abs(c.x - p.x);
-                    float along = run.Out.y != 0 ? Mathf.Abs(c.x - p.x) : Mathf.Abs(c.z - p.y);
-                    if (across <= H * 0.5f && along < best)
-                    {
-                        best = along;
-                        half = k;
-                    }
-                }
-            }
-
-            return best < H;
         }
 
         private static int CornerDoorCell(SyntyBuilding spec, Run run, int len, int fallback)
@@ -1352,7 +1574,7 @@ namespace UOClient.Buildings.Synty
             // Distance from this run's origin to the door's centre, along the run's own walking direction.
             var d = SyntyKit.Dir(new Vector2(run.Out.x, run.Out.y));
             float t = horiz ? (_entry.Value.x - org.x) * d.x : (_entry.Value.z - org.z) * d.y;
-            int bay = Mathf.FloorToInt(t / C);
+            int bay = Mathf.FloorToInt(t / U);              // the unit the door's centre falls in
             return bay >= 0 && bay < len ? bay : -1;
         }
 
@@ -1559,7 +1781,7 @@ namespace UOClient.Buildings.Synty
                     if (runFrom == int.MinValue) continue;
 
                     var run = new Run { Out = outDir, Line = line, From = runFrom, To = i };
-                    PlaceRun(g, RunOrigin(run, 0f), outDir, (i - runFrom) * 2, null, wallPieces, "GardenWall");
+                    PlaceRun(g, RunOrigin(run, 0f), outDir, i - runFrom, null, wallPieces, "GardenWall");
                     runFrom = int.MinValue;
                 }
             }
@@ -1867,12 +2089,12 @@ namespace UOClient.Buildings.Synty
             return true;
         }
 
-        /// <summary>True when the hearth stands on module `c` of this run, so no window may go there.</summary>
+        /// <summary>True when the hearth stands on the module starting at unit `c` of this run, so no window may go there.</summary>
         private static bool HearthTakesModule(SyntyBuilding spec, int storey, Run run, int c)
         {
             if (storey != 0 || run.Room == null) return false;
             if (!HearthCell(spec, out var room, out var outDir, out int along)) return false;
-            return run.Room == room && run.Out == outDir && CellAlong(run, c) == along;
+            return run.Room == room && run.Out == outDir && (CellAlong(run, c) == along || CellAlong(run, c + 1) == along);
         }
 
         /// <summary>
@@ -4215,61 +4437,103 @@ namespace UOClient.Buildings.Synty
             var lowerCells = Cells(lower);
             var upperCells = Cells(upper);
 
-            // The front door's cell, so the foot landing can stay out of it.
-            var doorCell = new Vector2Int(-999, -999);
-            if (from == 0 && spec.EntryRoom != null)
-                foreach (var run in MergeRuns(BoundaryFaces(lowerCells), lower))
-                {
-                    if (run.Out.y >= 0 || run.Room == null || run.Room.Name != spec.EntryRoom) continue;
-                    doorCell = new Vector2Int(run.From + (run.To - run.From - 1) / 2, run.Line);
-                    break;
-                }
+            // The front doors, so the foot landing can stay out of them: the plan's own doorways where it has
+            // them, else the middle of the entry room's south face (where the generator would put its door).
+            var doorPoints = new List<Vector2>();
+            if (from == 0)
+            {
+                doorPoints.AddRange(spec.EntryPoints);
+                if (doorPoints.Count == 0 && spec.EntryRoom != null)
+                    foreach (var run in MergeRuns(BoundaryFaces(lowerCells), lower))
+                    {
+                        if (run.Out.y >= 0 || run.Room == null || run.Room.Name != spec.EntryRoom) continue;
+                        doorPoints.Add(new Vector2((run.From + run.To) * 0.5f * U, run.Line * U));
+                        break;
+                    }
+            }
 
             SyntyStair best = null;
             int bestScore = int.MinValue;
 
-            var cells = new List<Vector2Int>(upperCells);
-            cells.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
-
-            foreach (var v in cells)
+            foreach (var v in Sorted(upperCells))
             {
-                if (!lowerCells.Contains(v)) continue;
+                // The void is 2 x 2 units — one 2.5 m module, the flight's own footprint — with `v` its
+                // south-west unit. All four units must stand on both storeys, in one room on each.
                 var roomLo = RoomAt(lower, v);
                 var roomUp = RoomAt(upper, v);
                 if (roomLo == null || roomUp == null) continue;
-                // A void has to be cut out of something. A cell that carries no deck already — an unfloored
-                // room, or the open middle of a gallery — is not a stairwell, it is a hole the flight would
-                // stand in the bottom of.
-                if (!Floored(spec, from + 1, v)) continue;
-                // The void takes a whole cell out of the room above, so that room has to be at least 2 x 2 or
-                // the "stairwell" has eaten the room. On a 2 x 2 it leaves 18.75 m² and a rail round the hole,
-                // which is what a small town house actually looks like.
-                if (roomUp.W * roomUp.D < 4) continue;
+                bool fits = true;
+                foreach (var c in Block(v, 0, 0))
+                {
+                    // A void has to be cut out of something: a unit with no deck already (an unfloored room, the
+                    // open middle of a gallery) is a hole the flight would stand in the bottom of.
+                    if (RoomAt(lower, c) != roomLo || RoomAt(upper, c) != roomUp || !Floored(spec, from + 1, c))
+                    { fits = false; break; }
+                }
+                if (!fits) continue;
+                // The void takes a whole module out of the room above, so that room must be at least 5 x 5 m or
+                // the "stairwell" has eaten the room.
+                if (roomUp.W * roomUp.D < 16) continue;
 
                 foreach (float yaw in new[] { 0f, 90f, 180f, 270f })
                     foreach (bool flip in new[] { false, true })
                     {
-                        var foot = v + FootDir(yaw);
-                        var head = v + HeadDir(yaw, flip);
-                        if (RoomAt(lower, foot) != roomLo) continue;   // foot landing walled off, or absent
-                        if (RoomAt(upper, head) != roomUp) continue;   // head landing walled off, or absent
-                        if (!Floored(spec, from, foot)) continue;      // nothing to step off onto below
-                        if (!Floored(spec, from + 1, head)) continue;  // nor above — a gallery's void, say
-                        if (foot == doorCell) continue;                // not across the front door
+                        var footDir = FootDir(yaw);
+                        var headDir = HeadDir(yaw, flip);
+
+                        // Each end of the flight steps off onto the strip of units along that side of the void,
+                        // in the same room (no partition across the landing) and floored.
+                        bool ok = true;
+                        foreach (var c in Strip(v, footDir, 0))
+                            if (RoomAt(lower, c) != roomLo || !Floored(spec, from, c)) { ok = false; break; }
+                        if (!ok) continue;
+                        foreach (var c in Strip(v, headDir, 0))
+                            if (RoomAt(upper, c) != roomUp || !Floored(spec, from + 1, c)) { ok = false; break; }
+                        if (!ok) continue;
+
+                        // Not across a front door.
+                        foreach (var c in Strip(v, footDir, 0))
+                        {
+                            var mid = new Vector2((c.x + 0.5f) * U, (c.y + 0.5f) * U);
+                            foreach (var p in doorPoints) if (Vector2.Distance(mid, p) < 1.5f) ok = false;
+                        }
+                        if (!ok) continue;
 
                         // Prefer a void against an outside wall, and prefer it away from the plan's middle.
                         int score = 0;
-                        foreach (var d in Dirs) if (!upperCells.Contains(v + d)) score += 4;
-                        if (!lowerCells.Contains(foot + FootDir(yaw))) score += 1;
+                        foreach (var d in Dirs)
+                            foreach (var c in Strip(v, d, 0))
+                                if (!upperCells.Contains(c)) { score += 4; break; }
+                        foreach (var c in Strip(v, footDir, 1))
+                            if (!lowerCells.Contains(c)) { score += 1; break; }
                         if (score > bestScore) { bestScore = score; best = new SyntyStair(v.x, v.y, yaw, flip); }
                     }
             }
 
             if (best == null)
                 Debug.LogError($"[SyntyGen] {spec.Name}: no stair fits between storeys {from} and {from + 1} — " +
-                               "a stairwell needs one cell present on both storeys with a landing cell in the " +
-                               "same room at the foot (below) and at the head (above). The upper storey is sealed.");
+                               "a stairwell needs a 2 x 2 unit void present on both storeys with a landing strip " +
+                               "in the same room at the foot (below) and at the head (above). The upper storey is sealed.");
             return best ?? new SyntyStair();
+        }
+
+        /// <summary>The 2 x 2 units of the void whose south-west unit is `v`, shifted by (dx, dz).</summary>
+        private static IEnumerable<Vector2Int> Block(Vector2Int v, int dx, int dz)
+        {
+            for (int z = 0; z < 2; z++)
+                for (int x = 0; x < 2; x++) yield return new Vector2Int(v.x + dx + x, v.y + dz + z);
+        }
+
+        /// <summary>
+        /// The two units along side `d` of the void at `v`, `gap` units out from it: gap 0 is the strip touching
+        /// the void, the landing a flight steps off onto.
+        /// </summary>
+        private static IEnumerable<Vector2Int> Strip(Vector2Int v, Vector2Int d, int gap)
+        {
+            int ox = d.x > 0 ? 2 + gap : d.x < 0 ? -1 - gap : 0;
+            int oz = d.y > 0 ? 2 + gap : d.y < 0 ? -1 - gap : 0;
+            for (int i = 0; i < 2; i++)
+                yield return d.x != 0 ? new Vector2Int(v.x + ox, v.y + i) : new Vector2Int(v.x + i, v.y + oz);
         }
 
         /// <summary>
@@ -4306,7 +4570,7 @@ namespace UOClient.Buildings.Synty
             var g = SyntyKit.Group($"Stairwell_{from}", parent);
 
             float y = SyntyKit.FloorY(from, spec.Plinth);
-            var centre = new Vector3((st.Cell.x + 0.5f) * C, 0f, (st.Cell.y + 0.5f) * C);
+            var centre = new Vector3((st.Cell.x + 1) * U, 0f, (st.Cell.y + 1) * U);   // middle of the 2 x 2 unit void
 
             var foot = FootDir(st.Yaw);
 
@@ -4361,73 +4625,92 @@ namespace UOClient.Buildings.Synty
             var cells = Cells(rooms);
             bool hasVoid = arriving != null && arriving.Cell.x >= 0;
 
-            // Every unfloored cell inside the footprint, plus the stairwell's own — which IS floored as far as
-            // the plan is concerned and is a hole only because a flight comes up through it.
-            var holes = new List<Vector2Int>();
-            foreach (var c in cells) if (!Floored(spec, storey, c)) holes.Add(c);
-            if (hasVoid && Floored(spec, storey, arriving.Cell)) holes.Add(arriving.Cell);
+            // Every unfloored unit inside the footprint, plus the stairwell's own four — which ARE floored as far
+            // as the plan is concerned and are a hole only because a flight comes up through them.
+            var holes = new HashSet<Vector2Int>();
+            foreach (var c in cells) if (!Floored(spec, storey, c) || InVoid(arriving, c)) holes.Add(c);
             if (holes.Count == 0) return;
-
-            // Deterministic, so a template builds the same way every time.
-            holes.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
 
             var g = SyntyKit.Group($"Guards_{storey}", parent);
             float y = SyntyKit.FloorY(storey, spec.Plinth);
             var head = hasVoid ? HeadDir(arriving.Yaw, arriving.Flip) : Vector2Int.zero;
             var foot = hasVoid ? FootDir(arriving.Yaw) : Vector2Int.zero;
 
-            // Posts are shared between adjacent holes, so they are deduped on position rather than placed per
-            // cell — two hole cells side by side would otherwise stand two beams in the same 0.14 m of air.
+            // Posts are shared between rails, so they are deduped on their corner of the unit lattice.
             var posts = new HashSet<Vector2Int>();
+            void Post(Vector2Int key)
+            {
+                if (!posts.Add(key)) return;
+                var post = SyntyKit.Place("SM_Bld_House_Railing_Beam_01", g, new Vector3(key.x * U, y, key.y * U), 0f, "Guard_Post");
+                // Measured off the pack: the beam is a 2.318 m column and every preset that uses it as a rail
+                // post scales it to 0.45-0.51 in Y. At 0.45 it stands 1.043 m, level with the rail's 1.027.
+                if (post != null) post.transform.localScale = new Vector3(1f, 0.45f, 1f);
+            }
 
-            foreach (var v in holes)
+            // An edge is railed when the unit across it is FLOORED, in the SAME room, and not a hole itself —
+            // genuinely open floor to fall off, with no wall or partition between.
+            var edges = new List<(int Dx, int Dz, int Line, int Along)>();
+            foreach (var v in Sorted(holes))
             {
                 var mineRoom = RoomAt(rooms, v);
-                var centre = new Vector3((v.x + 0.5f) * C, 0f, (v.y + 0.5f) * C);
-
-                var railed = new Dictionary<Vector2Int, bool>();
-                foreach (var d in Dirs)
-                    railed[d] = Floored(spec, storey, v + d) && RoomAt(rooms, v + d) == mineRoom
-                                && !(hasVoid && v + d == arriving.Cell);
-
                 foreach (var d in Dirs)
                 {
-                    if (!railed[d]) continue;
-                    var t = new Vector2Int(-d.y, d.x);
-                    var mid = new Vector3(centre.x + d.x * H, y, centre.z + d.y * H);
+                    var n = v + d;
+                    if (holes.Contains(n) || !Floored(spec, storey, n) || RoomAt(rooms, n) != mineRoom) continue;
+                    bool horiz = d.y != 0;
+                    int line = horiz ? (d.y > 0 ? v.y + 1 : v.y) : (d.x > 0 ? v.x + 1 : v.x);
 
-                    if (hasVoid && v == arriving.Cell && d == head)
+                    // The stair head: of the two units the flight arrives through, the one on the foot side gets
+                    // `Railing_Half_01` (1.158 m), the other is left open to step out of — a doorway's worth, and
+                    // precisely what `Preset_House_Archway_01` does.
+                    if (hasVoid && InVoid(arriving, v) && d == head)
                     {
-                        var a = mid + new Vector3(foot.x, 0f, foot.y) * H;
-                        SyntyKit.Place("SM_Bld_House_Railing_Half_01", g, a,
+                        var off = v - arriving.Cell;
+                        int side = foot.x != 0 ? off.x : off.y;
+                        bool footSide = (foot.x + foot.y) > 0 ? side == 1 : side == 0;
+                        if (!footSide) continue;
+                        var mid = new Vector2((v.x + 0.5f) * U + d.x * U * 0.5f, (v.y + 0.5f) * U + d.y * U * 0.5f);
+                        var corner = mid + new Vector2(foot.x, foot.y) * (U * 0.5f);
+                        SyntyKit.Place("SM_Bld_House_Railing_Half_01", g, new Vector3(corner.x, y, corner.y),
                                        SyntyKit.Yaw(new Vector2(foot.x, foot.y)), "Guard_Rail");
+                        Post(new Vector2Int(Mathf.RoundToInt(corner.x / U), Mathf.RoundToInt(corner.y / U)));
+                        continue;
                     }
-                    else
-                    {
-                        // Corner-to-corner along this edge, with the run direction chosen so the rail's own
-                        // body (local -Z from its pivot) travels from the start corner to the far one.
-                        var a = mid - new Vector3(t.x, 0f, t.y) * H;
-                        SyntyKit.Place("SM_Bld_House_Railing_01", g, a,
-                                       SyntyKit.Yaw(new Vector2(-t.x, -t.y)), "Guard_Rail");
-                    }
-                }
 
-                // A post only where a railed edge ends. A post at a corner between two walls is a post inside
-                // a wall, which is the same waste the buried corbels were. Keyed on the corner's own cell
-                // coordinate — corners live on the cell lattice, so two hole cells meeting at one corner
-                // produce the same key and one post.
-                foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
-                {
-                    if (!railed[new Vector2Int(dx, 0)] && !railed[new Vector2Int(0, dz)]) continue;
-                    var key = new Vector2Int(dx > 0 ? v.x + 1 : v.x, dz > 0 ? v.y + 1 : v.y);
-                    if (!posts.Add(key)) continue;
-                    var post = SyntyKit.Place("SM_Bld_House_Railing_Beam_01", g,
-                                              new Vector3(key.x * C, y, key.y * C), 0f, "Guard_Post");
-                    // Measured off the pack: the beam is a 2.318 m column and every preset that uses it as a
-                    // rail post scales it to 0.45-0.51 in Y. At 0.45 it stands 1.043 m, level with the rail's
-                    // 1.027.
-                    if (post != null) post.transform.localScale = new Vector3(1f, 0.45f, 1f);
+                    edges.Add((d.x, d.y, line, horiz ? v.x : v.y));
                 }
+            }
+            edges.Sort((a, b) =>
+                a.Dx != b.Dx ? a.Dx.CompareTo(b.Dx) : a.Dz != b.Dz ? a.Dz.CompareTo(b.Dz) :
+                a.Line != b.Line ? a.Line.CompareTo(b.Line) : a.Along.CompareTo(b.Along));
+
+            // Merge each straight stretch and rail it with true-size pieces: 2.5 m rails, and a 1.158 m half rail
+            // closing an odd stretch, with a post at every joint and end.
+            int i = 0;
+            while (i < edges.Count)
+            {
+                var e = edges[i];
+                int from = e.Along, to = from + 1, j = i + 1;
+                while (j < edges.Count && edges[j].Dx == e.Dx && edges[j].Dz == e.Dz && edges[j].Line == e.Line
+                       && edges[j].Along == to) { to++; j++; }
+                i = j;
+
+                var t = new Vector2Int(-e.Dz, e.Dx);                 // the direction a rail's body runs from its pivot
+                bool horiz = e.Dz != 0;
+                bool ascending = horiz ? t.x > 0 : t.y > 0;
+                int startAlong = ascending ? from : to;
+                Vector2Int Key(int k) => horiz ? new Vector2Int(startAlong + t.x * k, e.Line)
+                                               : new Vector2Int(e.Line, startAlong + t.y * k);
+                int n = to - from;
+                float yaw = SyntyKit.Yaw(new Vector2(-t.x, -t.y));
+                for (int k = 0; k < n; k += 2)
+                {
+                    var key = Key(k);
+                    SyntyKit.Place(n - k >= 2 ? "SM_Bld_House_Railing_01" : "SM_Bld_House_Railing_Half_01", g,
+                                   new Vector3(key.x * U, y, key.y * U), yaw, "Guard_Rail");
+                    Post(key);
+                }
+                Post(Key(n));
             }
         }
 
@@ -4482,11 +4765,11 @@ namespace UOClient.Buildings.Synty
                 float yaw = SyntyKit.Yaw(outward) + 180f;
                 const float Proud = 0.214f;                 // wall half-thickness 0.121 + brace half-thickness 0.093
                 var org = RunOrigin(run, y) + new Vector3(outward.x, 0f, outward.y) * Proud;
-                for (int i = 0; i < run.To - run.From; i++)
+                for (int i = 0; i + 2 <= run.To - run.From; i += 2)
                 {
-                    // Half a metre in from the cell's start, so the 1.486 m brace sits inside its own module
+                    // Half a metre in from the module's start, so the 1.486 m brace sits inside its own module
                     // rather than straddling the joint between two panels.
-                    var p = org + new Vector3(d.x, 0f, d.y) * (i * C + 0.5f);
+                    var p = org + new Vector3(d.x, 0f, d.y) * (i * U + 0.5f);
                     SyntyKit.Place("SM_Bld_House_Supports_01", g, p, yaw, "Bracket");
                 }
             }
@@ -4505,7 +4788,7 @@ namespace UOClient.Buildings.Synty
             var cells = Cells(spec.Floor(storey));
             float y = SyntyKit.FloorY(storey, spec.Plinth);
 
-            foreach (var c in cells)
+            foreach (var c in Sorted(cells))
                 foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
                 {
                     var a = new Vector2Int(c.x + dx, c.y);
@@ -4513,15 +4796,15 @@ namespace UOClient.Buildings.Synty
                     if (cells.Contains(a) || cells.Contains(b)) continue;
                     // The post hides the seam where two wall panels butt, so on a jettied storey it belongs at
                     // the corner the walls actually make, not at the corner the cells make.
-                    float x = (dx > 0 ? c.x + 1 : c.x) * C + dx * JettyAt(spec, storey, SideOf(new Vector2Int(dx, 0)));
-                    float z = (dz > 0 ? c.y + 1 : c.y) * C + dz * JettyAt(spec, storey, SideOf(new Vector2Int(0, dz)));
+                    float x = (dx > 0 ? c.x + 1 : c.x) * U + dx * JettyAt(spec, storey, SideOf(new Vector2Int(dx, 0)));
+                    float z = (dz > 0 ? c.y + 1 : c.y) * U + dz * JettyAt(spec, storey, SideOf(new Vector2Int(0, dz)));
                     SyntyKit.Place("SM_Bld_House_WoodBeam_01", g, new Vector3(x, y, z), 0f, "Post");
                 }
         }
 
         // ================================================================= roof
 
-        /// <summary>Bounding cell rectangle of the top storey.</summary>
+        /// <summary>Bounding unit rectangle of the top storey.</summary>
         private static RectInt TopRect(SyntyBuilding spec)
         {
             int x0 = int.MaxValue, z0 = int.MaxValue, x1 = int.MinValue, z1 = int.MinValue;
@@ -4551,10 +4834,10 @@ namespace UOClient.Buildings.Synty
             var r = TopRect(spec);
             int top = spec.Storeys - 1;
             return Rect.MinMaxRect(
-                r.xMin * C - JettyAt(spec, top, Side.West),
-                r.yMin * C - JettyAt(spec, top, Side.South),
-                r.xMax * C + JettyAt(spec, top, Side.East),
-                r.yMax * C + JettyAt(spec, top, Side.North));
+                r.xMin * U - JettyAt(spec, top, Side.West),
+                r.yMin * U - JettyAt(spec, top, Side.South),
+                r.xMax * U + JettyAt(spec, top, Side.East),
+                r.yMax * U + JettyAt(spec, top, Side.North));
         }
 
         /// <summary>
@@ -4604,101 +4887,171 @@ namespace UOClient.Buildings.Synty
             if (spec.RoofWings != null && spec.RoofWings.Count > 0) { BuildWingedRoof(spec, set, parent); return; }
 
             var g = SyntyKit.Group("Roof", parent);
-            var rect = TopRectMetres(spec);
+            var gb = GableFor(TopRectMetres(spec), spec.Storeys, spec.Plinth);
+            if (Mathf.Abs(gb.Plan.width - Mathf.Round(gb.Plan.width / U) * U) > 0.01f ||
+                Mathf.Abs(gb.Plan.height - Mathf.Round(gb.Plan.height / U) * U) > 0.01f)
+                Debug.LogError($"[SyntyGen] {spec.Name}: roof plan {gb.Plan.width:F2} x {gb.Plan.height:F2} m is not " +
+                               "a whole number of 1.25 m units — a jetty must be applied to BOTH faces of an axis or neither.");
 
-            // Slopes descend along the SHORTER axis; the ridge runs along the longer one.
-            //
-            // In METRES rather than cells, because a jettied top storey is not a whole number of cells across.
-            // The two integers that come out of it — half-modules of span, whole bays of run — are what the
-            // loops below walk, and both are checked rather than assumed: an odd span cannot close a 45° ridge
-            // on the module and a fractional run cannot close the ridge along its length.
-            bool spanIsX = rect.width <= rect.height;
-            float spanM = spanIsX ? rect.width : rect.height;
-            float runM = spanIsX ? rect.height : rect.width;
-            int spanH = Mathf.RoundToInt(spanM / H);
-            int run = Mathf.RoundToInt(runM / C);
+            BuildGableRange(spec, set, g, gb, true, true, null);
 
-            if (Mathf.Abs(runM - run * C) > 0.01f)
-                Debug.LogError($"[SyntyGen] {spec.Name}: roof run of {runM:F2} m is not a whole number of " +
-                               "2.5 m bays — a jetty must be applied to BOTH faces of an axis or neither.");
-            if (spanH % 2 != 0)
-                Debug.LogError($"[SyntyGen] {spec.Name}: roof span of {spanM:F2} m is an odd number of " +
-                               "half-modules, so a 45° ridge lands mid-course and cannot be built — a jetty " +
-                               "must be applied to BOTH faces of an axis or neither.");
+            // Chimney. `Chimney_01` is 4.145 m tall with its pivot at the BASE, so it is positioned by where its
+            // TOP should land: emergence is held at a constant ~1.2 m whatever the building's height. Along the
+            // ridge only (the one line where its flat base meets a 45° roof), over the hearth where there is one.
+            if (spec.Chimney)
+            {
+                const float StackHeight = 4.145f, Emerge = 1.2f;
+                float y = gb.RidgeY + Emerge - StackHeight;
+                float runM = gb.RunU * U;
+                float alongLocal = Mathf.Min(C, runM * 0.5f);
+                if (HearthCell(spec, out var hRoom, out var hOut, out int hAlong))
+                {
+                    bool hHoriz = hOut.y != 0;
+                    float hx = hHoriz ? (hAlong + 0.5f) * U : (hOut.x > 0 ? hRoom.X2 : hRoom.X) * U;
+                    float hz = hHoriz ? (hOut.y > 0 ? hRoom.Z2 : hRoom.Z) * U : (hAlong + 0.5f) * U;
+                    alongLocal = gb.SpanIsX ? hz - gb.Plan.yMin : hx - gb.Plan.xMin;
+                    alongLocal = Mathf.Clamp(alongLocal, Mathf.Min(C * 0.5f, runM * 0.5f), Mathf.Max(runM - C * 0.5f, runM * 0.5f));
+                }
+                SyntyKit.Place("SM_Bld_House_Chimney_01", g, new Vector3(gb.RidgeX, y, alongLocal), 0f, "Chimney");
+            }
+        }
 
-            if (spanIsX)
-                g.SetLocalPositionAndRotation(new Vector3(rect.xMin, 0f, rect.yMin), Quaternion.identity);
+        /// <summary>
+        /// One gabled range, measured off its plan rectangle.
+        ///
+        /// ── Which axis it spans ─────────────────────────────────────────────────────────────────────────────
+        ///
+        /// A 45° ridge closes on the kit's 1.25 m courses only over an EVEN number of units, so the gable spans the
+        /// even axis whenever there is one (<see cref="SyntyRoofWing.SpanAlongX"/>); its run along the ridge may be
+        /// odd, and ends on a half bay. When both axes are odd there is no exact symmetric 45° gable: the span is
+        /// rounded UP one unit and centred — 0.625 m of extra eave each side, the eave dropped the same 0.625 m so
+        /// the slope still meets the wall top exactly at the wall line. That is the CENTRED-OVERHANG fallback, and
+        /// it is the only place a roof is not exactly on its footprint.
+        /// </summary>
+        private struct Gable
+        {
+            public Rect Plan;         // the walls' rectangle, metres
+            public bool SpanIsX;
+            public int SpanU;         // units the slopes cover, eave to eave: always even
+            public int RunU;          // units along the ridge
+            public float Overhang;    // 0, or U / 2 on the centred-overhang fallback
+            public float EaveY;       // the slope's eave line (dropped by the overhang)
+            public float WallTopY;    // the top of the walls under it
+            public float RidgeX => SpanU * 0.5f * U;                    // local, from the range's eave line
+            public float RidgeY => EaveY + SpanU * 0.5f * U;
+
+            /// <summary>The rectangle the slopes cover in plan, metres (the walls' plus any overhang).</summary>
+            public Rect Cover => SpanIsX
+                ? Rect.MinMaxRect(Plan.xMin - Overhang, Plan.yMin, Plan.xMax + Overhang, Plan.yMax)
+                : Rect.MinMaxRect(Plan.xMin, Plan.yMin - Overhang, Plan.xMax, Plan.yMax + Overhang);
+        }
+
+        private static Gable GableFor(Rect plan, int storeys, bool plinth)
+        {
+            int wU = Mathf.RoundToInt(plan.width / U), dU = Mathf.RoundToInt(plan.height / U);
+            var gb = new Gable { Plan = plan, SpanIsX = SyntyRoofWing.SpanAlongX(wU, dU) };
+            int span = gb.SpanIsX ? wU : dU;
+            gb.RunU = gb.SpanIsX ? dU : wU;
+            bool odd = (span & 1) != 0;
+            gb.SpanU = odd ? span + 1 : span;
+            gb.Overhang = odd ? U * 0.5f : 0f;
+            gb.WallTopY = SyntyKit.EaveY(storeys, plinth);
+            gb.EaveY = gb.WallTopY - gb.Overhang;
+            return gb;
+        }
+
+        /// <summary>
+        /// Slopes, ridge cap and eave lips bay by bay along the ridge, then the gable ends asked for, in the
+        /// exact grammar Synty's own demo houses use (see <see cref="BuildRoof"/>'s notes): the range is built in a
+        /// local frame with its span along +X and its ridge along +Z, and the group is yawed into place.
+        ///
+        /// Bays are true size: whole 2.5 m bays (`Roof_Tile_01`, `_Half_01` for a 1.25 m course at the ridge,
+        /// `Peak_Cap_01`, `End_01`) and, closing an odd run, ONE 1.25 m bay at the far end (`Roof_Tile_Half_02`,
+        /// `_Half_03`, `Peak_Cap_Half_01`, `End_Half_01`). Measured, the half bay pieces carry exactly the pivot
+        /// law of the whole ones — pivot at the course's upper edge, body along local -Z — with Z ∈ [-1.25, 0]
+        /// instead of [-2.5, 0], so they go in the same places.
+        ///
+        /// `skipBay` (may be null) says which bays another range already roofs, by their [lo, hi) units along the
+        /// ridge; those bays are left out.
+        /// </summary>
+        private static void BuildGableRange(SyntyBuilding spec, SyntyWallSet set, Transform g, Gable gb,
+                                            bool gableLo, bool gableHi, System.Func<int, int, bool> skipBay)
+        {
+            if (gb.SpanIsX)
+                g.SetLocalPositionAndRotation(new Vector3(gb.Plan.xMin - gb.Overhang, 0f, gb.Plan.yMin), Quaternion.identity);
             else
-                g.SetLocalPositionAndRotation(new Vector3(rect.xMin, 0f, rect.yMax), Quaternion.Euler(0f, 90f, 0f));
+                g.SetLocalPositionAndRotation(new Vector3(gb.Plan.xMin, 0f, gb.Plan.yMax + gb.Overhang), Quaternion.Euler(0f, 90f, 0f));
 
             bool thatch = spec.Roof == RoofKind.GableThatch;
-            string slope = thatch ? "SM_Bld_House_Roof_Thatch_01" : "SM_Bld_House_Roof_Tile_01";
-            string slopeHalf = thatch ? "SM_Bld_House_Roof_Thatch_Half_01" : "SM_Bld_House_Roof_Tile_Half_01";
-            string cap = thatch ? "SM_Bld_House_Roof_Thatch_Peak_Cap_01" : "SM_Bld_House_Roof_Tile_Peak_Cap_01";
-            string eave = thatch ? "SM_Bld_House_Roof_Thatch_End_01" : "SM_Bld_House_Roof_Tile_End_01";
-            string rake = thatch ? "SM_Bld_House_Roof_Thatch_Edge_01" : "SM_Bld_House_Roof_Tile_Edge_01";
-            string rakeHalf = thatch ? "SM_Bld_House_Roof_Thatch_Edge_02" : "SM_Bld_House_Roof_Tile_Edge_02";
+            string kind = thatch ? "Thatch" : "Tile";
+            string slope = $"SM_Bld_House_Roof_{kind}_01";
+            string slopeHalf = $"SM_Bld_House_Roof_{kind}_Half_01";        // half course, whole bay
+            string slopeBay = $"SM_Bld_House_Roof_{kind}_Half_02";         // whole course, half bay
+            string slopeQuarter = $"SM_Bld_House_Roof_{kind}_Half_03";     // half course, half bay
+            string cap = $"SM_Bld_House_Roof_{kind}_Peak_Cap_01";
+            string capHalf = $"SM_Bld_House_Roof_{kind}_Peak_Cap_Half_01";
+            string eave = $"SM_Bld_House_Roof_{kind}_End_01";
+            string eaveHalf = $"SM_Bld_House_Roof_{kind}_End_Half_01";
+            string rake = $"SM_Bld_House_Roof_{kind}_Edge_01";
+            string rakeHalf = $"SM_Bld_House_Roof_{kind}_Edge_02";
 
-            float eaveY = SyntyKit.EaveY(spec.Storeys, spec.Plinth);
+            float eaveY = gb.EaveY;
+            int riseU = gb.SpanU / 2;                    // a 45° rise is half the span
+            var courses = SlopeCourses(riseU);           // eave -> ridge, 2 units at a time, 1 closing at the ridge
+            float xr = gb.RidgeX;
+            float ridgeY = gb.RidgeY;
+            float spanW = gb.SpanU * U;
 
-            // Half-modules of rise from eave to ridge. A 45° slope makes the rise half the span, so this is
-            // half the span measured in half-modules — which on an unjettied plan is exactly the cell span,
-            // the coincidence the old whole-cell loop was built on.
-            int riseH = spanH / 2;
-            var courses = SlopeCourses(riseH);          // eave -> ridge, 2 half-modules at a time, 1 closing
-            float xr = riseH * H;                        // ridge line, local
-            float ridgeY = eaveY + riseH * H;
-            float spanW = spanM;
-
-            // ---- slopes, ridge cap, eave lips: one bay per 2.5 m along the run
-            for (int zi = 0; zi < run; zi++)
+            // ---- slopes, ridge cap, eave lips: whole bays, then one half bay closing an odd run
+            int bayIndex = 0;
+            for (int lo = 0; lo < gb.RunU; lo += 2, bayIndex++)
             {
-                float zLo = zi * C, zHi = (zi + 1) * C;
+                int len = Mathf.Min(2, gb.RunU - lo);
+                if (skipBay != null && skipBay(lo, lo + len)) continue;
+                float zLo = lo * U, zHi = (lo + len) * U;
+                bool halfBay = len == 1;
 
                 float wx = 0f, ex = spanW, cy = eaveY;
                 for (int i = 0; i < courses.Count; i++)
                 {
                     int step = courses[i];
-                    wx += step * H; ex -= step * H; cy += step * H;
+                    wx += step * U; ex -= step * U; cy += step * U;
 
-                    // Dormers.
-                    //
-                    // Stood beside Synty's own presets, the generator's first correct output read as clean but
-                    // PLAIN, and the largest single reason was the roof: the demo houses break their slopes with
-                    // dormer windows and the generated ones were unbroken planes. `Roof_Tile_Window_02` has the
-                    // identical footprint to the plain slope panel, so it is a drop-in swap rather than a new
-                    // placement problem — much the cheapest way to buy back silhouette variety.
-                    //
-                    // Only on the LOWEST course, only where that course is a full one (there is no half-course
-                    // dormer in the kit), and only where the roof has at least two courses: a dormer on a
-                    // one-course roof sits on the eave and reads as a mistake.
+                    // Dormers: only on the lowest course, only a whole course of a whole bay (there is no half
+                    // dormer in the kit), and only where the roof has at least two courses.
                     bool dormerHere = spec.Dormers && !thatch && courses.Count >= 2
-                                      && i == 0 && step == 2 && zi % 2 == 1;
-                    string piece = dormerHere ? "SM_Bld_House_Roof_Tile_Window_02" : (step == 2 ? slope : slopeHalf);
+                                      && i == 0 && step == 2 && !halfBay && bayIndex % 2 == 1;
+                    string piece = dormerHere ? "SM_Bld_House_Roof_Tile_Window_02"
+                                 : halfBay ? (step == 2 ? slopeBay : slopeQuarter)
+                                 : (step == 2 ? slope : slopeHalf);
 
                     SyntyKit.Place(piece, g, new Vector3(wx, cy, zHi), 0f, "Roof_W");
                     SyntyKit.Place(piece, g, new Vector3(ex, cy, zLo), 180f, "Roof_E");
                 }
 
-                SyntyKit.Place(cap, g, new Vector3(xr, ridgeY, zHi), 0f, "Ridge");
-                SyntyKit.Place(eave, g, new Vector3(0f, eaveY, zHi), 0f, "Eave_W");
-                SyntyKit.Place(eave, g, new Vector3(spanW, eaveY, zLo), 180f, "Eave_E");
+                SyntyKit.Place(halfBay ? capHalf : cap, g, new Vector3(xr, ridgeY, zHi), 0f, "Ridge");
+                SyntyKit.Place(halfBay ? eaveHalf : eave, g, new Vector3(0f, eaveY, zHi), 0f, "Eave_W");
+                SyntyKit.Place(halfBay ? eaveHalf : eave, g, new Vector3(spanW, eaveY, zLo), 180f, "Eave_E");
             }
 
-            // ---- gable ends
-            foreach (float zLine in new[] { 0f, run * C })
+            // ---- gable ends. On the centred-overhang fallback the gable's lowest course hangs 0.625 m down
+            // the face of the wall below it, so it is stood 3 cm proud of that wall rather than in its plane.
+            float proud = gb.Overhang > 0f ? 0.03f : 0f;
+            for (int end = 0; end < 2; end++)
             {
-                bool far = zLine > 0f;
+                bool far = end == 1;
+                if (far ? !gableHi : !gableLo) continue;
+                float zLine = far ? gb.RunU * U + proud : -proud;
 
                 float y = eaveY;
-                int above = riseH;                       // half-modules of rise above this course's foot
+                int above = riseU;                       // units of rise above this course's foot
                 foreach (int step in courses)
                 {
                     if (step == 2)
                     {
                         // The cut panel's diagonal drops 2.5 over 2.5, so its outer edge sits on the triangle's
-                        // edge at THIS course's foot and its inner edge two half-modules in.
-                        float xL = xr - (above - 2) * H, xR = xr + (above - 2) * H;
+                        // edge at THIS course's foot and its inner edge two units in.
+                        float xL = xr - (above - 2) * U, xR = xr + (above - 2) * U;
                         SyntyKit.Place(set.Cut, g, new Vector3(xL, y, zLine), 0f, "Gable");
                         SyntyKit.Place(set.Cut, g, new Vector3(xR, y, zLine), 180f, "Gable");
 
@@ -4713,7 +5066,7 @@ namespace UOClient.Buildings.Synty
                         SyntyKit.Place(set.Peak, g, new Vector3(xr, y, zLine), 0f, "GablePeak");
                         SyntyKit.Place(set.Peak, g, new Vector3(xr, y, zLine), 180f, "GablePeak");
                     }
-                    y += step * H;
+                    y += step * U;
                     above -= step;
                 }
 
@@ -4722,7 +5075,7 @@ namespace UOClient.Buildings.Synty
                 float rwx = 0f, rex = spanW, ry = eaveY;
                 foreach (int step in courses)
                 {
-                    rwx += step * H; rex -= step * H; ry += step * H;
+                    rwx += step * U; rex -= step * U; ry += step * U;
                     string rp = step == 2 ? rake : rakeHalf;
                     var w = SyntyKit.Place(rp, g, new Vector3(rwx, ry, zLine), 0f, "Rake");
                     var e = SyntyKit.Place(rp, g, new Vector3(rex, ry, zLine), 180f, "Rake");
@@ -4730,39 +5083,10 @@ namespace UOClient.Buildings.Synty
                     if (e != null && far) e.transform.localScale = new Vector3(1f, 1f, -1f);
                 }
             }
-
-            // Chimney. `Chimney_01` is 4.145 m tall with its pivot at the BASE, so it is positioned by where its
-            // TOP should land, not by where the roof is: anything else either floats a four-metre stack over the
-            // ridge (first attempt) or buries it entirely on a three-storey plan. Emergence is held at a constant
-            // ~1.2 m whatever the building's height, which is what keeps a street of mixed heights reading as one
-            // town rather than as a set of unrelated silhouettes.
-            if (spec.Chimney)
-            {
-                const float StackHeight = 4.145f, Emerge = 1.2f;
-                float y = ridgeY + Emerge - StackHeight;
-
-                // Along the ridge, over the hearth where there is one.
-                //
-                // Only along the ridge, never across it: the stack has a flat base and the ridge is the one
-                // line on a 45° roof where a flat base meets the surface, so the across-span coordinate is
-                // not a choice. Matching the along-ridge coordinate is, and it is the difference between a
-                // stack that lines up with the chimney breast in the front elevation and one that stands a
-                // room and a half away from the fire it is supposed to be drawing.
-                float alongLocal = C;
-                if (HearthCell(spec, out var hRoom, out var hOut, out int hAlong))
-                {
-                    bool hHoriz = hOut.y != 0;
-                    float hx = hHoriz ? (hAlong + 0.5f) * C : (hOut.x > 0 ? hRoom.X2 : hRoom.X) * C;
-                    float hz = hHoriz ? (hOut.y > 0 ? hRoom.Z2 : hRoom.Z) * C : (hAlong + 0.5f) * C;
-                    alongLocal = spanIsX ? hz - rect.yMin : hx - rect.xMin;
-                    alongLocal = Mathf.Clamp(alongLocal, C * 0.5f, runM - C * 0.5f);
-                }
-                SyntyKit.Place("SM_Bld_House_Chimney_01", g, new Vector3(xr, y, alongLocal), 0f, "Chimney");
-            }
         }
 
         /// <summary>
-        /// Courses from the eave to the ridge, in half-modules: full 2.5 m courses first, one 1.25 m course
+        /// Courses from the eave to the ridge, in units of rise: full 2.5 m courses first, one 1.25 m course
         /// closing an odd remainder at the ridge. The same greedy-largest-first rule
         /// <see cref="SyntyTileRun.Tile"/> uses on walls, and it asserts the same thing — that the courses sum
         /// to the rise exactly, so a roof can never be built one course short.
@@ -4784,8 +5108,8 @@ namespace UOClient.Buildings.Synty
 
         /// <summary>
         /// UOClient: lowers a gabled roof to <see cref="SyntyBuilding.RoofPitch"/> by scaling each range in
-        /// height about its eave. Every roof piece is placed with a yaw only, so a vertical scale above the
-        /// range keeps each piece in its own plane and simply flattens the slope.
+        /// height about the top of its walls. Every roof piece is placed with a yaw only, so a vertical scale
+        /// keeps each piece in its own plane and simply flattens the slope; nothing is scaled horizontally.
         /// </summary>
         private static void FlattenRoof(SyntyBuilding spec, Transform ext)
         {
@@ -4820,13 +5144,23 @@ namespace UOClient.Buildings.Synty
 
         // ================================================================= the winged roof
 
-        /// <summary>Cells of one range, at index `i` along its LONG axis.</summary>
-        private static IEnumerable<Vector2Int> BayCells(SyntyRoofWing w, int i)
+        /// <summary>The plan rectangle of a range, in metres.</summary>
+        private static Rect WingPlan(SyntyRoofWing w) =>
+            Rect.MinMaxRect(w.Rect.xMin * U, w.Rect.yMin * U, w.Rect.xMax * U, w.Rect.yMax * U);
+
+        /// <summary>
+        /// Units of one range across its whole span, at units [lo, hi) along its ridge (negative or past the
+        /// end for the strips just beyond its gable ends).
+        /// </summary>
+        private static IEnumerable<Vector2Int> BayCells(SyntyRoofWing w, int lo, int hi)
         {
-            if (w.SpanIsX)
-                for (int x = w.Rect.xMin; x < w.Rect.xMax; x++) yield return new Vector2Int(x, w.Rect.yMin + i);
-            else
-                for (int z = w.Rect.yMin; z < w.Rect.yMax; z++) yield return new Vector2Int(w.Rect.xMin + i, z);
+            for (int i = lo; i < hi; i++)
+            {
+                if (w.SpanIsX)
+                    for (int x = w.Rect.xMin; x < w.Rect.xMax; x++) yield return new Vector2Int(x, w.Rect.yMin + i);
+                else
+                    for (int z = w.Rect.yMin; z < w.Rect.yMax; z++) yield return new Vector2Int(w.Rect.xMin + i, z);
+            }
         }
 
         /// <summary>Ranges (other than `self`) that also cover `c`.</summary>
@@ -4837,41 +5171,16 @@ namespace UOClient.Buildings.Synty
             return n;
         }
 
-        /// <summary>Which way the 45° slope descends over cell `c` in range `w` — always across the short axis.</summary>
-        private static Vector2Int DownSlope(SyntyRoofWing w, Vector2Int c)
-        {
-            if (w.SpanIsX) return c.x == w.Rect.xMin ? new Vector2Int(-1, 0) : new Vector2Int(1, 0);
-            return c.y == w.Rect.yMin ? new Vector2Int(0, -1) : new Vector2Int(0, 1);
-        }
-
         /// <summary>
-        /// A gabled roof over a plan made of two or more RANGES — the L and the U.
+        /// A gabled roof over a plan made of two or more RANGES — the L and the U, and the storeys of a stepped
+        /// house, each at its own eave.
         ///
-        /// ── The shape of the method, and why it is not one loop ────────────────────────────────────────────
-        ///
-        /// Each range is roofed by exactly the code <see cref="BuildRoof"/> already uses, in exactly the local
-        /// frame it already uses (ridge along local Z, slopes descending ±X, the whole group yawed into place),
-        /// because that code is the transcription of the pack's own grammar and re-deriving it in world
-        /// coordinates per orientation is how the two historic roof faults happened. What is new is only two
-        /// SUBTRACTIONS and one addition:
-        ///
-        ///  1. A bay whose cells are also covered by another range is **skipped** — both its slope columns, its
-        ///     ridge cap and its eave lips. Two ranges crossing do not each get a roof over the square they
-        ///     share; the square gets a valley.
-        ///  2. A gable end is built only where the cells beyond it are outside the footprint AND the end bay is
-        ///     unshared. The first test is what stops the U-plan's single-storey yard wings from standing a
-        ///     gable wall inside the two-storey street range they butt into — coplanar with that range's own
-        ///     wall, which would z-fight the length of the junction. The second is what stops the L-plan's two
-        ///     ranges from each gabling into the corner square they share.
-        ///  3. The shared squares are then roofed cell by cell with `Roof_Tile_Corner_01`, the valley, oriented
-        ///     by the one thing that decides it: the direction BOTH ranges' slopes agree on, which is the
-        ///     corner of the cell the water runs to.
-        ///
-        /// ── The eave lips over a shared square, which are not a detail ─────────────────────────────────────
-        ///
-        /// A valley cell still has boundary faces, and the ones that are the low edge of either range's slope
-        /// are eaves like any other. They are placed in the same pass as the corner piece rather than left to
-        /// the per-range loop, because the per-range loop has just skipped that bay.
+        /// Each range is roofed by exactly <see cref="BuildGableRange"/>, the code a single gable uses, in its own
+        /// local frame. A gable end is built only where the units beyond it are outside the footprint: that is
+        /// what stops a single-storey wing from standing a gable wall inside the two-storey range it butts into.
+        /// With <see cref="SyntyBuilding.IntersectWings"/> (every UO house), crossing ranges each roof their whole
+        /// rectangle and their slopes cut into each other; without it, a bay shared with another range is left
+        /// to that range.
         /// </summary>
         private static void BuildWingedRoof(SyntyBuilding spec, SyntyWallSet set, Transform parent)
         {
@@ -4879,172 +5188,43 @@ namespace UOClient.Buildings.Synty
             int top = spec.Storeys - 1;
             var foot = Cells(spec.Floor(top));
 
-            bool thatch = spec.Roof == RoofKind.GableThatch;
-            string slope = thatch ? "SM_Bld_House_Roof_Thatch_01" : "SM_Bld_House_Roof_Tile_01";
-            string slopeHalf = thatch ? "SM_Bld_House_Roof_Thatch_Half_01" : "SM_Bld_House_Roof_Tile_Half_01";
-            string cap = thatch ? "SM_Bld_House_Roof_Thatch_Peak_Cap_01" : "SM_Bld_House_Roof_Tile_Peak_Cap_01";
-            string eave = thatch ? "SM_Bld_House_Roof_Thatch_End_01" : "SM_Bld_House_Roof_Tile_End_01";
-            string rake = thatch ? "SM_Bld_House_Roof_Thatch_Edge_01" : "SM_Bld_House_Roof_Tile_Edge_01";
-            string rakeHalf = thatch ? "SM_Bld_House_Roof_Thatch_Edge_02" : "SM_Bld_House_Roof_Tile_Edge_02";
-            string valley = thatch ? "SM_Bld_House_Roof_Thatch_Corner_01" : "SM_Bld_House_Roof_Tile_Corner_01";
-
             for (int wi = 0; wi < spec.RoofWings.Count; wi++)
             {
                 var w = spec.RoofWings[wi];
                 var g = SyntyKit.Group("Roof_Range" + wi, root);
+                var gb = GableFor(WingPlan(w), w.Storeys, spec.Plinth);
+                int run = gb.RunU;
 
-                var rect = Rect.MinMaxRect(w.Rect.xMin * C, w.Rect.yMin * C, w.Rect.xMax * C, w.Rect.yMax * C);
-                bool spanIsX = w.SpanIsX;
-                float spanW = spanIsX ? rect.width : rect.height;
-                int run = w.RunCells;
-
-                if (spanIsX)
-                    g.SetLocalPositionAndRotation(new Vector3(rect.xMin, 0f, rect.yMin), Quaternion.identity);
-                else
-                    g.SetLocalPositionAndRotation(new Vector3(rect.xMin, 0f, rect.yMax), Quaternion.Euler(0f, 90f, 0f));
-
-                float eaveY = SyntyKit.EaveY(w.Storeys, spec.Plinth);
-                int riseH = w.SpanCells;                    // half-modules; a 45° rise is half the span
-                var courses = SlopeCourses(riseH);
-                float xr = riseH * H;
-                float ridgeY = eaveY + riseH * H;
-
-                // Which bays this range actually roofs.
-                var mine = new bool[run];
-                for (int i = 0; i < run; i++)
+                bool FreeBeyond(int lo, int hi)
                 {
-                    mine[i] = true;
-                    if (spec.IntersectWings) continue; // UOClient: crossing ranges both roof their shared bays
-                    foreach (var c in BayCells(w, i)) if (WingsOver(spec, c, w) > 0) { mine[i] = false; break; }
+                    foreach (var c in BayCells(w, lo, hi)) if (foot.Contains(c)) return false;
+                    return true;
                 }
 
-                for (int zi = 0; zi < run; zi++)
-                {
-                    if (!mine[zi]) continue;
-                    float zLo = zi * C, zHi = (zi + 1) * C;
-
-                    float wx = 0f, ex = spanW, cy = eaveY;
-                    foreach (int step in courses)
+                System.Func<int, int, bool> skip = null;
+                if (!spec.IntersectWings)
+                    skip = (lo, hi) =>
                     {
-                        wx += step * H; ex -= step * H; cy += step * H;
-                        string piece = step == 2 ? slope : slopeHalf;
-                        SyntyKit.Place(piece, g, new Vector3(wx, cy, zHi), 0f, "Roof_W");
-                        SyntyKit.Place(piece, g, new Vector3(ex, cy, zLo), 180f, "Roof_E");
-                    }
+                        foreach (var c in BayCells(w, lo, hi)) if (WingsOver(spec, c, w) > 0) return true;
+                        return false;
+                    };
 
-                    SyntyKit.Place(cap, g, new Vector3(xr, ridgeY, zHi), 0f, "Ridge");
-                    SyntyKit.Place(eave, g, new Vector3(0f, eaveY, zHi), 0f, "Eave_W");
-                    SyntyKit.Place(eave, g, new Vector3(spanW, eaveY, zLo), 180f, "Eave_E");
-                }
-
-                // ---- gable ends
-                for (int end = 0; end < 2; end++)
-                {
-                    bool far = end == 1;
-
-                    // One test, and it is about the PLAN rather than about the other ranges: a gable closes an
-                    // end of the roof, and an end needs closing exactly where the building stops.
-                    //
-                    // An earlier pass also skipped ends whose bay was shared with another range, on the theory
-                    // that the valley square roofed them. It does not, and the capture said so: over the L's
-                    // corner square the two ranges' tents combine to a little peak, so the south and west
-                    // elevations there rise 2.5 m above the eave in a triangle — two open triangles at the
-                    // outer corner, straight into the roof void. Both ranges genuinely end at that corner and
-                    // both genuinely gable, and their two gables meet at the corner post. The surface at each
-                    // of those planes is exactly the triangle's own edge, which is why they close.
-                    bool free = true;
-                    foreach (var c in BayCells(w, far ? run : -1)) if (foot.Contains(c)) { free = false; break; }
-                    if (!free) continue;
-
-                    float zLine = far ? run * C : 0f;
-
-                    float y = eaveY;
-                    int above = riseH;
-                    foreach (int step in courses)
-                    {
-                        if (step == 2)
-                        {
-                            float xL = xr - (above - 2) * H, xR = xr + (above - 2) * H;
-                            SyntyKit.Place(set.Cut, g, new Vector3(xL, y, zLine), 0f, "Gable");
-                            SyntyKit.Place(set.Cut, g, new Vector3(xR, y, zLine), 180f, "Gable");
-                            if (above > 2)
-                                PlaceRun(g, new Vector3(xR, y, zLine), new Vector2Int(0, 1), (above - 2) * 2, null,
-                                    RunPieces.Course(set.Plain, set.Half), "Gable");
-                        }
-                        else
-                        {
-                            SyntyKit.Place(set.Peak, g, new Vector3(xr, y, zLine), 0f, "GablePeak");
-                            SyntyKit.Place(set.Peak, g, new Vector3(xr, y, zLine), 180f, "GablePeak");
-                        }
-                        y += step * H;
-                        above -= step;
-                    }
-
-                    float rwx = 0f, rex = spanW, ry = eaveY;
-                    foreach (int step in courses)
-                    {
-                        rwx += step * H; rex -= step * H; ry += step * H;
-                        string rp = step == 2 ? rake : rakeHalf;
-                        var a = SyntyKit.Place(rp, g, new Vector3(rwx, ry, zLine), 0f, "Rake");
-                        var b = SyntyKit.Place(rp, g, new Vector3(rex, ry, zLine), 180f, "Rake");
-                        if (a != null && !far) a.transform.localScale = new Vector3(1f, 1f, -1f);
-                        if (b != null && far) b.transform.localScale = new Vector3(1f, 1f, -1f);
-                    }
-                }
+                BuildGableRange(spec, set, g, gb, FreeBeyond(-1, 0), FreeBeyond(run, run + 1), skip);
             }
 
-            // ---- the valleys, in world coordinates because they belong to no single range
-            var gv = SyntyKit.Group("Roof_Valleys", root);
-            if (spec.IntersectWings) return; // UOClient: the slopes cut into each other instead
-            foreach (var c in foot)
-            {
-                var downs = new List<Vector2Int>();
-                float eaveY = 0f;
-                foreach (var w in spec.RoofWings)
-                {
-                    if (!w.Rect.Contains(c)) continue;
-                    downs.Add(DownSlope(w, c));
-                    eaveY = SyntyKit.EaveY(w.Storeys, spec.Plinth);
-                }
-                if (downs.Count < 2) continue;
-                if (downs.Count > 2)
-                {
-                    Debug.LogError($"[SyntyGen] {spec.Name}: cell {c} is under {downs.Count} roof ranges — " +
-                                   "the valley piece joins two, and three meeting is a fold the kit has no piece for.");
-                    continue;
-                }
-
-                // The corner the water runs to: the one both slopes point away from the ridges toward.
-                var low = downs[0] + downs[1];
-                float yaw = low.y > 0 ? (low.x < 0 ? 0f : 90f) : (low.x > 0 ? 180f : 270f);
-                var off = low.y > 0 ? (low.x < 0 ? new Vector2(1f, 1f) : new Vector2(1f, -1f))
-                                    : (low.x > 0 ? new Vector2(-1f, -1f) : new Vector2(-1f, 1f));
-                var centre = new Vector2((c.x + 0.5f) * C, (c.y + 0.5f) * C);
-                var piv = centre + off * H;
-                SyntyKit.Place(valley, gv, new Vector3(piv.x, eaveY + C, piv.y), yaw, "Roof_Valley");
-
-                // Its own eave lips: a valley cell is still on the outside of the building on up to two faces.
-                foreach (var d in downs)
-                {
-                    if (foot.Contains(c + d)) continue;
-                    // Pivot on the eave line, at the end of the bay the piece's body runs back from — the same
-                    // (out, out-turned-a-quarter) pair every run in this generator is placed by.
-                    var lip = centre + new Vector2(d.x, d.y) * H + new Vector2(d.y, -d.x) * H;
-                    SyntyKit.Place(eave, gv, new Vector3(lip.x, eaveY, lip.y),
-                                   SyntyKit.Yaw(new Vector2(d.x, d.y)) + 90f, "Eave_Valley");
-                }
-            }
+            // Kept for FlattenRoof's contract; the unit-grid generator lays no valley pieces (UO houses cross
+            // their ranges instead, see IntersectWings).
+            SyntyKit.Group("Roof_Valleys", root);
+            if (!spec.IntersectWings)
+                Debug.LogWarning($"[SyntyGen] {spec.Name}: valley pieces are not laid on the 1.25 m plan grid; " +
+                                 "shared bays are left to one range.");
 
             BuildWingedChimney(spec, root);
         }
 
         /// <summary>
-        /// The stack, on the ridge of the range the hearth is in.
-        ///
-        /// Same rule <see cref="BuildRoof"/> uses and for the same reason — positioned by where its TOP should
-        /// land so emergence stays constant across heights — but it cannot share that code, because on a
-        /// multi-range plan "the ridge" is a question with more than one answer and the right one is the ridge
-        /// of the range the chimney breast is actually in.
+        /// The stack, on the ridge of the range the hearth is in. Positioned by where its TOP should land so
+        /// emergence stays constant across heights.
         /// </summary>
         private static void BuildWingedChimney(SyntyBuilding spec, Transform root)
         {
@@ -5052,9 +5232,9 @@ namespace UOClient.Buildings.Synty
             if (!HearthCell(spec, out var hRoom, out var hOut, out int hAlong)) return;
 
             bool hHoriz = hOut.y != 0;
-            float hx = hHoriz ? (hAlong + 0.5f) * C : (hOut.x > 0 ? hRoom.X2 : hRoom.X) * C;
-            float hz = hHoriz ? (hOut.y > 0 ? hRoom.Z2 : hRoom.Z) * C : (hAlong + 0.5f) * C;
-            var cell = new Vector2Int(Mathf.FloorToInt(hx / C), Mathf.FloorToInt(hz / C));
+            float hx = hHoriz ? (hAlong + 0.5f) * U : (hOut.x > 0 ? hRoom.X2 : hRoom.X) * U;
+            float hz = hHoriz ? (hOut.y > 0 ? hRoom.Z2 : hRoom.Z) * U : (hAlong + 0.5f) * U;
+            var cell = new Vector2Int(Mathf.FloorToInt(hx / U), Mathf.FloorToInt(hz / U));
             cell.x = Mathf.Clamp(cell.x, hRoom.X, hRoom.X2 - 1);
             cell.y = Mathf.Clamp(cell.y, hRoom.Z, hRoom.Z2 - 1);
 
@@ -5063,14 +5243,13 @@ namespace UOClient.Buildings.Synty
             if (host == null) host = spec.RoofWings[0];
 
             const float StackHeight = 4.145f, Emerge = 1.2f;
-            float ridgeY = SyntyKit.EaveY(host.Storeys, spec.Plinth) + host.SpanCells * H;
-            float y = ridgeY + Emerge - StackHeight;
+            var gb = GableFor(WingPlan(host), host.Storeys, spec.Plinth);
+            float y = gb.RidgeY + Emerge - StackHeight;
 
             // On the ridge across the span, and beside the hearth along the run.
-            float x = host.SpanIsX ? (host.Rect.xMin + host.Rect.width * 0.5f) * C
-                                   : Mathf.Clamp(hx, (host.Rect.xMin + 0.5f) * C, (host.Rect.xMax - 0.5f) * C);
-            float z = host.SpanIsX ? Mathf.Clamp(hz, (host.Rect.yMin + 0.5f) * C, (host.Rect.yMax - 0.5f) * C)
-                                   : (host.Rect.yMin + host.Rect.height * 0.5f) * C;
+            var plan = gb.Plan;
+            float x = gb.SpanIsX ? plan.center.x : Mathf.Clamp(hx, plan.xMin + U, plan.xMax - U);
+            float z = gb.SpanIsX ? Mathf.Clamp(hz, plan.yMin + U, plan.yMax - U) : plan.center.y;
             SyntyKit.Place("SM_Bld_House_Chimney_01", root, new Vector3(x, y, z), 0f, "Chimney");
         }
 
@@ -5078,11 +5257,9 @@ namespace UOClient.Buildings.Synty
         /// The roof SURFACE at a plan point, in metres, or false where there is no roof over it.
         ///
         /// One function, shared with <see cref="SyntyBuildingVerifier"/>'s envelope check rather than
-        /// re-derived there. Every historic fault on this roof was two pieces of code disagreeing about where
-        /// the surface was, and a multi-range roof triples the number of places that could disagree.
-        ///
-        /// The winged case is the **max** of the ranges' own tent functions, which is what the union of two
-        /// gabled ranges is: where they cross, the higher surface wins and the fold between them is the valley.
+        /// re-derived there, and built off the same <see cref="GableFor"/> the roof itself is built off — every
+        /// historic fault on this roof was two pieces of code disagreeing about where the surface was. The
+        /// winged case is the **max** of the ranges' own tent functions. (Unpitched: the 45° surface.)
         /// </summary>
         public static bool RoofSurfaceAt(SyntyBuilding spec, float x, float z, out float y)
         {
@@ -5094,69 +5271,42 @@ namespace UOClient.Buildings.Synty
                 bool any = false;
                 foreach (var w in spec.RoofWings)
                 {
-                    float x0 = w.Rect.xMin * C, x1 = w.Rect.xMax * C;
-                    float z0 = w.Rect.yMin * C, z1 = w.Rect.yMax * C;
-                    // 0.25 m of slack, not 0.05. A wall STRADDLES its grid line by half of its 0.242 m
-                    // thickness and a corner post stands proud of it again, so a range's own eave wall and
-                    // its own posts sit up to 0.15 m outside its own rectangle. At 0.05 a two-storey range's
-                    // wall falls out of its own range and into a neighbouring single-storey one, and the
-                    // check then measures it against a roof 2.5 m too low — measured, exactly that reported a
-                    // corner post as breaking a roof by 2.35 m.
-                    //
-                    // Deliberately NOT wide enough to swallow a projecting bay: `WindowBox_02` reaches
-                    // 1.095 m, so a first-floor bay hung over a single-storey wing's roof still fails, which
-                    // is the fault this check exists to catch.
-                    if (x < x0 - 0.25f || x > x1 + 0.25f || z < z0 - 0.25f || z > z1 + 0.25f) continue;
-
-                    float across = w.SpanIsX ? x - x0 : z - z0;
-                    float span = w.SpanIsX ? x1 - x0 : z1 - z0;
-                    float h = SyntyKit.EaveY(w.Storeys, spec.Plinth)
-                              + Mathf.Min(Mathf.Max(across, 0f), span - Mathf.Min(across, span));
+                    var gb = GableFor(WingPlan(w), w.Storeys, spec.Plinth);
+                    var cover = gb.Cover;
+                    // 0.25 m of slack: a wall STRADDLES its grid line by half of its 0.242 m thickness and a
+                    // corner post stands proud of it again. Not wide enough to swallow a projecting bay.
+                    if (x < cover.xMin - 0.25f || x > cover.xMax + 0.25f || z < cover.yMin - 0.25f || z > cover.yMax + 0.25f) continue;
+                    float h = TentAt(gb, x, z);
                     if (!any || h > y) { y = h; any = true; }
                 }
                 return any;
             }
 
-            var rect = TopRectMetres(spec);
-            bool spanIsX = rect.width <= rect.height;
-            float sw = spanIsX ? rect.width : rect.height;
-            float lo = spanIsX ? rect.xMin : rect.yMin;
-            float aLo = spanIsX ? rect.yMin : rect.xMin;
-            float aHi = spanIsX ? rect.yMax : rect.xMax;
-
-            float along = spanIsX ? z : x;
-            if (along < aLo - 0.05f || along > aHi + 0.05f) return false;
-            float acr = (spanIsX ? x : z) - lo;
-            if (acr < -0.05f || acr > sw + 0.05f) return false;
-
-            y = SyntyKit.EaveY(spec.Storeys, spec.Plinth)
-                + Mathf.Min(Mathf.Max(acr, 0f), sw - Mathf.Min(acr, sw));
+            var g1 = GableFor(TopRectMetres(spec), spec.Storeys, spec.Plinth);
+            var c1 = g1.Cover;
+            if (x < c1.xMin - 0.05f || x > c1.xMax + 0.05f || z < c1.yMin - 0.05f || z > c1.yMax + 0.05f) return false;
+            y = TentAt(g1, x, z);
             return true;
+        }
+
+        /// <summary>The 45° tent of one range at a plan point (clamped to its eaves).</summary>
+        private static float TentAt(Gable gb, float x, float z)
+        {
+            var cover = gb.Cover;
+            float across = gb.SpanIsX ? x - cover.xMin : z - cover.yMin;
+            float span = gb.SpanU * U;
+            across = Mathf.Clamp(across, 0f, span);
+            return gb.EaveY + Mathf.Min(across, span - across);
         }
 
         /// <summary>
         /// A parapeted stone deck over every part of the plan, each part at its OWN height.
         ///
-        /// ── The pieces, all three measured and all three on the house atlas ────────────────────────────────
-        ///
-        /// See <see cref="RoofKind.Flat"/> for the survey that settles this. In short: the house set already
-        /// contains a flat roof, and the Castle set — the obvious place to look, and the only one with an
-        /// explicit parapet vocabulary — is the wrong answer on three counts rather than one. Measured,
-        /// `Castle_Battlements_01` is 5.000 m long on a 5 m module the house kit has no grid for, 0.500 m
-        /// thick against a house wall's 0.242 so it overhangs both faces, and skinned with `Castle_Wall_01`, a
-        /// cream atlas that cannot be swapped to the house grey because the two do not share UVs. The house
-        /// set's own `Wall_Half_Height_01` is right on all three: 2.500 m, 0.242 m, `Mat_01_A`.
-        ///
-        /// ── Per storey, which is the whole reason a civic plan wants this roof ─────────────────────────────
-        ///
-        /// The first version of this roofed the top storey and stopped, which is correct for a box and silently
-        /// wrong for anything else: on a 3-storey centre over 2-storey wings it decked the centre and left both
-        /// wings open to the sky. A flat roof's one advantage over a gable is that it does not have to
-        /// reconcile a stepped massing into one surface — each part caps where it ends. So the loop is over
-        /// STOREYS, and what it caps at storey `s` is the cells present at `s` and absent at `s+1`.
-        ///
-        /// The parapet then follows the boundary of that capped region, minus the faces where the taller block
-        /// stands: a parapet against a wall that carries on upward is a parapet buried in a wall.
+        /// See <see cref="RoofKind.Flat"/> for the survey of the pieces: the house set's `Floor_Stone_01/02/03`
+        /// decks (laid true-size by <see cref="LaySlabs"/>), `Wall_Half_Height_01` parapets closed with
+        /// `Wall_Quarter_01`, all on the house atlas. The loop is over STOREYS: what it caps at storey `s` is the
+        /// units present at `s` and absent at `s+1`, and the parapet follows that region's boundary minus the
+        /// faces where a taller block stands.
         /// </summary>
         private static void BuildFlatRoof(SyntyBuilding spec, Transform parent)
         {
@@ -5174,37 +5324,79 @@ namespace UOClient.Buildings.Synty
                 // The top of THIS storey's wall, not the building's.
                 float y = SyntyKit.EaveY(st + 1, spec.Plinth);
 
-                // `Floor_Stone_01` stands ON its plane (y ∈ [0, 0.046]) with its pivot at the max-X/max-Z
-                // corner — the opposite corner from the boarded slab, which is why this is the far corner and
-                // `BuildFloors` uses the near one. Measured, not assumed; it is the same call that file makes.
-                //
-                // TWO tiles per cell, and the second is the whole point. `SM_Bld_House_Floor_Stone_01` is a
-                // single-sided slab: MEASURED, its mesh carries 283 upward normals and ZERO downward ones, and
-                // the stock `Synty/Generic_Basic` shader is Cull Back (`_Cull` = 2), so from inside the room
-                // below you look straight THROUGH the deck to the sky. So lay a second copy flipped in Y: the
-                // flip presents that same face pointing DOWN — MEASURED by rendering it from below, it draws a
-                // solid stone ceiling — giving the terrace its underside. This is the Polyperfect
-                // `HomeGenerator.BuildFlatRoof` idiom (one upright ceiling tile + one Y-flipped) carried onto
-                // the Synty deck, whose tiles ship the other way up. The Y-flip is the project's established
-                // mirroring idiom (see the window shutters); verified by looking, not by trusting the sign.
-                foreach (var c in capped)
-                {
-                    var at = new Vector3((c.x + 1) * C, y, (c.y + 1) * C);
-                    SyntyKit.Place("SM_Bld_House_Floor_Stone_01", g, at, 0f, "RoofDeck");
-                    var under = SyntyKit.Place("SM_Bld_House_Floor_Stone_01", g, at, 0f, "RoofDeckUnder");
-                    if (under != null) under.transform.localScale = new Vector3(1f, -1f, 1f);
-                }
+                // `Floor_Stone_*` is a single-sided slab (measured: upward normals only, Cull Back), so each slab
+                // is laid twice — once as the deck, once flipped in Y as the ceiling seen from the room below.
+                LaySlabs(capped, g, y, true, "RoofDeck");
+                foreach (var under in LaySlabs(capped, g, y, true, "RoofDeckUnder"))
+                    under.transform.localScale = new Vector3(1f, -1f, 1f);
 
                 var faces = new List<(Vector2Int, Vector2Int)>();
-                foreach (var c in capped)
+                foreach (var c in Sorted(capped))
                     foreach (var d in Dirs)
                         if (!capped.Contains(c + d) && !above.Contains(c + d)) faces.Add((c, d));
 
                 foreach (var run in MergeRuns(faces, spec.Floor(st)))
-                    PlaceRun(g, RunOrigin(run, y), run.Out, (run.To - run.From) * 2, null,
+                    PlaceRun(g, RunOrigin(run, y), run.Out, run.To - run.From, null,
                         RunPieces.Course("SM_Bld_House_Wall_Half_Height_01", "SM_Bld_House_Wall_Quarter_01"),
                         "Parapet");
+
+                // UOClient: a half-height post (`WoodBeam_05`, 1.26 m, the parapet's own height) at every convex
+                // corner of the parapet, as BuildCornerPosts does for the walls below.
+                foreach (var c in Sorted(capped))
+                    foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
+                    {
+                        var a = new Vector2Int(c.x + dx, c.y);
+                        var b = new Vector2Int(c.x, c.y + dz);
+                        if (capped.Contains(a) || capped.Contains(b) || above.Contains(a) || above.Contains(b)) continue;
+                        float x = (dx > 0 ? c.x + 1 : c.x) * U;
+                        float z = (dz > 0 ? c.y + 1 : c.y) * U;
+                        SyntyKit.Place("SM_Bld_House_WoodBeam_05", g, new Vector3(x, y, z), 0f, "ParapetPost");
+                    }
             }
+        }
+
+        // ================================================================= UOClient: a plinth on its own
+
+        /// <summary>
+        /// UOClient: just the base of a building — the visible stone plinth, its buried skirt, foundation courses
+        /// below it, base corner blocks at convex corners, and a deck of floor slabs on top — for a set of UO TILES
+        /// (one 1.25 m plan unit each). Player-designed (custom) houses stand on it, so they share the generated
+        /// houses' base and the ground under them is covered whatever its slope. The same runs, pivot and piece laws
+        /// as <see cref="BuildBase"/>: whole 2.5 m courses and a half closing an odd run. Tile (x, z) covers
+        /// [x, x + 1] x [z, z + 1] units of local space, +Z north.
+        /// </summary>
+        public static Transform BuildPlinth(HashSet<Vector2Int> tiles, Transform parent, int foundationCourses = 1)
+        {
+            var g = SyntyKit.Group("Plinth", parent);
+            foreach (var run in MergeRuns(BoundaryFaces(tiles), new List<SyntyRoom>()))
+            {
+                int len = run.To - run.From;
+                PlaceRun(g, RunOrigin(run, 0f), run.Out, len, null,
+                    RunPieces.Course("SM_Bld_House_Base_Wall_01", "SM_Bld_House_Base_Wall_Half_01"), "Base");
+                PlaceRun(g, RunOrigin(run, 0f), run.Out, len, null,
+                    RunPieces.Course("SM_Bld_House_Base_Wall_02", "SM_Bld_House_Base_Wall_Half_02"), "Skirt");
+                for (int k = 1; k <= foundationCourses; k++)
+                    PlaceRun(g, RunOrigin(run, -k * SyntyKit.BaseTop), run.Out, len, null,
+                        RunPieces.Course("SM_Bld_House_Base_Wall_01", "SM_Bld_House_Base_Wall_Half_01"), "Foundation");
+            }
+
+            foreach (var c in Sorted(tiles))
+            {
+                foreach (var (dx, dz) in new[] { (-1, -1), (1, -1), (1, 1), (-1, 1) })
+                {
+                    if (tiles.Contains(new Vector2Int(c.x + dx, c.y)) || tiles.Contains(new Vector2Int(c.x, c.y + dz))) continue;
+                    float x = (dx > 0 ? c.x + 1 : c.x) * U;
+                    float z = (dz > 0 ? c.y + 1 : c.y) * U;
+                    SyntyKit.Place("SM_Bld_House_Base_Corner_01", g, new Vector3(x, 0f, z), 0f, "Base_Corner");
+                    SyntyKit.Place("SM_Bld_House_Base_Corner_02", g, new Vector3(x, 0f, z), 0f, "Base_CornerSkirt");
+                    for (int k = 1; k <= foundationCourses; k++)
+                        SyntyKit.Place("SM_Bld_House_Base_Corner_01", g, new Vector3(x, -k * SyntyKit.BaseTop, z), 0f, "Foundation_Corner");
+                }
+            }
+
+            // Deck: true-size slabs, largest first.
+            LaySlabs(tiles, g, SyntyKit.FloorY(0, true), false, "Deck");
+            return g;
         }
     }
 }

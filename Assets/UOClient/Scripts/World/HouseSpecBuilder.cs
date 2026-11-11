@@ -6,9 +6,15 @@ using UOClient.Data;
 namespace UOClient.World
 {
     /// <summary>
-    /// Turns a <see cref="HouseLayout"/> (UO tiles) into a building spec for the Synty generator (2.5 m
-    /// cells, two UO tiles each). The built house's root goes at <see cref="RootPosition"/>; its cell (0, 0)
-    /// is the south-west corner of the footprint, and its +Z is UO north.
+    /// Turns a <see cref="HouseLayout"/> (UO tiles) into a building spec for the Synty generator. Only the footprint
+    /// shape per storey, the tileset and the storey count are used, never UO's individual wall tiles.
+    /// <para>
+    /// The plan is drawn on the generator's 1.25 m unit grid (<see cref="SyntyKit.Unit"/>), ONE UNIT PER UO TILE,
+    /// so the house stands exactly on its UO footprint and is built from true-size pieces: a 3-tile wall is one
+    /// 2.5 m panel and one 1.25 m half. Nothing is stretched or squashed.
+    /// </para>
+    /// The built house's root goes at <see cref="RootPosition"/>; its unit (0, 0) is the south-west tile of the
+    /// footprint, and its +Z is UO north.
     /// </summary>
     public static class HouseSpecBuilder
     {
@@ -19,16 +25,21 @@ namespace UOClient.World
         private const float MinGableFill = 0.8f;
 
         /// <summary>
-        /// Where the 2-tile cell grid sits on the UO tiles: <see cref="West"/> is the tile x of cell 0's west
-        /// edge, <see cref="South"/> the tile y of its south edge (cell rows count northward from there).
+        /// The plan grid over the footprint: one unit per tile. <see cref="West"/> is the tile x of the footprint's
+        /// west edge, <see cref="South"/> the tile y just past its south edge (unit rows count northward from there,
+        /// UO y counting southward).
         /// </summary>
         private struct Grid
         {
             public int West, South;
+            public int CellsX, CellsY;
 
-            public Vector2Int Cell(int x, int y) => new Vector2Int(FloorDiv(x - West, 2), FloorDiv(South - 1 - y, 2));
+            /// <summary>The tile a plan unit stands on.</summary>
+            public (int X, int Y) MiddleTile(int cx, int cy) => (West + cx, South - 1 - cy);
 
-            private static int FloorDiv(int a, int b) => a >= 0 ? a / b : -((-a + b - 1) / b);
+            /// <summary>A point in UO tile coordinates, in the generator's own metres.</summary>
+            public Vector2 Local(float uoX, float uoY) =>
+                new Vector2((uoX - West) * SyntyKit.Unit, (South - uoY) * SyntyKit.Unit);
         }
 
         public static Vector3 RootPosition(HouseLayout layout)
@@ -37,68 +48,15 @@ namespace UOClient.World
             return new Vector3(WorldSpace.X(grid.West), layout.FloorZ * WorldSpace.ZScale, WorldSpace.Z(grid.South));
         }
 
-        /// <summary>
-        /// A UO footprint is rarely an even number of tiles each way, so the grid can sit four ways on it
-        /// (shifted a tile east and/or north). Takes the one whose cells match the tiles best, with the
-        /// fewest rectangles: every rectangle is another wall jog and another roof range.
-        /// </summary>
-        /// <summary>
-        /// The UO tile edges the generated house puts an outer wall on: the cell-grid outline of its ground
-        /// floor (porch excluded, it's open), as (x, y, east) = the east edge of tile (x, y), or its south edge
-        /// when east is false. A UO wall on any other edge has no generated wall standing in for it.
-        /// </summary>
-        public static HashSet<(int X, int Y, bool East)> WalledEdges(HouseLayout layout)
-        {
-            Grid grid = GridFor(layout);
-            HashSet<Vector2Int> cells = Cells(grid, layout.Ground);
-            var edges = new HashSet<(int X, int Y, bool East)>();
-            foreach (Vector2Int c in cells)
-            {
-                int x0 = grid.West + 2 * c.x;              // west tile column of the cell
-                int ySouth = grid.South - 1 - 2 * c.y;     // south tile row
-                int yNorth = ySouth - 1;                   // north tile row
-                for (int i = 0; i < 2; i++)
-                {
-                    if (!cells.Contains(new Vector2Int(c.x - 1, c.y))) edges.Add((x0 - 1, yNorth + i, true));
-                    if (!cells.Contains(new Vector2Int(c.x + 1, c.y))) edges.Add((x0 + 1, yNorth + i, true));
-                    if (!cells.Contains(new Vector2Int(c.x, c.y - 1))) edges.Add((x0 + i, ySouth, false));
-                    if (!cells.Contains(new Vector2Int(c.x, c.y + 1))) edges.Add((x0 + i, yNorth - 1, false));
-                }
-            }
-
-            return edges;
-        }
-
         private static Grid GridFor(HouseLayout layout)
         {
-            Grid best = default;
-            int bestScore = int.MaxValue;
-            for (int oy = 0; oy <= 1; oy++)
+            return new Grid
             {
-                for (int ox = 0; ox <= 1; ox++)
-                {
-                    var grid = new Grid { West = layout.MinX - ox, South = layout.MaxY + 1 + oy };
-                    HashSet<Vector2Int> cells = Cells(grid, layout.Ground);
-                    int mismatch = 0;
-                    foreach ((int x, int y) in layout.Ground)
-                    {
-                        if (!cells.Contains(grid.Cell(x, y)))
-                        {
-                            mismatch++;
-                        }
-                    }
-
-                    mismatch += cells.Count * 4 - (layout.Ground.Count - mismatch);
-                    int score = mismatch + Rectangles(cells).Count * 6;
-                    if (score < bestScore)
-                    {
-                        bestScore = score;
-                        best = grid;
-                    }
-                }
-            }
-
-            return best;
+                West = layout.MinX,
+                South = layout.MaxY + 1,
+                CellsX = layout.MaxX - layout.MinX + 1,
+                CellsY = layout.MaxY - layout.MinY + 1,
+            };
         }
 
         public static SyntyBuilding Build(HouseLayout layout)
@@ -112,7 +70,7 @@ namespace UOClient.World
                 Dormers = false,
                 Chimney = false, // a chimney is authored for a 45° roof; UO's own chimney statics stay
                 IntersectWings = true,
-                NoPartitions = true, // UO's interior walls and doors are drawn from the map
+                NoPartitions = true, // open interiors for now: UO's interior walls are claimed with the rest of the house
                 Look = LookFor(layout.Walls),
                 Roof = layout.ThatchRoof ? RoofKind.GableThatch : RoofKind.GableTile,
             };
@@ -137,15 +95,22 @@ namespace UOClient.World
                     break;
                 }
 
-                List<SyntyRoom> rooms = Rooms(cells, storey);
-                if (storey == 0)
+                // Castle-style buildings (stone, flat roof: banks, keeps, guard towers) stand twice as tall: each UO
+                // storey is built as two, so they tower over the houses the way they read in the 2D client.
+                int repeat = IsCastle(layout) ? 2 : 1;
+                for (int k = 0; k < repeat; k++)
                 {
-                    spec.Rooms = rooms;
-                    AddPorch(layout, grid, cells, spec.Rooms);
-                }
-                else
-                {
-                    spec.Above.Add(rooms);
+                    int built = storey * repeat + k;
+                    List<SyntyRoom> rooms = Rooms(cells, built);
+                    if (built == 0)
+                    {
+                        spec.Rooms = rooms;
+                        AddPorch(layout, grid, cells, spec.Rooms);
+                    }
+                    else
+                    {
+                        spec.Above.Add(rooms);
+                    }
                 }
             }
 
@@ -157,7 +122,7 @@ namespace UOClient.World
             spec.EntryRoom = spec.Rooms[0].Name;
             foreach ((int hx, int hy) in layout.Hangings)
             {
-                spec.BlankPoints.Add(new Vector2((hx + 0.5f - grid.West) * WorldSpace.TileSize, (grid.South - hy - 0.5f) * WorldSpace.TileSize));
+                spec.BlankPoints.Add(grid.Local(hx + 0.5f, hy + 0.5f));
             }
 
             foreach ((Vector2 point, int width) in DoorPoints(grid, layout.Doors))
@@ -166,7 +131,15 @@ namespace UOClient.World
                 spec.EntryWidths.Add(width);
             }
 
-            PlanRoof(spec);
+            if (layout.FlatRoof)
+            {
+                spec.Roof = RoofKind.Flat; // UO's flat roofs are walkable decks behind parapets
+            }
+            else
+            {
+                PlanRoof(spec);
+            }
+
             return spec;
         }
 
@@ -226,23 +199,18 @@ namespace UOClient.World
             }
         }
 
-        /// <summary>A cell is in the plan when at least two of its four tiles are.</summary>
+        /// <summary>The plan's units: one per footprint tile.</summary>
         private static HashSet<Vector2Int> Cells(Grid grid, HashSet<(int X, int Y)> tiles)
         {
-            var count = new Dictionary<Vector2Int, int>();
-            foreach ((int x, int y) in tiles)
-            {
-                Vector2Int cell = grid.Cell(x, y);
-                count.TryGetValue(cell, out int n);
-                count[cell] = n + 1;
-            }
-
             var cells = new HashSet<Vector2Int>();
-            foreach (KeyValuePair<Vector2Int, int> pair in count)
+            for (int cy = 0; cy < grid.CellsY; cy++)
             {
-                if (pair.Value >= 2)
+                for (int cx = 0; cx < grid.CellsX; cx++)
                 {
-                    cells.Add(pair.Key);
+                    if (tiles.Contains(grid.MiddleTile(cx, cy)))
+                    {
+                        cells.Add(new Vector2Int(cx, cy));
+                    }
                 }
             }
 
@@ -258,7 +226,9 @@ namespace UOClient.World
             {
                 RectInt best = default;
                 int bestArea = 0;
-                foreach (Vector2Int start in left)
+                var starts = new List<Vector2Int>(left);
+                starts.Sort((a, b) => a.y != b.y ? a.y.CompareTo(b.y) : a.x.CompareTo(b.x)); // a fixed order: ties are decided by it
+                foreach (Vector2Int start in starts)
                 {
                     // Widest rectangle growing up from each row width starting at this cell.
                     int maxW = 0;
@@ -308,6 +278,9 @@ namespace UOClient.World
 
             return true;
         }
+
+        /// <summary>Stone walls under a flat roof: a castle-style building, built two storeys per UO storey.</summary>
+        public static bool IsCastle(HouseLayout layout) => layout.FlatRoof && layout.Walls == HouseWalls.Masonry;
 
         private static List<SyntyRoom> Rooms(HashSet<Vector2Int> cells, int storey)
         {
@@ -361,6 +334,7 @@ namespace UOClient.World
                 }
             }
 
+            MergeSlivers(ranges);
             if (ranges.Count == 1)
             {
                 spec.RoofPitch = PitchFor(ranges);
@@ -399,16 +373,60 @@ namespace UOClient.World
             spec.RoofPitch = PitchFor(ranges);
         }
 
-        /// <summary>Gentler roofs on wider spans: 45° suits a cottage, not a 10 m hall.</summary>
+        /// <summary>
+        /// A range one unit (1.25 m) wide would carry a 0.6 m toy gable, so it is merged into a neighbour at the
+        /// same eave wherever the two together make a rectangle. One that cannot be merged keeps its own small
+        /// gable across its narrow side (the generator's centred-overhang fallback).
+        /// </summary>
+        private static void MergeSlivers(List<SyntyRoofWing> ranges)
+        {
+            bool merged = true;
+            while (merged)
+            {
+                merged = false;
+                for (int i = 0; i < ranges.Count && !merged; i++)
+                {
+                    RectInt a = ranges[i].Rect;
+                    if (Mathf.Min(a.width, a.height) > 1)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < ranges.Count && !merged; j++)
+                    {
+                        if (i == j || ranges[j].Storeys != ranges[i].Storeys)
+                        {
+                            continue;
+                        }
+
+                        RectInt b = ranges[j].Rect;
+                        bool besideX = a.yMin == b.yMin && a.yMax == b.yMax && (a.xMax == b.xMin || b.xMax == a.xMin);
+                        bool besideZ = a.xMin == b.xMin && a.xMax == b.xMax && (a.yMax == b.yMin || b.yMax == a.yMin);
+                        if (!besideX && !besideZ)
+                        {
+                            continue;
+                        }
+
+                        int x0 = Mathf.Min(a.xMin, b.xMin), z0 = Mathf.Min(a.yMin, b.yMin);
+                        int x1 = Mathf.Max(a.xMax, b.xMax), z1 = Mathf.Max(a.yMax, b.yMax);
+                        ranges[j] = new SyntyRoofWing(x0, z0, x1 - x0, z1 - z0, ranges[j].Storeys);
+                        ranges.RemoveAt(i);
+                        merged = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>Gentler roofs on wider spans: 45° suits a cottage, not a 10 m hall. Spans in units (1.25 m).</summary>
         private static float PitchFor(List<SyntyRoofWing> ranges)
         {
             int span = 0;
             foreach (SyntyRoofWing range in ranges)
             {
-                span = Mathf.Max(span, range.SpanCells);
+                span = Mathf.Max(span, range.SpanUnits);
             }
 
-            return span >= 4 ? 30f : span == 3 ? 35f : 40f;
+            return span >= 8 ? 30f : span >= 6 ? 35f : 40f;
         }
 
         /// <summary>
@@ -423,13 +441,13 @@ namespace UOClient.World
             {
                 foreach (SyntyRoofWing main in ranges)
                 {
-                    if (wing == main || wing.Storeys != main.Storeys || wing.SpanCells > main.SpanCells)
+                    if (wing == main || wing.Storeys != main.Storeys || wing.SpanUnits > main.SpanUnits)
                     {
                         continue;
                     }
 
                     RectInt w = wing.Rect, m = main.Rect;
-                    int reach = Mathf.Max(1, main.SpanCells / 2);
+                    int reach = Mathf.Max(1, main.SpanUnits / 2);   // units, to main's ridge
                     bool square = w.width == w.height;
                     if ((wing.SpanIsX || square) && !main.SpanIsX && w.xMin >= m.xMin && w.xMax <= m.xMax)
                     {
@@ -515,6 +533,7 @@ namespace UOClient.World
                     sum += DoorPoint(grid, member);
                 }
 
+                // Width in units = UO tiles; the generator fits whole kit door modules to it.
                 points.Add((sum / group.Count, group.Count));
             }
 
@@ -545,7 +564,7 @@ namespace UOClient.World
                 default: x = door.X; break;
             }
 
-            return new Vector2((x - grid.West) * WorldSpace.TileSize, (grid.South - y) * WorldSpace.TileSize);
+            return grid.Local(x, y);
         }
     }
 }

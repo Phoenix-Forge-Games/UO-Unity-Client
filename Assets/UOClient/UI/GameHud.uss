@@ -1,0 +1,28 @@
+.hud { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.hidden { display: none; }
+.nameplates { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.nameplate { position: absolute; align-items: center; translate: -50% -100%; }
+.nameplate-name { color: rgb(235, 225, 200); font-size: 14px; -unity-font-style: bold; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9); }
+.nameplate-bubble { color: rgb(255, 255, 255); font-size: 14px; max-width: 320px; white-space: normal; -unity-text-align: middle-center;
+    background-color: rgba(10, 10, 14, 0.75); border-radius: 6px; padding: 4px 8px; margin-bottom: 2px; }
+.chat { position: absolute; left: 16px; bottom: 16px; width: 440px; }
+.chat-log { max-height: 220px; background-color: rgba(10, 10, 14, 0.35); border-radius: 4px; padding: 4px 6px; }
+.chat-line { color: rgb(230, 230, 230); font-size: 13px; white-space: normal; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); }
+.chat-input { margin-top: 4px; }
+.door-prompt { position: absolute; translate: -50% -50%; color: rgb(255, 235, 170); font-size: 15px; -unity-font-style: bold;
+    background-color: rgba(10, 10, 14, 0.7); border-radius: 5px; padding: 3px 9px; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9); }
+.unit-frames { position: absolute; left: 16px; top: 16px; flex-direction: row; }
+.unit-frame { width: 230px; margin-right: 12px; padding: 6px 8px; background-color: rgba(10, 10, 14, 0.7); border-radius: 6px;
+    border-width: 2px; border-color: rgba(0, 0, 0, 0); }
+.unit-frame.in-combat { border-color: rgb(200, 40, 30); }
+.unit-name { color: rgb(235, 225, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 4px; }
+.unit-frame.hostile .unit-name { color: rgb(255, 120, 105); }
+.unit-bar { height: 20px; background-color: rgba(40, 10, 10, 0.9); border-radius: 3px; overflow: hidden; }
+.unit-fill { position: absolute; left: 0; top: 0; bottom: 0; background-color: rgb(40, 170, 60); }
+.unit-value { position: absolute; left: 0; right: 0; top: 0; bottom: 0; -unity-text-align: middle-center; color: white; font-size: 14px;
+    -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9); }
+.float-number { position: absolute; translate: -50% -50%; color: rgb(255, 230, 120); font-size: 20px; -unity-font-style: bold;
+    -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.95); }
+.float-taken { color: rgb(255, 80, 70); }
+.dead-note { position: absolute; top: 18%; left: 50%; translate: -50% 0; padding: 8px 18px; border-radius: 6px;
+    background-color: rgba(20, 24, 36, 0.75); color: rgb(200, 215, 240); font-size: 18px; -unity-font-style: bold; }

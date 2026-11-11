@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.phoenixforgegames.animgen": "file:G:/Git/Personal/PhoenixForgeGames/Unity.AnimGen",
     "com.unity.ai.navigation": "2.0.16",
     "com.unity.cinemachine": "6.6.0",
     "com.unity.collab-proxy": "2.13.6",
@@ -15,6 +16,7 @@
     "com.unity.test-framework": "1.8.0",
     "com.unity.timeline": "6.6.0",
     "com.unity.ugui": "2.6.0",
+    "com.unity.visualeffectgraph": "17.6.0",
     "com.unity.visualscripting": "1.9.12",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",

@@ -68,6 +68,90 @@ namespace UOClient
             return anchored;
         }
 
+        /// <summary>
+        /// Forgets the houses in and around some blocks (a server multi was added, moved or removed there), so the
+        /// next scan finds them afresh. Returns every block that must be rebuilt: those blocks, plus every block a
+        /// forgotten house covered or was anchored in.
+        /// </summary>
+        public HashSet<(int BlockX, int BlockY)> Forget(IEnumerable<(int BlockX, int BlockY)> blocks)
+        {
+            var rebuild = new HashSet<(int, int)>();
+            var stale = new HashSet<HouseLayout>();
+            foreach ((int bx, int by) in blocks)
+            {
+                rebuild.Add((bx, by));
+                for (int y = (by << 3) - RoofReach; y <= (by << 3) + 7 + RoofReach; y++)
+                {
+                    for (int x = (bx << 3) - RoofReach; x <= (bx << 3) + 7 + RoofReach; x++)
+                    {
+                        if (_footprint.TryGetValue((x, y), out HouseLayout house))
+                        {
+                            stale.Add(house);
+                        }
+                    }
+                }
+            }
+
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            void Grow(int x, int y)
+            {
+                minX = Math.Min(minX, x);
+                minY = Math.Min(minY, y);
+                maxX = Math.Max(maxX, x);
+                maxY = Math.Max(maxY, y);
+            }
+
+            foreach ((int bx, int by) in rebuild)
+            {
+                Grow((bx << 3) - RoofReach, (by << 3) - RoofReach);
+                Grow((bx << 3) + 7 + RoofReach, (by << 3) + 7 + RoofReach);
+            }
+
+            foreach (HouseLayout house in stale)
+            {
+                foreach ((int x, int y) in house.Ground)
+                {
+                    Grow(x - RoofReach, y - RoofReach);
+                    Grow(x + RoofReach, y + RoofReach);
+                }
+
+                rebuild.Add((house.Anchor.X >> 3, house.Anchor.Y >> 3));
+            }
+
+            // Clear everything known about the whole area, then mark its blocks unscanned and to be rebuilt.
+            RemoveWhere(_footprint, minX, minY, maxX, maxY);
+            RemoveWhere(_roofZone, minX, minY, maxX, maxY);
+            _visited.RemoveWhere(t => t.X >= minX && t.X <= maxX && t.Y >= minY && t.Y <= maxY);
+            _detector.Forget(minX, minY, maxX, maxY);
+            for (int by = minY >> 3; by <= maxY >> 3; by++)
+            {
+                for (int bx = minX >> 3; bx <= maxX >> 3; bx++)
+                {
+                    _scanned.Remove((bx, by));
+                    rebuild.Add((bx, by));
+                }
+            }
+
+            return rebuild;
+        }
+
+        private static void RemoveWhere(Dictionary<(int X, int Y), HouseLayout> map, int x0, int y0, int x1, int y1)
+        {
+            var stale = new List<(int X, int Y)>();
+            foreach ((int X, int Y) key in map.Keys)
+            {
+                if (key.X >= x0 && key.X <= x1 && key.Y >= y0 && key.Y <= y1)
+                {
+                    stale.Add(key);
+                }
+            }
+
+            foreach ((int X, int Y) key in stale)
+            {
+                map.Remove(key);
+            }
+        }
+
         private void CollectAnchored(int bx, int by, List<HouseLayout> into)
         {
             for (int y = by << 3; y < (by << 3) + 8; y++)
@@ -84,6 +168,7 @@ namespace UOClient
 
         private void Register(HouseLayout house)
         {
+            house.Canonicalize();
             var tiles = new HashSet<(int X, int Y)>(house.Ground);
             tiles.UnionWith(house.Porch);
             foreach ((int x, int y) in tiles)
@@ -168,19 +253,12 @@ namespace UOClient
                     return false;
                 }
 
-                // Above the eaves (gable steps, caps) the generated roof and gables stand in. Below them, a UO
-                // wall is hidden only where the generated house has a wall on the same edge: the house's
-                // footprint is rounded to 2.5 m cells, and a UO wall the rounding moved off the outline (or an
-                // interior wall) must stay visible, or it blocks the player invisibly.
-                if (z >= Top(house) - 2)
-                {
-                    return true;
-                }
-
-                return CoveredByGeneratedWall(house, graphic, x, y);
+                // Footprint only: the generated house stands in for every UO wall, window and door of the house,
+                // outline and interior alike (one tile is one module, so nothing is moved off the outline).
+                return true;
             }
 
-            // Floors, and the stairs and boards of the foundation under them.
+            // Floors, the house's stairs (the generator builds its own), and the boards of the foundation under them.
             if (info.Is(TileFlag.Surface) && (info.Height <= 2 || info.Is(TileFlag.Bridge)) &&
                 (!info.Is(TileFlag.Impassable) || info.Is(TileFlag.Bridge)) && // a bed is furniture, not floor
                 _footprint.TryGetValue((x, y), out HouseLayout floored))
@@ -190,49 +268,6 @@ namespace UOClient
 
             return false;
         }
-
-        private readonly Dictionary<HouseLayout, HashSet<(int X, int Y, bool East)>> _walledEdges =
-            new Dictionary<HouseLayout, HashSet<(int X, int Y, bool East)>>();
-
-        private bool CoveredByGeneratedWall(HouseLayout house, ushort graphic, int x, int y)
-        {
-            if (!_walledEdges.TryGetValue(house, out HashSet<(int X, int Y, bool East)> edges))
-            {
-                edges = World.HouseSpecBuilder.WalledEdges(house);
-                _walledEdges[house] = edges;
-            }
-
-            WallEdges shape = _walls.Get(graphic);
-            bool south = edges.Contains((x, y, false)), east = edges.Contains((x, y, true));
-            if ((shape & WallEdges.Full) != 0 || (shape & WallEdges.Post) != 0)
-            {
-                // A post or a solid block is covered when a generated wall runs past it.
-                return south || east || edges.Contains((x + 1, y, false)) || edges.Contains((x, y + 1, true));
-            }
-
-            bool needSouth = (shape & WallEdges.South) != 0, needEast = (shape & WallEdges.East) != 0;
-            return (needSouth || needEast) && (!needSouth || south) && (!needEast || east);
-        }
-
-        /// <summary>Does this wall stand between tiles of the same house on every edge it occupies?</summary>
-        private bool IsInterior(ushort graphic, int x, int y)
-        {
-            if (!_footprint.TryGetValue((x, y), out HouseLayout house))
-            {
-                return false;
-            }
-
-            WallEdges edges = _walls.Get(graphic);
-            bool south = (edges & WallEdges.South) == 0 || Inside(house, x, y + 1);
-            bool east = (edges & WallEdges.East) == 0 || Inside(house, x + 1, y);
-            bool post = (edges & WallEdges.Post) == 0 ||
-                        (Inside(house, x + 1, y) && Inside(house, x, y + 1) && Inside(house, x + 1, y + 1));
-            bool full = (edges & WallEdges.Full) == 0;
-            return edges != WallEdges.None && south && east && post && full;
-        }
-
-        private bool Inside(HouseLayout house, int x, int y) =>
-            _footprint.TryGetValue((x, y), out HouseLayout other) && other == house;
 
         private static int Top(HouseLayout house) => house.FloorZ + house.Storeys.Count * StoreyZ;
 

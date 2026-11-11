@@ -1,0 +1,470 @@
+{
+ "Source": "ServUO Scripts/Multis/Boats (BaseBoat speeds, the deeds and boats), footprints from the UO multi data",
+ "Speeds": {
+  "FastMs": 250,
+  "NormalMs": 500,
+  "SlowMs": 1000,
+  "Note": "a tile every so many milliseconds: full speed, normal, slow; the ship's window toggles fast and slow"
+ },
+ "Rules": {
+  "BoardReach": 8,
+  "ShoreSearch": 10,
+  "DeckLift": 0.3,
+  "Draft": 0.05,
+  "Note": "a ship is placed with a ghost: wholly on water, with dry land within 6 tiles of its hull (near the coast), its centre within 30 tiles of you; you may board from 8 m and go ashore to dry land within 10 tiles of the hull",
+  "CoastReach": 6,
+  "PlaceReach": 30
+ },
+ "Boats": [
+  {
+   "Deed": "SmallBoatDeed",
+   "Boat": "SmallBoat",
+   "Name": 1041205,
+   "NorthId": 0,
+   "Docked": "SmallDockedBoat",
+   "Width": 5,
+   "Length": 11,
+   "Bow": 5,
+   "Stern": 5,
+   "Bounds": [
+    [
+     -2,
+     -5,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     5,
+     2
+    ],
+    [
+     -2,
+     -5,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     5,
+     2
+    ]
+   ],
+   "HoldDistance": 4,
+   "TillerManDistance": -4,
+   "Classic": true
+  },
+  {
+   "Deed": "SmallDragonBoatDeed",
+   "Boat": "SmallDragonBoat",
+   "Name": 1041206,
+   "NorthId": 4,
+   "Docked": "SmallDockedDragonBoat",
+   "Width": 5,
+   "Length": 11,
+   "Bow": 5,
+   "Stern": 5,
+   "Bounds": [
+    [
+     -2,
+     -5,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     5,
+     2
+    ],
+    [
+     -2,
+     -5,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     5,
+     2
+    ]
+   ],
+   "HoldDistance": 4,
+   "TillerManDistance": -4,
+   "Classic": true
+  },
+  {
+   "Deed": "MediumBoatDeed",
+   "Boat": "MediumBoat",
+   "Name": 1041207,
+   "NorthId": 8,
+   "Docked": "MediumDockedBoat",
+   "Width": 5,
+   "Length": 12,
+   "Bow": 5,
+   "Stern": 6,
+   "Bounds": [
+    [
+     -2,
+     -5,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     5,
+     2
+    ],
+    [
+     -2,
+     -6,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     6,
+     2
+    ]
+   ],
+   "HoldDistance": 4,
+   "TillerManDistance": -5,
+   "Classic": true
+  },
+  {
+   "Deed": "MediumDragonBoatDeed",
+   "Boat": "MediumDragonBoat",
+   "Name": 1041208,
+   "NorthId": 12,
+   "Docked": "MediumDockedDragonBoat",
+   "Width": 5,
+   "Length": 12,
+   "Bow": 5,
+   "Stern": 6,
+   "Bounds": [
+    [
+     -2,
+     -5,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     5,
+     2
+    ],
+    [
+     -2,
+     -6,
+     2,
+     5
+    ],
+    [
+     -5,
+     -2,
+     6,
+     2
+    ]
+   ],
+   "HoldDistance": 4,
+   "TillerManDistance": -5,
+   "Classic": true
+  },
+  {
+   "Deed": "LargeBoatDeed",
+   "Boat": "LargeBoat",
+   "Name": 1041209,
+   "NorthId": 16,
+   "Docked": "LargeDockedBoat",
+   "Width": 5,
+   "Length": 13,
+   "Bow": 6,
+   "Stern": 6,
+   "Bounds": [
+    [
+     -2,
+     -6,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     6,
+     2
+    ],
+    [
+     -2,
+     -6,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     6,
+     2
+    ]
+   ],
+   "HoldDistance": 5,
+   "TillerManDistance": -5,
+   "Classic": true
+  },
+  {
+   "Deed": "LargeDragonBoatDeed",
+   "Boat": "LargeDragonBoat",
+   "Name": 1041210,
+   "NorthId": 20,
+   "Docked": "LargeDockedDragonBoat",
+   "Width": 5,
+   "Length": 13,
+   "Bow": 6,
+   "Stern": 6,
+   "Bounds": [
+    [
+     -2,
+     -6,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     6,
+     2
+    ],
+    [
+     -2,
+     -6,
+     2,
+     6
+    ],
+    [
+     -6,
+     -2,
+     6,
+     2
+    ]
+   ],
+   "HoldDistance": 5,
+   "TillerManDistance": -5,
+   "Classic": true
+  },
+  {
+   "Deed": "RowBoatDeed",
+   "Boat": "RowBoat",
+   "Name": 1116491,
+   "NorthId": 60,
+   "Docked": "DockedRowBoat",
+   "Width": 3,
+   "Length": 8,
+   "Bow": 3,
+   "Stern": 4,
+   "Bounds": [
+    [
+     -1,
+     -3,
+     1,
+     4
+    ],
+    [
+     -4,
+     -1,
+     3,
+     1
+    ],
+    [
+     -1,
+     -4,
+     1,
+     3
+    ],
+    [
+     -3,
+     -1,
+     4,
+     1
+    ]
+   ],
+   "HoldDistance": -1,
+   "TillerManDistance": -4,
+   "Classic": true
+  },
+  {
+   "Deed": "OrcishGalleonDeed",
+   "Boat": "OrcishGalleon",
+   "Name": 1116738,
+   "NorthId": 24,
+   "Docked": "DockedOrcishGalleon",
+   "Width": 17,
+   "Length": 22,
+   "Bow": 9,
+   "Stern": 12,
+   "Bounds": [
+    [
+     -8,
+     -9,
+     8,
+     12
+    ],
+    [
+     -12,
+     -8,
+     9,
+     8
+    ],
+    [
+     -8,
+     -12,
+     8,
+     9
+    ],
+    [
+     -9,
+     -8,
+     12,
+     8
+    ]
+   ],
+   "HoldDistance": 9,
+   "TillerManDistance": 6,
+   "Classic": false
+  },
+  {
+   "Deed": "GargishGalleonDeed",
+   "Boat": "GargishGalleon",
+   "Name": 1116739,
+   "NorthId": 36,
+   "Docked": "DockedGargishGalleon",
+   "Width": 8,
+   "Length": 24,
+   "Bow": 14,
+   "Stern": 9,
+   "Bounds": [
+    [
+     -4,
+     -14,
+     3,
+     9
+    ],
+    [
+     -9,
+     -4,
+     14,
+     3
+    ],
+    [
+     -3,
+     -9,
+     4,
+     14
+    ],
+    [
+     -14,
+     -3,
+     9,
+     4
+    ]
+   ],
+   "HoldDistance": 6,
+   "TillerManDistance": 1,
+   "Classic": false
+  },
+  {
+   "Deed": "TokunoGalleonDeed",
+   "Boat": "TokunoGalleon",
+   "Name": 1116740,
+   "NorthId": 48,
+   "Docked": "DockedTokunoGalleon",
+   "Width": 7,
+   "Length": 22,
+   "Bow": 10,
+   "Stern": 11,
+   "Bounds": [
+    [
+     -3,
+     -10,
+     3,
+     11
+    ],
+    [
+     -11,
+     -3,
+     10,
+     3
+    ],
+    [
+     -3,
+     -11,
+     3,
+     10
+    ],
+    [
+     -10,
+     -3,
+     11,
+     3
+    ]
+   ],
+   "HoldDistance": -5,
+   "TillerManDistance": -1,
+   "Classic": false
+  },
+  {
+   "Deed": "BritannianShipDeed",
+   "Boat": "BritannianShip",
+   "Name": 1150017,
+   "NorthId": 64,
+   "Docked": "DockedBritannianShip",
+   "Width": 11,
+   "Length": 36,
+   "Bow": 17,
+   "Stern": 18,
+   "Bounds": [
+    [
+     -5,
+     -17,
+     5,
+     18
+    ],
+    [
+     -18,
+     -5,
+     17,
+     5
+    ],
+    [
+     -5,
+     -18,
+     5,
+     17
+    ],
+    [
+     -17,
+     -5,
+     18,
+     5
+    ]
+   ],
+   "HoldDistance": 9,
+   "TillerManDistance": 7,
+   "Classic": false
+  }
+ ],
+ "Sailing": {
+  "Accel": 2.0,
+  "Brake": 3.0,
+  "ReverseShare": 0.35,
+  "TurnScale": 400,
+  "TurnMin": 10,
+  "TurnMax": 45,
+  "StillTurnShare": 0.3,
+  "Note": "the helmsman steers with the movement keys: forward speeds up (Accel m/s a second) to full speed (a tile every FastMs), back slows and goes astern at 35%; left and right turn TurnScale / length degrees a second (10-45), 30% of that when still. A basic first version: sails and wind later (Valheim-style sailing is a TODO)"
+ }
+}

@@ -1,0 +1,1000 @@
+{
+ "Source": "ServUO Config/Housing.cfg, Multis/HousePlacement.cs, Multis/HousePlacementTool.cs (one-time migration; this file is canonical now)",
+ "Rules": {
+  "AccountLimit": 1,
+  "YardSize": 5,
+  "PlotGap": 1,
+  "MaxRise": 1.25,
+  "ClaimReach": 8,
+  "Storeys": 3,
+  "RoofLevels": 2,
+  "StoreyHeight": 2.5,
+  "BuildReach": 40.0,
+  "DecayDays": 30,
+  "RefundShare": 1.0,
+  "ClearTrees": true,
+  "Text": {
+   "PlotGap": "Tiles of free land kept between two plots.",
+   "MaxRise": "Most the ground may rise across a plot (metres); the house stands on its highest point and foundations cover the rest.",
+   "ClaimReach": "A plot is claimed in front of you: its nearest tile within this many tiles.",
+   "Storeys": "Storeys a house may have (walls, doors, windows, stairs); floors and railings also go on the level above (a roof terrace).",
+   "RoofLevels": "Levels above the top storey that roof pieces may use (a steep roof over a wide house).",
+   "BuildReach": "Metres from a piece the builder may stand while placing or removing it.",
+   "DecayDays": "A house nobody who may build in it has visited for this many days falls down (design: upkeep by visiting).",
+   "RefundShare": "Share of a piece's materials given back when it's removed.",
+   "AccountLimit": "Plots per account (ServUO's AccountHouseLimit).",
+   "YardSize": "ServUO's clear yard in front of and behind classic houses; plots don't use it (they are their own yard).",
+   "SpawnClearance": "Tiles around a plot (and the plot itself) where no creature spawns or wanders in on its own; they may still chase someone there."
+  },
+  "SpawnClearance": 8
+ },
+ "Layers": {
+  "Road": {
+   "Land": [
+    [
+     113,
+     120
+    ],
+    [
+     232,
+     235
+    ],
+    [
+     1966,
+     1969
+    ],
+    [
+     16372,
+     16372
+    ],
+    [
+     16376,
+     16379
+    ],
+    [
+     1090,
+     1145
+    ],
+    [
+     1281,
+     1296
+    ],
+    [
+     9,
+     21
+    ],
+    [
+     336,
+     348
+    ]
+   ],
+   "Note": "HousePlacement.RoadIDs: no plot tile may lie on a road."
+  },
+  "Blocked": {
+   "StaticFlags": [
+    "Impassable"
+   ],
+   "LandFlags": [
+    "Impassable"
+   ],
+   "ExceptLayers": [
+    "Lumberjacking.Logs"
+   ],
+   "Note": "Anything impassable on the map or among the decorations blocks a plot. Trees don't: as on SeriousFun (TreeClearing), they're cleared when the plot is claimed."
+  }
+ },
+ "Plots": [
+  {
+   "Name": "Small",
+   "Size": 12,
+   "Deed": "SmallPlotDeed",
+   "Price": 88000,
+   "Storage": 1380,
+   "Lockdowns": 690,
+   "Vendors": 26,
+   "From": "12x12 2-Story Customizable House"
+  },
+  {
+   "Name": "Medium",
+   "Size": 18,
+   "Deed": "MediumPlotDeed",
+   "Price": 187000,
+   "Storage": 2437,
+   "Lockdowns": 1218,
+   "Vendors": 42,
+   "From": "18x18 3-Story Customizable House"
+  },
+  {
+   "Name": "Large",
+   "Size": 24,
+   "Deed": "LargePlotDeed",
+   "Price": 525000,
+   "Storage": 3019,
+   "Lockdowns": 1509,
+   "Vendors": 78,
+   "From": "23x23 3-Story Customizable Keep"
+  },
+  {
+   "Name": "Keep",
+   "Size": 32,
+   "Deed": "KeepPlotDeed",
+   "Price": 525000,
+   "Storage": 4688,
+   "Lockdowns": 2344,
+   "Vendors": 78,
+   "From": "32x32 3-Story Customizable Castle"
+  }
+ ],
+ "Styles": [
+  {
+   "Name": "Timber",
+   "Material": "PolygonFantasyKingdom_Mat_01_A"
+  },
+  {
+   "Name": "Plaster",
+   "Material": "PolygonFantasyKingdom_Mat_01_C"
+  },
+  {
+   "Name": "Stone",
+   "Material": "PolygonFantasyKingdom_Mat_02_B"
+  },
+  {
+   "Name": "Rich",
+   "Material": "PolygonFantasyKingdom_Mat_02_C"
+  },
+  {
+   "Name": "Rustic",
+   "Material": "PolygonFantasyKingdom_Mat_04_A"
+  }
+ ],
+ "RoofStyles": [
+  {
+   "Name": "Clay",
+   "Material": "PolygonFantasyKingdom_Mat_01_A"
+  },
+  {
+   "Name": "Slate",
+   "Material": "PolygonFantasyKingdom_Mat_04_B"
+  },
+  {
+   "Name": "Moss",
+   "Material": "PolygonFantasyKingdom_Mat_02_B"
+  }
+ ],
+ "Pieces": [
+  {
+   "Id": "found_stone",
+   "Name": "Stone foundation",
+   "Category": "Foundation",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Base",
+   "Levels": "Ground",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Base_Wall_02",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 6
+    },
+    {
+     "Item": "IronIngot",
+     "Amount": 2
+    }
+   ]
+  },
+  {
+   "Id": "floor_wood",
+   "Name": "Wooden floor",
+   "Category": "Floor",
+   "Shape": "Tile",
+   "W": 2,
+   "D": 2,
+   "Slot": "Floor",
+   "Levels": "Building",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Floor_Wood_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 10
+    }
+   ]
+  },
+  {
+   "Id": "floor_stone",
+   "Name": "Stone floor",
+   "Category": "Floor",
+   "Shape": "Tile",
+   "W": 2,
+   "D": 2,
+   "Slot": "Floor",
+   "Levels": "Building",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Floor_Stone_01",
+     "At": [
+      2.5,
+      0,
+      2.5
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 2
+    },
+    {
+     "Item": "IronIngot",
+     "Amount": 6
+    }
+   ]
+  },
+  {
+   "Id": "wall",
+   "Name": "Wall",
+   "Category": "Wall",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 12
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "wall_narrow",
+   "Name": "Narrow wall",
+   "Category": "Wall",
+   "Shape": "Edge",
+   "W": 1,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Half_01",
+     "At": [
+      1.25,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 6
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "wall_low",
+   "Name": "Low wall",
+   "Category": "Wall",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Building",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Half_Height_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 6
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "window",
+   "Name": "Window",
+   "Category": "Window",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Window_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 12
+    },
+    {
+     "Item": "Hinge",
+     "Amount": 2
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "window_box",
+   "Name": "Window with flower box",
+   "Category": "Window",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_WindowBox_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 14
+    },
+    {
+     "Item": "Hinge",
+     "Amount": 2
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "door",
+   "Name": "Door",
+   "Category": "Door",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Door_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 16
+    },
+    {
+     "Item": "Hinge",
+     "Amount": 2
+    },
+    {
+     "Item": "IronIngot",
+     "Amount": 2
+    }
+   ],
+   "Paint": "Wall",
+   "Door": true
+  },
+  {
+   "Id": "door_inner",
+   "Name": "Inner door",
+   "Category": "Door",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Door_02",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 12
+    },
+    {
+     "Item": "Hinge",
+     "Amount": 2
+    }
+   ],
+   "Paint": "Wall",
+   "Door": true
+  },
+  {
+   "Id": "stairs",
+   "Name": "Stairs",
+   "Category": "Stairs",
+   "Shape": "Tile",
+   "W": 2,
+   "D": 2,
+   "Slot": "Volume",
+   "Levels": "Storeys",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Stairs_01",
+     "At": [
+      1.185,
+      0,
+      2.46
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 20
+    }
+   ]
+  },
+  {
+   "Id": "railing",
+   "Name": "Railing",
+   "Category": "Railing",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Building",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Railing_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 90
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 4
+    }
+   ]
+  },
+  {
+   "Id": "roof_tile",
+   "Name": "Tiled roof slope",
+   "Category": "Roof",
+   "Shape": "Tile",
+   "W": 2,
+   "D": 2,
+   "Slot": "Volume",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Roof_Tile_01",
+     "At": [
+      2.5,
+      2.5,
+      2.5
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 12
+    }
+   ],
+   "Paint": "Roof"
+  },
+  {
+   "Id": "roof_thatch",
+   "Name": "Thatched roof slope",
+   "Category": "Roof",
+   "Shape": "Tile",
+   "W": 2,
+   "D": 2,
+   "Slot": "Volume",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Roof_Thatch_01",
+     "At": [
+      2.5,
+      2.5,
+      2.5
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 8
+    }
+   ]
+  },
+  {
+   "Id": "ridge_tile",
+   "Name": "Tiled ridge",
+   "Category": "Roof",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Ridge",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Roof_Tile_Peak_Cap_01",
+     "At": [
+      2.5,
+      2.5,
+      0
+     ],
+     "Yaw": 90
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 3
+    }
+   ],
+   "Paint": "Roof"
+  },
+  {
+   "Id": "ridge_thatch",
+   "Name": "Thatched ridge",
+   "Category": "Roof",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Ridge",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Roof_Thatch_Peak_Cap_01",
+     "At": [
+      2.5,
+      2.5,
+      0
+     ],
+     "Yaw": 90
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 2
+    }
+   ]
+  },
+  {
+   "Id": "gable",
+   "Name": "Gable end",
+   "Category": "Roof",
+   "Shape": "Edge",
+   "W": 4,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      1.25,
+      0,
+      0
+     ],
+     "Yaw": 0
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Quarter_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      2.5,
+      1.25,
+      0
+     ],
+     "Yaw": 0
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Quarter_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 180
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      2.5,
+      1.25,
+      0
+     ],
+     "Yaw": 180
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      3.75,
+      0,
+      0
+     ],
+     "Yaw": 180
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 20
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "gable_half",
+   "Name": "Half gable",
+   "Category": "Roof",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      1.25,
+      0,
+      0
+     ],
+     "Yaw": 0
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Quarter_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    },
+    {
+     "Prefab": "SM_Bld_House_Wall_Peak_01",
+     "At": [
+      2.5,
+      1.25,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 10
+    }
+   ],
+   "Paint": "Wall"
+  },
+  {
+   "Id": "gable_wall",
+   "Name": "Gable wall",
+   "Category": "Roof",
+   "Shape": "Edge",
+   "W": 2,
+   "D": 0,
+   "Slot": "Wall",
+   "Levels": "Roof",
+   "Parts": [
+    {
+     "Prefab": "SM_Bld_House_Wall_01",
+     "At": [
+      2.5,
+      0,
+      0
+     ],
+     "Yaw": 0
+    }
+   ],
+   "Cost": [
+    {
+     "Item": "Board",
+     "Amount": 12
+    }
+   ],
+   "Paint": "Wall"
+  }
+ ],
+ "Blueprints": [
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011303,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 36750,
+   "Multi": 100,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011304,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 36750,
+   "Multi": 102,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011305,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 36500,
+   "Multi": 104,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011306,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 35000,
+   "Multi": 106,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011307,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 36500,
+   "Multi": 108,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallOldHouse",
+   "Cliloc": 1011308,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 36500,
+   "Multi": 110,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallShop",
+   "Cliloc": 1011321,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 50250,
+   "Multi": 160,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallShop",
+   "Cliloc": 1011322,
+   "Storage": 489,
+   "Lockdowns": 244,
+   "Vendors": 10,
+   "Price": 52250,
+   "Multi": 162,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SmallTower",
+   "Cliloc": 1011317,
+   "Storage": 667,
+   "Lockdowns": 333,
+   "Vendors": 14,
+   "Price": 73250,
+   "Multi": 152,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "TwoStoryVilla",
+   "Cliloc": 1011319,
+   "Storage": 1265,
+   "Lockdowns": 632,
+   "Vendors": 24,
+   "Price": 113500,
+   "Multi": 158,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "SandStonePatio",
+   "Cliloc": 1011320,
+   "Storage": 1265,
+   "Lockdowns": 632,
+   "Vendors": 24,
+   "Price": 76250,
+   "Multi": 156,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "LogCabin",
+   "Cliloc": 1011318,
+   "Storage": 1265,
+   "Lockdowns": 632,
+   "Vendors": 24,
+   "Price": 81250,
+   "Multi": 154,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "GuildHouse",
+   "Cliloc": 1011309,
+   "Storage": 1576,
+   "Lockdowns": 788,
+   "Vendors": 28,
+   "Price": 131250,
+   "Multi": 116,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "TwoStoryHouse",
+   "Cliloc": 1011310,
+   "Storage": 1576,
+   "Lockdowns": 788,
+   "Vendors": 28,
+   "Price": 162500,
+   "Multi": 118,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "TwoStoryHouse",
+   "Cliloc": 1011311,
+   "Storage": 1576,
+   "Lockdowns": 788,
+   "Vendors": 28,
+   "Price": 162750,
+   "Multi": 120,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "LargePatioHouse",
+   "Cliloc": 1011315,
+   "Storage": 1576,
+   "Lockdowns": 788,
+   "Vendors": 28,
+   "Price": 129000,
+   "Multi": 140,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "LargeMarbleHouse",
+   "Cliloc": 1011316,
+   "Storage": 1576,
+   "Lockdowns": 788,
+   "Vendors": 28,
+   "Price": 160250,
+   "Multi": 150,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "Tower",
+   "Cliloc": 1011312,
+   "Storage": 2437,
+   "Lockdowns": 1218,
+   "Vendors": 42,
+   "Price": 366250,
+   "Multi": 122,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "Keep",
+   "Cliloc": 1011313,
+   "Storage": 3019,
+   "Lockdowns": 1509,
+   "Vendors": 52,
+   "Price": 562500,
+   "Multi": 124,
+   "Kind": "Classic"
+  },
+  {
+   "Type": "Castle",
+   "Cliloc": 1011314,
+   "Storage": 4688,
+   "Lockdowns": 2344,
+   "Vendors": 78,
+   "Price": 865000,
+   "Multi": 126,
+   "Kind": "Classic"
+  }
+ ],
+ "Notes": [
+  "Stone pieces cost iron for now: granite needs stone mining, which waits for learned mining skills. Switch their Cost to Granite then.",
+  "Plot tiers take their price, storage and lockdowns from ServUO's customisable foundation of the same size (the 24x24 tier from its 23x23 keep). Storage and lockdowns aren't used yet.",
+  "Blueprints are ServUO's classic houses, kept for the planned 'stamp a classic house' feature (BuildingDesign.md)."
+ ],
+ "PiecesText": {
+  "Frame": "A piece is laid out in its own frame: X along its length, Z across, Y up from its level's floor line, metres. A Tile piece covers X 0..W*1.25 and Z 0..D*1.25 (W x D tiles); an Edge piece runs along a tile edge from X 0 to W*1.25 at Z 0. Rotation turns it a quarter at a time about its middle.",
+  "Parts": "Kit prefabs placed in that frame (At: x, y, z; Yaw: degrees). Every part keeps its prefab's own colliders.",
+  "Slot": "What a piece takes up, so two can't overlap: Floor (a tile's floor), Volume (a tile's space: stairs, roof slopes), Wall and Base (an edge; Base is below ground), Ridge (the top of an edge, for ridge caps).",
+  "Levels": "Ground: level 0 only. Storeys: 0 to Storeys-1. Building: 0 to Storeys (floors, low walls and railings make a roof terrace). Roof: 1 to Storeys+RoofLevels-1.",
+  "Paint": "Wall pieces take the house's wall style, Roof pieces its roof style (Styles / RoofStyles: material swaps of the kit's atlas).",
+  "Door": "The part's door leaf opens with E like the world's doors; on a private house only the owner and friends can open it.",
+  "Cost": "Materials taken from the builder's backpack (Crafting's resource equivalents apply: logs pay for boards). Removing a piece gives RefundShare of them back."
+ }
+}

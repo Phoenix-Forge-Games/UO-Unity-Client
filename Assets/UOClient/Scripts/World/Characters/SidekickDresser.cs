@@ -74,8 +74,13 @@ namespace UOClient
         private readonly RuntimeAnimatorController _controller;
         private readonly Transform _rigSource;
         private readonly Avatar _avatar;
-        private readonly Dictionary<int, GameObject> _body = new Dictionary<int, GameObject>();
-        private readonly Dictionary<int, List<GameObject>> _faces = new Dictionary<int, List<GameObject>>();
+        private readonly Dictionary<int, GameObject> _humanBody = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, List<GameObject>> _humanFaces = new Dictionary<int, List<GameObject>>();
+        private readonly Dictionary<int, GameObject> _elfBody = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, List<GameObject>> _elfFaces = new Dictionary<int, List<GameObject>>();
+        private Dictionary<int, GameObject> _body;
+        private Dictionary<int, List<GameObject>> _faces;
+        private bool _elf;
         private readonly Dictionary<GameObject, SkinnedMeshRenderer> _renderers = new Dictionary<GameObject, SkinnedMeshRenderer>();
         private readonly Dictionary<GameObject, int> _types = new Dictionary<GameObject, int>();
 
@@ -95,15 +100,27 @@ namespace UOClient
 
             _avatar = wardrobe.BaseModel.GetComponentInChildren<Animator>(true)?.avatar;
 
-            foreach (GameObject part in wardrobe.Body)
+            Index(wardrobe.Body, _humanBody, null);
+            Index(wardrobe.Faces, null, _humanFaces);
+            Index(wardrobe.ElfBody, _elfBody, null);
+            Index(wardrobe.ElfFaces, null, _elfFaces);
+            if (_elfBody.Count == 0)
             {
-                if (part != null)
+                foreach (KeyValuePair<int, GameObject> pair in _humanBody)
                 {
-                    _body[TypeOf(part)] = part;
+                    _elfBody[pair.Key] = pair.Value;
                 }
             }
+        }
 
-            foreach (GameObject part in wardrobe.Faces)
+        private static void Index(GameObject[] parts, Dictionary<int, GameObject> single, Dictionary<int, List<GameObject>> many)
+        {
+            if (parts == null)
+            {
+                return;
+            }
+
+            foreach (GameObject part in parts)
             {
                 if (part == null)
                 {
@@ -111,14 +128,23 @@ namespace UOClient
                 }
 
                 int type = TypeOf(part);
-                if (!_faces.TryGetValue(type, out List<GameObject> list))
+                if (single != null)
                 {
-                    _faces[type] = list = new List<GameObject>();
+                    single[type] = part;
+                    continue;
+                }
+
+                if (!many.TryGetValue(type, out List<GameObject> list))
+                {
+                    many[type] = list = new List<GameObject>();
                 }
 
                 list.Add(part);
             }
         }
+
+        /// <summary>Elf bodies (male, female, and their ghosts).</summary>
+        public static bool IsElf(Mobile mobile) => mobile.Body >= 605 && mobile.Body <= 608;
 
         /// <summary>A string that changes whenever the model would: body, skin, and every worn item.</summary>
         public static string Signature(Mobile mobile)
@@ -143,10 +169,15 @@ namespace UOClient
         {
             var parts = new List<GameObject>();
             var regionHues = new ushort[RegionTypes.Length];
+            var regionMetal = new ushort[RegionTypes.Length];
+            var metalRegion = new bool[RegionTypes.Length];
             var dressed = new bool[RegionTypes.Length];
             uint seed = mobile.Serial * 2654435761u;
+            _elf = IsElf(mobile);
+            _body = _elf ? _elfBody : _humanBody;
+            _faces = _elf && _elfFaces.Count > 0 ? _elfFaces : _humanFaces;
 
-            Dress(mobile, parts, regionHues, dressed);
+            Dress(mobile, parts, regionHues, regionMetal, metalRegion, dressed);
 
             // Naked where nothing covers: body parts for torso, arms, hands, hips, legs and feet.
             for (int r = 0; r <= (int)Region.Feet; r++)
@@ -169,12 +200,14 @@ namespace UOClient
             int face = (int)(seed >> 8);
             foreach ((int left, int right) in new[] { (EarL, EarR), (BrowL, BrowR), (Nose, Nose) })
             {
-                GameObject l = Pick(_faces, left, face);
+                // Elves have no brow variants of their own; they borrow the human ones.
+                Dictionary<int, List<GameObject>> faces = _faces.ContainsKey(left) ? _faces : _humanFaces;
+                GameObject l = Pick(faces, left, face);
                 parts.Add(l ?? (_body.TryGetValue(left, out GameObject bl) ? bl : null));
                 if (right != left)
                 {
                     // The matching side from the same head variant.
-                    GameObject r = l != null ? Twin(_faces, l, right) : null;
+                    GameObject r = l != null ? Twin(faces, l, right) : null;
                     parts.Add(r ?? (_body.TryGetValue(right, out GameObject br) ? br : null));
                 }
             }
@@ -197,8 +230,85 @@ namespace UOClient
             }
 
             parts.RemoveAll(p => p == null);
-            Texture2D colours = ColourMap(mobile, regionHues, seed);
-            return Assemble(parts, colours, mobile.IsFemale, parent, $"Sidekick {mobile.Serial:X8}");
+            Texture2D colours = ColourMap(mobile, regionHues, regionMetal, metalRegion, seed);
+            GameObject model = Assemble(parts, colours, mobile.IsFemale, parent, $"Sidekick {mobile.Serial:X8}");
+            Arm(mobile, model);
+            if (IsGargoyle(mobile))
+            {
+                AddWings(model);
+            }
+
+            return model;
+        }
+
+        /// <summary>Gargoyle bodies (male, female): the human build with wings.</summary>
+        public static bool IsGargoyle(Mobile mobile) => mobile.Body == 666 || mobile.Body == 667;
+
+        /// <summary>
+        /// Wings on the back, on the shoulder blades, riding the upper spine. They are skinned to the Sidekick skin cells
+        /// and use the character's own material, so the skin hue tints them. The left is the right one mirrored.
+        /// </summary>
+        private void AddWings(GameObject model)
+        {
+            if (_wardrobe.GargoyleWing == null)
+            {
+                return;
+            }
+
+            Transform spine = null;
+            foreach (Transform t in model.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == "spine_03")
+                {
+                    spine = t;
+                    break;
+                }
+            }
+
+            SkinnedMeshRenderer any = model.GetComponentInChildren<SkinnedMeshRenderer>();
+            if (spine == null || any == null)
+            {
+                return;
+            }
+
+            Material material = any.sharedMaterial;
+            var animators = new List<Animator>();
+            var mounts = new List<(Transform Mount, float Side)>();
+            foreach (float side in new[] { 1f, -1f })
+            {
+                GameObject wing = Object.Instantiate(_wardrobe.GargoyleWing, model.transform, false);
+                wing.name = side > 0 ? "Wing R" : "Wing L";
+                float scale = _wardrobe.GargoyleWingScale;
+                wing.transform.localPosition = new Vector3(-side * 0.12f, 1.30f, -0.09f); // the wing mesh reaches toward -x, so the unmirrored one stands on the left
+                wing.transform.localRotation = Quaternion.identity;
+                wing.transform.localScale = new Vector3(side * scale, scale, scale);
+                wing.transform.SetParent(spine, true); // follows the spine, keeping its place
+                // The root joint of the wing sits on the upper back between the shoulder blades, close to the spine (not out on the arm).
+                Transform root = GargoyleWings.FindRoot(wing.transform);
+                if (root != null)
+                {
+                    Vector3 want = model.transform.TransformPoint(new Vector3(-side * 0.075f, 1.27f, -0.12f));
+                    wing.transform.position += want - root.position;
+                }
+                foreach (SkinnedMeshRenderer r in wing.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                {
+                    r.sharedMaterial = material;
+                    r.localBounds = new Bounds(Vector3.zero, Vector3.one * 3f);
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                }
+
+                Animator animator = wing.GetComponentInChildren<Animator>() ?? wing.AddComponent<Animator>();
+                animator.runtimeAnimatorController = _wardrobe.GargoyleWingController;
+                animator.applyRootMotion = false;
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                animators.Add(animator);
+                mounts.Add((wing.transform, -side)); // the side it is on, which is the side it reaches toward
+            }
+
+            var wings = model.AddComponent<GargoyleWings>();
+            wings.Bind(animators.ToArray());
+            wings.Mount(model.transform, mounts.ToArray());
+            model.AddComponent<GargoyleFlightPose>();
         }
 
         // ------------------------------------------------------------------ equipment → outfits
@@ -207,7 +317,7 @@ namespace UOClient
         /// For each region, the outermost worn item that covers it picks a matching outfit and contributes
         /// that outfit's parts for the region.
         /// </summary>
-        private void Dress(Mobile mobile, List<GameObject> parts, ushort[] regionHues, bool[] dressed)
+        private void Dress(Mobile mobile, List<GameObject> parts, ushort[] regionHues, ushort[] regionMetal, bool[] metalRegion, bool[] dressed)
         {
             var cover = new (Region Region, byte[] Layers)[]
             {
@@ -234,6 +344,20 @@ namespace UOClient
                         continue;
                     }
 
+                    // Over a metal chest piece, a doublet or tunic doesn't hide the breastplate, and over metal leg
+                    // armour a kilt or skirt doesn't hide the leg plates: their colour goes into the armour's cloth
+                    // instead (ClothHue, LegClothHue). A robe still covers everything.
+                    if (layer == MiddleTorso && region == Region.Torso && WearsMetal(mobile, InnerTorso))
+                    {
+                        continue;
+                    }
+
+                    if (layer == OuterLegs && (region == Region.Hips || region == Region.Legs) &&
+                        (WearsMetal(mobile, Pants) || WearsMetal(mobile, InnerLegs)))
+                    {
+                        continue;
+                    }
+
                     SidekickWardrobe.Outfit outfit = OutfitFor(item, layer, region);
                     if (outfit == null)
                     {
@@ -254,7 +378,12 @@ namespace UOClient
                     if (any)
                     {
                         dressed[(int)region] = true;
-                        regionHues[(int)region] = item.Hue;
+                        // A dyed metal piece colours only its metal (see MetalHue), not the cloth and leather that
+                        // come with the outfit part; UO would paint the whole piece.
+                        bool metal = IsMetal(item);
+                        regionHues[(int)region] = metal ? (ushort)0 : item.Hue;
+                        regionMetal[(int)region] = metal ? item.Hue : (ushort)0;
+                        metalRegion[(int)region] = metal;
                         break;
                     }
                 }
@@ -341,6 +470,13 @@ namespace UOClient
                     }
 
                     matches.Add(outfit);
+                }
+
+                // Elves wear elven gear where there is some; humans leave it to elves.
+                List<SidekickWardrobe.Outfit> own = matches.FindAll(o => o.Elven == _elf);
+                if (own.Count > 0 || !_elf)
+                {
+                    matches = own;
                 }
 
                 if (matches.Count > 0)
@@ -433,7 +569,7 @@ namespace UOClient
                 return OutfitKind.Leather;
             }
 
-            if (name.Contains("robe") || name.Contains("shroud"))
+            if (name.Contains("robe") || name.Contains("shroud") || name.Contains("wizard"))
             {
                 return OutfitKind.Robe;
             }
@@ -476,6 +612,163 @@ namespace UOClient
             }
 
             return HeadKind.Hat;
+        }
+
+        // ------------------------------------------------------------------ held items
+
+        // Grips relative to the Sidekick prop bone (prop_r / prop_l, in the palm). Synty weapons are modelled along +Y
+        // with the guard (or head) at the origin and their width on Z. Euler(180, 0, 0) runs that axis along the fist's
+        // channel, out of the thumb side; the quarter turn about it stands the crossguard upright, so the edges, not the
+        // flats, face up and down; the last turn tilts it at the wrist. Checked against close-up renders of the fist.
+        private static readonly Quaternion Channel = Quaternion.Euler(180f, 0f, 0f) * Quaternion.Euler(0f, 90f, 0f);
+        private static readonly Quaternion BladeGrip = Channel * Quaternion.Euler(-20f, 0f, 0f); // resting, point a little down; steeper digs into the ground mid-stride
+        private static readonly Quaternion UprightGrip = Channel; // shafts carried level, pointing forward
+        private static readonly Quaternion ShieldGrip = Quaternion.Euler(41f, 348f, 267f);
+        private static readonly Quaternion BowGrip = Quaternion.Euler(180f, 0f, 0f) * Quaternion.Euler(0f, 270f, 0f); // level, string up to the armpit
+
+        /// <summary>Where along a staff or polearm the hand holds it, as a share of its length: balanced at the middle.</summary>
+        private const float ShaftHold = 0.5f;
+
+        /// <summary>Puts the mobile's weapon, shield or tool (UO layers 1 and 2) in its hands, fists closed on them.</summary>
+        private void Arm(Mobile mobile, GameObject model)
+        {
+            if (_wardrobe.Weapons == null || _wardrobe.Weapons.Length == 0)
+            {
+                return;
+            }
+
+            Transform right = null, left = null;
+            foreach (Transform t in model.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == "prop_r")
+                {
+                    right = t;
+                }
+                else if (t.name == "prop_l")
+                {
+                    left = t;
+                }
+            }
+
+            foreach (byte layer in new byte[] { 0x01, 0x02 })
+            {
+                if (!mobile.Equipment.TryGetValue(layer, out EquippedItem item))
+                {
+                    continue;
+                }
+
+                SidekickWardrobe.Held held = HeldFor(NameOf(item));
+                if (held == null || held.Prefabs == null || held.Prefabs.Length == 0)
+                {
+                    continue;
+                }
+
+                GameObject prefab = held.Prefabs[(int)((item.Graphic * 2654435761u) >> 8) % held.Prefabs.Length];
+                bool leftHand = held.Grip == Grip.Shield || held.Grip == Grip.Bow;
+                Transform hand = leftHand ? left : right;
+                if (prefab == null || hand == null)
+                {
+                    continue;
+                }
+
+                GameObject go = Object.Instantiate(prefab, hand, false);
+                go.name = $"Held 0x{item.Graphic:X4}";
+                Quaternion grip = held.Grip switch
+                {
+                    Grip.Upright => UprightGrip,
+                    Grip.Shield => ShieldGrip,
+                    Grip.Bow => BowGrip,
+                    _ => BladeGrip,
+                } * Quaternion.Euler(held.Turn);
+                go.transform.localRotation = grip;
+
+                // Where along the item the fist closes: blades by the wardrobe's offset (the handle wrap sits just
+                // below the guard), staffs and polearms at their balance point.
+                Vector3 along = held.Offset;
+                if (held.Grip == Grip.Upright)
+                {
+                    (float low, float high) = Span(prefab);
+                    along.y -= low + (high - low) * ShaftHold;
+                }
+
+                go.transform.localPosition = grip * along;
+                foreach (Collider c in go.GetComponentsInChildren<Collider>(true))
+                {
+                    if (Application.isPlaying)
+                    {
+                        Object.Destroy(c);
+                    }
+                    else
+                    {
+                        Object.DestroyImmediate(c);
+                    }
+                }
+
+                if (held.Grip != Grip.Shield)
+                {
+                    HandCurl.Close(model, leftHand ? "_l" : "_r");
+                }
+            }
+        }
+
+        private readonly Dictionary<GameObject, (float, float)> _spans = new Dictionary<GameObject, (float, float)>();
+
+        /// <summary>The lowest and highest point of an item along its length (local Y).</summary>
+        private (float Low, float High) Span(GameObject prefab)
+        {
+            if (!_spans.TryGetValue(prefab, out (float, float) span))
+            {
+                float low = 0f, high = 0f;
+                foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    if (filter.sharedMesh == null)
+                    {
+                        continue;
+                    }
+
+                    Bounds b = filter.sharedMesh.bounds;
+                    Matrix4x4 m = Matrix4x4.TRS(filter.transform.localPosition, filter.transform.localRotation, filter.transform.localScale);
+                    foreach (Vector3 corner in new[] { b.min, b.max })
+                    {
+                        float y = m.MultiplyPoint3x4(corner).y;
+                        low = Mathf.Min(low, y);
+                        high = Mathf.Max(high, y);
+                    }
+                }
+
+                _spans[prefab] = span = (low, high);
+            }
+
+            return span;
+        }
+
+        private SidekickWardrobe.Held HeldFor(string name)
+        {
+            foreach (SidekickWardrobe.Held held in _wardrobe.Weapons)
+            {
+                if (string.IsNullOrEmpty(held.Names) || !AnyWord(name, held.Names) ||
+                    (!string.IsNullOrEmpty(held.Exclude) && AnyWord(name, held.Exclude)))
+                {
+                    continue;
+                }
+
+                return held;
+            }
+
+            return null;
+        }
+
+        private static bool AnyWord(string name, string words)
+        {
+            foreach (string word in words.Split('|'))
+            {
+                if (word.Length > 0 && name.Contains(word))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // ------------------------------------------------------------------ parts
@@ -570,7 +863,7 @@ namespace UOClient
         /// A copy of one of the ready-made palettes with the skin, hair and dyed regions replaced by UO hues.
         /// A hue keeps each cell's brightness, the way UO maps grey art onto a hue's ramp.
         /// </summary>
-        private Texture2D ColourMap(Mobile mobile, ushort[] regionHues, uint seed)
+        private Texture2D ColourMap(Mobile mobile, ushort[] regionHues, ushort[] regionMetal, bool[] metalRegion, uint seed)
         {
             Texture2D scheme = _wardrobe.Schemes != null && _wardrobe.Schemes.Length > 0
                 ? _wardrobe.Schemes[(int)(seed >> 16) % _wardrobe.Schemes.Length]
@@ -617,10 +910,83 @@ namespace UOClient
                         }
                     }
                 }
+
+                // Under a metal piece, each colour of its outfit parts is either plate or cloth. Plate: near-grey
+                // colours (dark plating, the tabard's dark side panels); it takes the ore when the piece is dyed.
+                // Cloth (the tabard's red, sashes, sleeves, the trousers behind the shin guards) takes the dye of the
+                // cloth worn with the armour: a doublet, tunic or shirt for the upper body, a kilt, skirt or pants for
+                // the lower (else the chest's); otherwise it keeps its own colour.
+                ushort upperCloth = ClothHue(mobile);
+                ushort lowerCloth = LegClothHue(mobile);
+                if (lowerCloth == 0)
+                {
+                    lowerCloth = upperCloth; // no kilt or skirt: the legs' cloth follows the chest's
+                }
+                for (int r = 0; r < regionMetal.Length; r++)
+                {
+                    if (!metalRegion[r])
+                    {
+                        continue;
+                    }
+
+                    bool lower = r == (int)Region.Hips || r == (int)Region.Legs || r == (int)Region.Knees;
+                    ushort cloth = lower ? lowerCloth : upperCloth;
+                    (int u0, int v0) = RegionCells[r];
+                    for (int column = 0; column < RegionColumns[r]; column++)
+                    {
+                        for (int slot = 0; slot < 5; slot++)
+                        {
+                            int u = u0 + column, v = v0 - slot;
+                            if (IsGrey(map, u, v))
+                            {
+                                if ((regionMetal[r] & 0x3FFF) != 0)
+                                {
+                                    Rehue(map, u, v, regionMetal[r], 16, 14);
+                                }
+                            }
+                            else if (cloth != 0)
+                            {
+                                Rehue(map, u, v, cloth);
+                            }
+                        }
+                    }
+                }
+
+                // Coloured ore armour (dull copper ... valorite) tints the metal itself. The four metal cells are
+                // shared by the whole figure, so the most prominent hued metal piece decides.
+                ushort metal = MetalHue(mobile);
+                if (metal != 0)
+                {
+                    foreach ((int u, int v) in MetalCells)
+                    {
+                        Rehue(map, u, v, metal, 16, 14); // armour metal is dark; the ore colour lives higher up the ramp
+                    }
+                }
+            }
+
+            if (mobile.IsGhost)
+            {
+                Whiten(map);
             }
 
             map.Apply(false, true);
             return map;
+        }
+
+        /// <summary>
+        /// Ghosts: the same character (hair, beard, robe) in pure white: every colour becomes near-white, keeping a
+        /// little of its brightness so folds and features still read.
+        /// </summary>
+        private static void Whiten(Texture2D map)
+        {
+            Color[] pixels = map.GetPixels();
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                float shade = Mathf.Lerp(0.82f, 1f, pixels[i].grayscale);
+                pixels[i] = new Color(shade, shade, shade * 1.02f, pixels[i].a);
+            }
+
+            map.SetPixels(pixels);
         }
 
         /// <summary>
@@ -659,13 +1025,86 @@ namespace UOClient
             return map;
         }
 
+        // "Metal 01".."Metal 04" in the Sidekick colour grid.
+        private static readonly (int U, int V)[] MetalCells = { (8, 10), (8, 9), (8, 8), (8, 7) };
+
+        /// <summary>The hue of the most prominent dyed metal armour piece (chest, arms, legs, helm, gloves), or 0.</summary>
+        private ushort MetalHue(Mobile mobile)
+        {
+            foreach (byte layer in new[] { InnerTorso, Arms, Pants, InnerLegs, Helm, Gloves })
+            {
+                if (!mobile.Equipment.TryGetValue(layer, out EquippedItem item) || (item.Hue & 0x3FFF) == 0)
+                {
+                    continue;
+                }
+
+                if (IsMetal(item))
+                {
+                    return item.Hue;
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// The hue of a dyed cloth chest piece worn with armour (doublet, tunic or surcoat, else a shirt), or 0: the
+        /// armour's own cloth takes it.
+        /// </summary>
+        private ushort ClothHue(Mobile mobile)
+        {
+            foreach (byte layer in new[] { MiddleTorso, Shirt })
+            {
+                if (mobile.Equipment.TryGetValue(layer, out EquippedItem item) && (item.Hue & 0x3FFF) != 0 && !IsMetal(item))
+                {
+                    return item.Hue;
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// The hue of dyed cloth worn on the legs with armour (a kilt or skirt, else pants when the leg armour is on
+        /// the inner layer), or 0: the leg armour's own cloth takes it.
+        /// </summary>
+        private ushort LegClothHue(Mobile mobile)
+        {
+            foreach (byte layer in new[] { OuterLegs, Pants })
+            {
+                if (mobile.Equipment.TryGetValue(layer, out EquippedItem item) && (item.Hue & 0x3FFF) != 0 && !IsMetal(item))
+                {
+                    return item.Hue;
+                }
+            }
+
+            return 0;
+        }
+
+        private bool WearsMetal(Mobile mobile, byte layer) =>
+            mobile.Equipment.TryGetValue(layer, out EquippedItem item) && IsMetal(item);
+
+        /// <summary>Plate, chain and ring armour: its hue goes to the metal only.</summary>
+        private bool IsMetal(EquippedItem item)
+        {
+            OutfitKind kind = KindOf(NameOf(item));
+            return kind == OutfitKind.Plate || kind == OutfitKind.Chain || kind == OutfitKind.Ring;
+        }
+
+        /// <summary>A colour-grid cell with almost no colour of its own: steel greys and dark plating, not cloth.</summary>
+        private static bool IsGrey(Texture2D map, int u, int v)
+        {
+            Color.RGBToHSV(map.GetPixel(u * 2, v * 2), out float _, out float saturation, out float _);
+            return saturation <= 0.10f;
+        }
+
         /// <summary>Recolours one 2×2 cell of the grid with a hue, keeping its brightness.</summary>
-        private void Rehue(Texture2D map, int u, int v, ushort hue)
+        private void Rehue(Texture2D map, int u, int v, ushort hue, int lowest = 8, int range = 22)
         {
             Color current = map.GetPixel(u * 2, v * 2);
             float lum = current.r * 0.3f + current.g * 0.59f + current.b * 0.11f;
-            // Shades 8..30 keep dark cells from going black and light ones from washing out.
-            int shade = 8 + Mathf.RoundToInt(lum * 22f);
+            // By default shades 8..30, so dark cells don't go black and light ones don't wash out.
+            int shade = lowest + Mathf.RoundToInt(lum * range);
             if (!_hues.TryShade(hue, shade, out byte r, out byte g, out byte b))
             {
                 return;
@@ -733,7 +1172,9 @@ namespace UOClient
                 renderer.bones = mapped;
                 renderer.rootBone = rootBone;
                 renderer.sharedMesh = MeshFor(source.sharedMesh, female);
-                renderer.localBounds = source.localBounds;
+                // The parts' own bounds are for their bind pose (arms out); an animated limb leaves them and gets culled
+                // whenever only it is on screen. A box around the whole figure, whatever the root bone's orientation.
+                renderer.localBounds = new Bounds(Vector3.zero, Vector3.one * 4f);
                 renderer.sharedMaterial = material;
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             }

@@ -1,0 +1,17 @@
+{
+    "name": "UOGame",
+    "rootNamespace": "UOGame",
+    "references": [
+        "UOClient",
+        "UOClient.Core",
+        "UOClient.Buildings",
+        "FishNet.Runtime",
+        "GameKit.Dependencies",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "noEngineReferences": false
+}

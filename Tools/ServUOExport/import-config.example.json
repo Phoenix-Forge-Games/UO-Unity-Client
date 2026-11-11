@@ -1,0 +1,45 @@
+{
+  "Source": "My Shard",
+
+  "AdminLevels": ["Owner", "Developer", "Administrator"],
+  "StaffLast": true,
+
+  "Facets": ["Felucca", "Trammel", "Ilshenar", "Malas", "Tokuno", "TerMur"],
+  "DefaultFacet": 1,
+
+  "Items": {
+    "MyShardTokenOfThanks": "",
+    "MyShardSpecialBlade": "Katana"
+  },
+  "ItemsFallBackToBaseType": true,
+  "Containers": ["Bag", "Backpack", "Pouch", "BankBox"],
+
+  "Creatures": {
+    "MyShardPetDrake": "Drake"
+  },
+  "CreaturesFallBackToBaseType": true,
+
+  "Props": {
+    "ArmorBonus": "AosElementAttribute",
+    "MyShardAttribute.LifeDrain": "AosWeaponAttribute.HitLeechHits",
+    "NegativeAttribute": ""
+  },
+
+  "Skills": {
+    "MyShardCustomSkill": ""
+  },
+
+  "Materials": {},
+  "PlainMaterials": ["None", "Iron", "RegularLeather", "RegularWood"],
+  "MaterialSuffixes": ["Leather", "Wood"],
+
+  "GargoyleSkinStart": 1755,
+  "DefaultHairMale": 8251,
+  "DefaultHairFemale": 8252,
+
+  "Houses": "PlotDeed",
+  "HouseContents": "Bank",
+  "AccountGold": "FirstCharacterBank",
+  "PetOverflow": "Stable",
+  "NameSuffixes": ["the Second", "the Third", "the Fourth"]
+}

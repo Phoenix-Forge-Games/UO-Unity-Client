@@ -1,0 +1,6910 @@
+{
+ "Source": "ServUO (ServUO): Magery rules, newest era (AOS..TOL branches), numbers and rules only",
+ "Expressions": {
+  "Grammar": "numbers; + - * / (real); ( ); < <= > >= == != ; c ? a : b ; floor ceil trunc round min max abs sqrt clamp(x,lo,hi) rand(lo,hi) (integer, inclusive) randf() ([0,1))",
+  "Variables": "Caster.<X> / Target.<X>: skill value (Magery, EvalInt, MagicResist, Inscribe, Poisoning, Meditation, Focus, DetectHidden, Hiding, Stealth) or <Skill>Fixed (integer tenths); Str Dex Int RawStr RawDex RawInt Hits HitsMax Stam StamMax Mana ManaMax IsPlayer PoisonLevel. Distance (straight-line tiles), Range (max(|dx|,|dy|)), Count (targets hit). Other names are defined next to the formula that uses them.",
+  "Trunc": "trunc() reproduces C# integer casts and integer division (toward zero)."
+ },
+ "Pools": {
+  "Source": "Server/Mobile.cs, Scripts/Mobiles/PlayerMobile.cs, Scripts/Mobiles/Normal/BaseCreature.cs, Scripts/Misc/RegenRates.cs, Scripts/Skills/Meditation.cs, Config/PlayerCaps.cfg",
+  "HitsMax": {
+   "Player": {
+    "Expr": "50 + trunc(min(Caster.Str, StrMaxCap) / 2) + min(BonusHits, 25)",
+    "Note": "Str includes stat modifiers, capped at StrMaxCap. BonusHits = the Hit Point Increase item property (capped 25 for players). Wolf/Kitsune animal forms add 20; Toughness and Invigorate masteries add their bonus."
+   },
+   "Creature": "HitsMaxSeed + its Str modifiers when the creature has a seed (Creatures.json Hits), otherwise Str",
+   "Default": {
+    "Expr": "50 + trunc(Caster.Str / 2)",
+    "Note": "plain mobiles (neither player nor creature)"
+   }
+  },
+  "StamMax": {
+   "Player": {
+    "Expr": "min(Caster.Dex, DexMaxCap) + BonusStam",
+    "Note": "BonusStam = Stamina Increase item property"
+   },
+   "Creature": "StamMaxSeed + Dex modifiers when seeded, otherwise Dex",
+   "Default": "Dex"
+  },
+  "ManaMax": {
+   "Player": {
+    "Expr": "min(Caster.Int, IntMaxCap) + BonusMana + (Elf ? 20 : 0)",
+    "Note": "BonusMana = Mana Increase item property; Intuition mastery and Urali Trance tonic add their bonus"
+   },
+   "Creature": "ManaMaxSeed + Int modifiers when seeded, otherwise Int",
+   "Default": "Int"
+  },
+  "StatCaps": {
+   "TotalStatCap": 225,
+   "StrCap": 125,
+   "DexCap": 125,
+   "IntCap": 125,
+   "StrMaxCap": 150,
+   "DexMaxCap": 150,
+   "IntMaxCap": 150
+  },
+  "Regen": {
+   "Model": "Each pool gains 1 point every Interval seconds; the interval is recomputed after every tick.",
+   "Hits": {
+    "Interval": {
+     "Expr": "1 / (0.1 * (1 + HitPointRegen))",
+     "Unit": "s"
+    },
+    "HitPointRegen": "Hit Point Regeneration item property + creature DefaultHitsRegen + 2 for human players; floored at 0; players capped at 18; then +20 Horrific Beast, + Ninjitsu Fixed/30 in dog/cat form, + mastery bonuses (after the cap)",
+    "Stops": "dead, or poisoned (unless the creature regenerates through poison); summons and dead pets never regenerate hits",
+    "Default": 11.0
+   },
+   "Stam": {
+    "Interval": {
+     "Expr": "1 / (1.42 + (Caster.Focus * 0.1 + StamRegen) / 100) * (Monster ? 1.95 : 1)",
+     "Unit": "s",
+     "Note": "Monster = a creature flagged as a monster"
+    },
+    "StamRegen": "Stamina Regeneration item property + creature DefaultStamRegen + 15 Vampiric Embrace, +20 Kirin form; players capped at 24; then mastery bonuses; floored at -1",
+    "Default": 7.0,
+    "Note": "Each tick also gives a Focus gain check. Paragons and dead pets do not regenerate stamina."
+   },
+   "Mana": {
+    "Interval": {
+     "Expr": "1 / (0.2 + FocusBonus + MedBonus + ItemBonus)",
+     "Unit": "s"
+    },
+    "FocusBonus": {
+     "Expr": "Caster.Focus / 200"
+    },
+    "MedBonus": {
+     "Expr": "ArmorPenalty > 0 ? 0 : (0.0075 * Caster.Meditation + 0.0025 * Caster.Int) * (Meditating ? 2 : 1)",
+     "Note": "The source also multiplies by 1.1 when MedBonus >= 100, which can never happen."
+    },
+    "ItemBase": {
+     "Expr": "((Caster.Meditation / 2 + Caster.Focus / 4) / 90) * 0.65 + 2.35"
+    },
+    "Intensity": {
+     "Expr": "min(5.5, sqrt(ManaRegen))"
+    },
+    "ItemBonus": {
+     "Expr": "(ItemBase * Intensity - (ItemBase - 1)) / 10",
+     "Note": "negative (between -0.2 and -0.135) when ManaRegen is 0, as in the source"
+    },
+    "ManaRegen": "Mana Regeneration item property + creature DefaultManaRegen + 3 Vampiric Embrace or +13 Lich form + 2 for gargoyle players (no cap in ML)",
+    "Default": 7.0,
+    "Note": "Each tick gives Meditation (when not actively meditating) and Focus gain checks. Dead pets do not regenerate mana."
+   },
+   "ArmorPenalty": {
+    "Value": {
+     "Expr": "(Neck + Hands + Head + Arms + Legs + Chest) / 4",
+     "Note": "Each worn armor piece adds: 0 if it has Mage Armor or Spell Channeling, otherwise its scaled base armor rating (MeditationAllowance None), half of it (Half) or 0 (All). Shields don't count in AOS."
+    },
+    "Effect": "Any penalty above 0 removes MedBonus entirely and blocks active Meditation."
+   },
+   "Meditation": {
+    "Chance": {
+     "Expr": "(50 + (Caster.Meditation - (Caster.ManaMax - Caster.Mana)) * 2) / 100",
+     "Roll": "succeeds if Chance > randf()"
+    },
+    "Effect": "Sets Meditating (doubles MedBonus) until the meditator acts, moves or is hurt.",
+    "RefusedIf": [
+     "targeting something",
+     "mana already full (10 s)",
+     "armor penalty > 0 (10 s)"
+    ],
+    "Hands": "Weapons/shields other than spellbooks, runebooks and Spell Channeling items go to the backpack.",
+    "SkillDelay": 10.0
+   }
+  }
+ },
+ "Casting": {
+  "Source": "Scripts/Spells/Base/Spell.cs, MagerySpell.cs, SpellHelper.cs",
+  "CircleMana": [
+   4,
+   6,
+   9,
+   11,
+   14,
+   20,
+   40,
+   50
+  ],
+  "ManaCost": {
+   "Expr": "trunc(Mana * (1 - min(LowerManaCost, 40) / 100 - InherentLMC / 100))",
+   "Mana": {
+    "Expr": "FreeReagents ? ceil(CircleMana * 1.25) : CircleMana",
+    "Note": "SeriousFun: when basic reagents are free (below), a player casting from a book pays 1.25 x mana, rounded up, before Lower Mana Cost"
+   },
+   "LowerManaCost": "the Lower Mana Cost item property, capped 40; InherentLMC = armor's inherent LMC (added after the cap)",
+   "Other": "Mind Rot raises the scalar; Purge Magic's curse adds 0.5; a Mana Phasing Orb makes the next spell free. Wands cost no mana.",
+   "Checked": "at cast start (to begin) and again when the spell takes effect (spent then)"
+  },
+  "Reagents": {
+   "FreeBasicReagents": true,
+   "Rule": "SeriousFun (Spells.FreeBasicReagents, default true): a player casting from a book does not consume the eight basic reagents (Black Pearl, Blood Moss, Garlic, Ginseng, Mandrake Root, Nightshade, Spiders' Silk, Sulfurous Ash) -- every Magery spell -- and pays the higher mana instead. Otherwise each listed reagent costs 1.",
+   "Skip": "Scrolls consume the scroll instead. Lower Reagent Cost (percent) skips the reagents entirely. Non-player casters never use reagents.",
+   "ArcaneGemFallback": "When reagents are missing, an Arcane Gem charge (1) pays instead."
+  },
+  "CastDelay": {
+   "Expr": "max(0.25, (4 + Circle - 1) * 0.25 - FasterCasting * 0.25 + BaseDelta) * Multiplier - 0.1",
+   "BasePerCircle": [
+    1.0,
+    1.25,
+    1.5,
+    1.75,
+    2.0,
+    2.25,
+    2.5,
+    2.75
+   ],
+   "PerFasterCasting": 0.25,
+   "Minimum": 0.25,
+   "Subtract": 0.1,
+   "Notes": "Circle is 1-8. BaseDelta and Multiplier are per spell (Spells[].CastDelay). The 0.1 s subtraction happens after the minimum (EA timing). SeriousFun: Faster Casting is uncapped (stock caps Magery at 2). Protection (and Urali tonic) costs 2 Faster Casting. Pre-AOS: 0.5 + 0.25 x (Circle - 1) s, no FC.",
+   "Spellstone": 0.0,
+   "Wand": "the base delay, no Faster Casting"
+  },
+  "Recovery": {
+   "Expr": "max(0, 6 - FasterCastRecovery * 1) / 4",
+   "Notes": "Seconds after the spell takes effect before another can be started (1.5 s at 0 FCR). Faster Cast Recovery is not capped. Wands ignore it. Pre-AOS: 0.75 s."
+  },
+  "SkillRange": [
+   {
+    "Circle": 1,
+    "Min": -20.0,
+    "Max": 20.0,
+    "ScrollMin": -48.5714,
+    "ScrollMax": -8.5714
+   },
+   {
+    "Circle": 2,
+    "Min": -5.7143,
+    "Max": 34.2857,
+    "ScrollMin": -34.2857,
+    "ScrollMax": 5.7143
+   },
+   {
+    "Circle": 3,
+    "Min": 8.5714,
+    "Max": 48.5714,
+    "ScrollMin": -20.0,
+    "ScrollMax": 20.0
+   },
+   {
+    "Circle": 4,
+    "Min": 22.8571,
+    "Max": 62.8571,
+    "ScrollMin": -5.7143,
+    "ScrollMax": 34.2857
+   },
+   {
+    "Circle": 5,
+    "Min": 37.1429,
+    "Max": 77.1429,
+    "ScrollMin": 8.5714,
+    "ScrollMax": 48.5714
+   },
+   {
+    "Circle": 6,
+    "Min": 51.4286,
+    "Max": 91.4286,
+    "ScrollMin": 22.8571,
+    "ScrollMax": 62.8571
+   },
+   {
+    "Circle": 7,
+    "Min": 65.7143,
+    "Max": 105.7143,
+    "ScrollMin": 37.1429,
+    "ScrollMax": 77.1429
+   },
+   {
+    "Circle": 8,
+    "Min": 80.0,
+    "Max": 120.0,
+    "ScrollMin": 51.4286,
+    "ScrollMax": 91.4286
+   }
+  ],
+  "SkillCheck": {
+   "Chance": {
+    "Expr": "(Caster.Magery - Min) / (Max - Min)",
+    "Note": "Below Min always fails, at/above Max always succeeds"
+   },
+   "Roll": "succeeds if rand(0, 99) <= trunc(Chance * 100)",
+   "Window": "Min/Max = 100/7 x (Circle - 1) -/+ 20 from a book; a scroll uses Circle - 2. Recall from a runebook needs no skill.",
+   "Also": "Evaluating Intelligence gets a gain check (0-cap) with every cast. Creature casters never fail the Magery check."
+  },
+  "Fizzle": {
+   "SkillCheckFailed": "spell fizzles: the reagents are already used up (they are taken just before the skill check), the mana is kept (only spent on success)",
+   "Hurt": "AOS: a player caster damaged while casting (or holding a target cursor) is disturbed unless under Protection, or a Casting Focus roll succeeds: chance% = min(12, CastingFocus property (+2 Fish Pie)) + (Inscribe >= 50 ? trunc(InscribeFixed / 200) : 0); 100%-element damage can also be shrugged off by matching Resonance (capped 40). Creature casters are never disturbed by damage. No recovery delay after a disturb.",
+   "Moving": "A player cannot move while casting (frozen until the spell is cast); there is no fizzle from movement.",
+   "Equip": "Equipping anything other than a spell-castable weapon while casting disturbs.",
+   "UseItem": "Using an object while holding the spell's target disturbs it.",
+   "NewCast": "Starting a new spell while the previous one waits for a target cancels the old one.",
+   "Paralyzed": "Paralysed/frozen at the moment the spell resolves: fizzle.",
+   "Refused": "Cannot start while: dead, calmed (Peacemaking), already casting, in an animal/Horrific Beast form, paralysed/frozen, still recovering, short of mana, flying over precarious ground, driving a boat.",
+   "Hands": "SeriousFun (Spells.WeaponCasting, default true): weapons go to the backpack on cast, except staves stay for non-healing spells and maces/shields stay for healing/buff spells; Spell Channeling items always stay. Healing/buff spells: Heal, Cure, Greater Heal, Arch Cure, Resurrection, Bless, Strength, Agility, Cunning, Protection, Arch Protection, Reactive Armor, Night Sight, Magic Reflection.",
+   "TargetTimeout": 30.0
+  },
+  "ResistedFormula": {
+   "Percent": {
+    "Expr": "max(Target.MagicResist / 5, Target.MagicResist - ((Caster.Magery - 20) / 5 + Circle * 5)) / 2",
+    "Note": "Circle 1-8; Target.MagicResist is lowered by Evil Omen"
+   },
+   "Roll": "resisted if Percent >= 100, never if <= 0, otherwise if Percent / 100 >= randf()",
+   "Gain": "the target gets a Resisting Spells gain check if its skill is below (Circle x 10) + (1 + trunc((Circle - 1) / 6)) x 25",
+   "UsedBy": "AOS: only Poison (full negation). Pre-AOS most damage spells took x0.75 (Flame Strike x0.6, Mind Blast x0.5) and Paralyze x0.75 when resisted."
+  },
+  "EvalIntScaling": {
+   "Steps": [
+    "D = (Dice d Sides + Base) * 100",
+    "ScribeBonus = Caster.InscribeFixed >= 1000 ? 10 : trunc(Caster.InscribeFixed / 200)",
+    "DamageBonus = ScribeBonus + trunc(Caster.Int / 10) + SDI",
+    "EvalScale = 30 + trunc(9 * Caster.EvalIntFixed / 100)",
+    "D = trunc(D * EvalScale / 100)",
+    "D = trunc(D * (100 + DamageBonus) / 100)",
+    "D = trunc(D * trunc(Scalar * 100) / 100)",
+    "Damage = trunc(D / 100)"
+   ],
+   "SDI": "Spell Damage Increase item property, -10 under a Runed Sash's ward, minus the target's Block reduction. Player vs player (caster and target both players): capped at 30 if the caster has no 30+ skill in another spell school (Spell Focus), else 20.",
+   "Scalar": "1.0, x the creature's own damage adjustments, x the caster's spellbook slayer (3.0, or 2.0 for a super slayer) or x2.0 if the target's book/weapon is an opposing super slayer, x region adjustments; 0 if the target evades (Evasion). Area/chain spells use 1.0 here.",
+   "Then": "The result goes through the target's resistances by damage type (combat system).",
+   "Expr": {
+    "Expr": "trunc(trunc(trunc(trunc((rand(Dice, Dice * Sides) + Base) * 100 * EvalScale / 100) * (100 + DamageBonus) / 100) * trunc(Scalar * 100) / 100) / 100)",
+    "Note": "the same as Steps, in one line; rand(Dice, Dice*Sides) stands for the dice roll",
+    "Names": [
+     "Base",
+     "Dice",
+     "Sides",
+     "EvalScale",
+     "DamageBonus",
+     "Scalar"
+    ]
+   },
+   "PreAOS": "base x (1 + (EvalInt - Resist)/500 if EvalInt > Resist, else /200) + (Magery - 100)/400; x2 vs non-human monsters."
+  },
+  "HealScaling": {
+   "Steps": [
+    "H = (Dice d Sides + Base) * 100",
+    "H = trunc(H * (30 + trunc(9 * Caster.EvalIntFixed / 100)) / 100)",
+    "H = trunc(H * (100 + ScribeBonus + trunc(Caster.Int / 10) + SDI) / 100)",
+    "Heal = trunc(H / 100)"
+   ],
+   "Note": "SeriousFun: player heal spells scale like damage (no PvP cap, no target scalar). Non-player casters use the spell's NonPlayerCaster formula."
+  },
+  "Reflection": {
+   "AOS": "The Magic Reflection spell does not reflect in AOS. A spell marked Reflectable can still be sent back by: SeriousFun Spell Reflection gear (chance% = total of the target's worn items, capped 75), creatures with their own reflect ability, or a Mirror Image clone taking the hit.",
+   "PreAOS": "MagicDamageAbsorb points (8-15): each reflected spell costs Circle points."
+  },
+  "DelayedDamage": {
+   "Delay": 1.0,
+   "Spells": [
+    "MagicArrowSpell",
+    "FireballSpell",
+    "MindBlastSpell",
+    "EnergyBoltSpell",
+    "ExplosionSpell",
+    "ChainLightningSpell",
+    "FlameStrikeSpell",
+    "MeteorSwarmSpell"
+   ],
+   "Note": "Damage lands Delay seconds after the spell takes effect (Explosion uses its own 3 s fuse)."
+  },
+  "Targeting": {
+   "Harmful": "a mobile (or damageable item for damage spells) the caster may harm; makes the caster an aggressor",
+   "Beneficial": "a mobile the caster may help",
+   "Location": "a ground point or object (its location), line of sight required",
+   "Item": "an item of the kind the spell names",
+   "Self": "no target; acts on the caster",
+   "None": "no target",
+   "Range": "tile range (max(|dx|, |dy|)) from the caster"
+  },
+  "Notes": [
+   "SeriousFun also has ExtendedMagery (Scripts/Custom/ExtendedMagery.cs): extra Magery spells with server ids 1000+ and circles past the 8th. They are not part of this export.",
+   "Casting reveals a hidden caster. Order when the spell resolves (after the cast delay and any target pick): reagents are taken, mana is checked, the Magery check is rolled, and only on success is the mana spent and the scroll used up.",
+   "Vampiric Embrace: casting a spell that uses Garlic deals 17-23 fire damage to the caster.",
+   "Every harmful spell breaks Evil Omen and triggers the target's on-harmful reactions."
+  ]
+ },
+ "Spellbook": {
+  "Type": "Spellbook",
+  "Offset": 0,
+  "Count": 64,
+  "Bit": "content is a 64-bit mask: bit i set = the book holds spell id Offset + i"
+ },
+ "PoisonLevels": [
+  {
+   "Level": 0,
+   "Name": "Lesser",
+   "Min": 4,
+   "Max": 16,
+   "Percent": 7.5,
+   "Delay": 3.0,
+   "Interval": 2.25,
+   "Ticks": 10
+  },
+  {
+   "Level": 1,
+   "Name": "Regular",
+   "Min": 8,
+   "Max": 18,
+   "Percent": 10.0,
+   "Delay": 3.0,
+   "Interval": 3.25,
+   "Ticks": 10
+  },
+  {
+   "Level": 2,
+   "Name": "Greater",
+   "Min": 12,
+   "Max": 20,
+   "Percent": 15.0,
+   "Delay": 3.0,
+   "Interval": 4.25,
+   "Ticks": 10
+  },
+  {
+   "Level": 3,
+   "Name": "Deadly",
+   "Min": 16,
+   "Max": 30,
+   "Percent": 30.0,
+   "Delay": 3.0,
+   "Interval": 5.25,
+   "Ticks": 15
+  },
+  {
+   "Level": 4,
+   "Name": "Lethal",
+   "Min": 20,
+   "Max": 50,
+   "Percent": 35.0,
+   "Delay": 3.0,
+   "Interval": 5.25,
+   "Ticks": 20
+  }
+ ],
+ "Spells": [
+  {
+   "Id": 0,
+   "Name": "Clumsy",
+   "Key": "ClumsySpell",
+   "Circle": 1,
+   "Mantra": "Uus Jux",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ClumsyScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "StatCurse",
+    "Stats": [
+     "Dex"
+    ],
+    "Percent": {
+     "Expr": "max(0, 8 + floor(Caster.EvalIntFixed / 100) - Target.MagicResistFixed / 100)",
+     "Unit": "percent of the target's base stat",
+     "Note": "Target.MagicResist here is lowered by Evil Omen's malus. Each curse also gives the target a Resisting Spells gain check."
+    },
+    "Amount": {
+     "Dex": {
+      "Expr": "ceil(Target.RawDex * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One curse modifier per stat ('[Magic] <Stat> Curse'). A new curse applies only if it is stronger than the existing one for that stat; if it is weaker the spell fizzles (mana spent); if equal nothing changes but the harmful side effects still happen.",
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true,
+    "ImmuneIf": "target is in Stone Form (Mysticism)"
+   },
+   "Resistable": false,
+   "Notes": "Harmful; no resist roll in the AOS era (Resisting Spells lowers the percent instead)."
+  },
+  {
+   "Id": 1,
+   "Name": "Create Food",
+   "Key": "CreateFoodSpell",
+   "Circle": 1,
+   "Mantra": "In Mani Ylem",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "CreateFoodScroll",
+   "Target": "None",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "CreateItem",
+    "OneOf": [
+     "Grapes",
+     "Ham",
+     "CheeseWedge",
+     "Muffins",
+     "FishSteak",
+     "Ribs",
+     "CookedBird",
+     "Sausage",
+     "Apple",
+     "Peach"
+    ],
+    "Amount": 1,
+    "Into": "CasterBackpack"
+   },
+   "Resistable": false,
+   "Notes": "Picks one food uniformly."
+  },
+  {
+   "Id": 2,
+   "Name": "Feeblemind",
+   "Key": "FeeblemindSpell",
+   "Circle": 1,
+   "Mantra": "Rel Wis",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "FeeblemindScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "StatCurse",
+    "Stats": [
+     "Int"
+    ],
+    "Percent": {
+     "Expr": "max(0, 8 + floor(Caster.EvalIntFixed / 100) - Target.MagicResistFixed / 100)",
+     "Unit": "percent of the target's base stat",
+     "Note": "Target.MagicResist here is lowered by Evil Omen's malus. Each curse also gives the target a Resisting Spells gain check."
+    },
+    "Amount": {
+     "Int": {
+      "Expr": "ceil(Target.RawInt * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One curse modifier per stat ('[Magic] <Stat> Curse'). A new curse applies only if it is stronger than the existing one for that stat; if it is weaker the spell fizzles (mana spent); if equal nothing changes but the harmful side effects still happen.",
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true,
+    "ImmuneIf": "target is in Stone Form (Mysticism)"
+   },
+   "Resistable": false,
+   "Notes": "Harmful; no resist roll in the AOS era (Resisting Spells lowers the percent instead)."
+  },
+  {
+   "Id": 3,
+   "Name": "Heal",
+   "Key": "HealSpell",
+   "Circle": 1,
+   "Mantra": "In Mani",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "HealScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "Heal",
+    "Base": 8,
+    "Dice": 1,
+    "Sides": 4,
+    "Scaling": "HealScaling",
+    "OtherTargetMultiplier": 1.5,
+    "NonPlayerCaster": {
+     "Expr": "trunc(Caster.MageryFixed / 120) + rand(1, 4)",
+     "OtherTargetMultiplier": 1.5
+    },
+    "FailsIf": [
+     "target is poisoned",
+     "target has a Mortal Strike wound",
+     "target is a dead bonded pet",
+     "target is animated dead",
+     "target is a repairable construct (golem)"
+    ],
+    "Note": "Player casters: 1d4+8 scaled by HealScaling, x1.5 (trunc) on someone else. The target must not be at full hits for the act to count as beneficial."
+   },
+   "Resistable": false,
+   "Notes": "SeriousFun: player heals scale like damage spells (stock AOS: Magery/12 + 1d4)."
+  },
+  {
+   "Id": 4,
+   "Name": "Magic Arrow",
+   "Key": "MagicArrowSpell",
+   "Circle": 1,
+   "Mantra": "In Por Ylem",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MagicArrowScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 10,
+    "Dice": 1,
+    "Sides": 4,
+    "Types": {
+     "Fire": 100
+    },
+    "Delay": 1.0,
+    "Scaling": "EvalIntScaling",
+    "NoStackWith": [
+     "MagicArrowSpell",
+     "NetherBoltSpell"
+    ],
+    "StackRule": "A second Magic Arrow (or Nether Bolt) on a target that already has one in flight fizzles (mana spent)."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 4-7 damage (Random(4,4)), x0.75 if resisted."
+  },
+  {
+   "Id": 5,
+   "Name": "Night Sight",
+   "Key": "NightSightSpell",
+   "Circle": 1,
+   "Mantra": "In Lor",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "NightSightScroll",
+   "Target": "Beneficial",
+   "Range": 12,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "NightSight",
+    "LightLevel": {
+     "Expr": "max(0, trunc(26 * Target.Magery / 100))",
+     "Note": "26 = full dungeon brightness; uses the TARGET's Magery in AOS"
+    },
+    "Duration": {
+     "Expr": "rand(15, 39) * 60",
+     "Unit": "s"
+    },
+    "Stacking": "No effect if the target already has night sight (mana still spent)."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS used the caster's Magery."
+  },
+  {
+   "Id": 6,
+   "Name": "Reactive Armor",
+   "Key": "ReactiveArmorSpell",
+   "Circle": 1,
+   "Mantra": "Flam Sanct",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ReactiveArmorScroll",
+   "Target": "Self",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "ResistToggle",
+    "Resists": {
+     "Physical": {
+      "Expr": "15 + trunc(Caster.Inscribe / 20)"
+     },
+     "Fire": -5,
+     "Cold": -5,
+     "Poison": -5,
+     "Energy": -5
+    },
+    "Duration": "UntilRecast",
+    "Note": "Casting again removes it. Persists through logout and death."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: absorbs melee damage = clamp((Magery+Meditation+Inscribe)/3, 1, 75) points."
+  },
+  {
+   "Id": 7,
+   "Name": "Weaken",
+   "Key": "WeakenSpell",
+   "Circle": 1,
+   "Mantra": "Des Mani",
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "WeakenScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "StatCurse",
+    "Stats": [
+     "Str"
+    ],
+    "Percent": {
+     "Expr": "max(0, 8 + floor(Caster.EvalIntFixed / 100) - Target.MagicResistFixed / 100)",
+     "Unit": "percent of the target's base stat",
+     "Note": "Target.MagicResist here is lowered by Evil Omen's malus. Each curse also gives the target a Resisting Spells gain check."
+    },
+    "Amount": {
+     "Str": {
+      "Expr": "ceil(Target.RawStr * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One curse modifier per stat ('[Magic] <Stat> Curse'). A new curse applies only if it is stronger than the existing one for that stat; if it is weaker the spell fizzles (mana spent); if equal nothing changes but the harmful side effects still happen.",
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true,
+    "ImmuneIf": "target is in Stone Form (Mysticism)"
+   },
+   "Resistable": false,
+   "Notes": "Harmful; no resist roll in the AOS era (Resisting Spells lowers the percent instead)."
+  },
+  {
+   "Id": 8,
+   "Name": "Agility",
+   "Key": "AgilitySpell",
+   "Circle": 2,
+   "Mantra": "Ex Uus",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "AgilityScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "StatBuff",
+    "Stats": [
+     "Dex"
+    ],
+    "Percent": {
+     "Expr": "1 + floor(Caster.EvalIntFixed / 100)",
+     "Unit": "percent of the target's base stat"
+    },
+    "Amount": {
+     "Dex": {
+      "Expr": "ceil(Target.RawDex * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One buff modifier per stat ('[Magic] <Stat> Buff'); the new offset is max(existing, new) and its timer restarts. Fizzles (mana spent) if the new offset is lower than the existing one or is 0."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 9,
+   "Name": "Cunning",
+   "Key": "CunningSpell",
+   "Circle": 2,
+   "Mantra": "Uus Wis",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "CunningScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "StatBuff",
+    "Stats": [
+     "Int"
+    ],
+    "Percent": {
+     "Expr": "1 + floor(Caster.EvalIntFixed / 100)",
+     "Unit": "percent of the target's base stat"
+    },
+    "Amount": {
+     "Int": {
+      "Expr": "ceil(Target.RawInt * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One buff modifier per stat ('[Magic] <Stat> Buff'); the new offset is max(existing, new) and its timer restarts. Fizzles (mana spent) if the new offset is lower than the existing one or is 0."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 10,
+   "Name": "Cure",
+   "Key": "CureSpell",
+   "Circle": 2,
+   "Mantra": "An Nox",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "CureScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "Cure",
+    "Chance": {
+     "Expr": "trunc((10000 + trunc(Caster.Magery * 75) - (Target.PoisonLevel + 1) * (Target.PoisonLevel < 4 ? 3300 : 3100)) / 100)",
+     "Unit": "percent",
+     "Roll": "cures if Chance > rand(0, 99)"
+    },
+    "Note": "No effect on a target that isn't poisoned (the beneficial act needs a poisoned target)."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 1750 per poison level."
+  },
+  {
+   "Id": 11,
+   "Name": "Harm",
+   "Key": "HarmSpell",
+   "Circle": 2,
+   "Mantra": "An Mani",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "HarmScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 17,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Cold": 100
+    },
+    "Delay": 0.0,
+    "Scaling": "EvalIntScaling",
+    "RangeFalloff": [
+     {
+      "MaxRange": 1,
+      "Multiplier": 1.0
+     },
+     {
+      "MaxRange": 2,
+      "Multiplier": 0.5
+     },
+     {
+      "MaxRange": null,
+      "Multiplier": 0.25
+     }
+    ],
+    "SlayerApplies": false
+   },
+   "Resistable": false,
+   "Notes": "Range is tile range (max(|dx|,|dy|)): full at 1, half at 2, quarter beyond. Pre-AOS: 1-15."
+  },
+  {
+   "Id": 12,
+   "Name": "Magic Trap",
+   "Key": "MagicTrapSpell",
+   "Circle": 2,
+   "Mantra": "In Jux",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MagicTrapScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "TrapContainer",
+    "Accepts": "a trappable container (chest, box, crate...)",
+    "TrapPower": {
+     "Expr": "rand(10, 50)"
+    },
+    "Trigger": "Opening the container: TrapPower direct damage (no resist) to the opener if within 1 tile; the trap is then spent.",
+    "FailsIf": "the container already has a non-magic trap (fizzle)"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS power was 1."
+  },
+  {
+   "Id": 13,
+   "Name": "Remove Trap",
+   "Key": "RemoveTrapSpell",
+   "Circle": 2,
+   "Mantra": "An Jux",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MagicUnTrapScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "DisarmContainer",
+    "Accepts": "a trappable container",
+    "Removes": "MagicTrap only",
+    "FailsIf": "the container has a non-magic trap (fizzle)"
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 14,
+   "Name": "Protection",
+   "Key": "ProtectionSpell",
+   "Circle": 2,
+   "Mantra": "Uus Sanct",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ProtectionScroll",
+   "Target": "Self",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "ProtectionToggle",
+    "AppliesTo": "Caster",
+    "Resists": {
+     "Physical": {
+      "Expr": "-15 + min(trunc(Caster.Inscribe / 20), 15)"
+     }
+    },
+    "SkillMods": {
+     "MagicResist": {
+      "Expr": "-35 + min(trunc(Caster.Inscribe / 20), 35)"
+     }
+    },
+    "DisruptImmunity": 100,
+    "FasterCasting": -2,
+    "Duration": "UntilRecast"
+   },
+   "Resistable": false,
+   "Notes": "While active, damage never disrupts the caster's spells, at the cost of resists and 2 points of Faster Casting. Pre-AOS: chance-based disrupt protection with a timer."
+  },
+  {
+   "Id": 15,
+   "Name": "Strength",
+   "Key": "StrengthSpell",
+   "Circle": 2,
+   "Mantra": "Uus Mani",
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "StrengthScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "StatBuff",
+    "Stats": [
+     "Str"
+    ],
+    "Percent": {
+     "Expr": "1 + floor(Caster.EvalIntFixed / 100)",
+     "Unit": "percent of the target's base stat"
+    },
+    "Amount": {
+     "Str": {
+      "Expr": "ceil(Target.RawStr * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One buff modifier per stat ('[Magic] <Stat> Buff'); the new offset is max(existing, new) and its timer restarts. Fizzles (mana spent) if the new offset is lower than the existing one or is 0."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 16,
+   "Name": "Bless",
+   "Key": "BlessSpell",
+   "Circle": 3,
+   "Mantra": "Rel Sanct",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "BlessScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "StatBuff",
+    "Stats": [
+     "Str",
+     "Dex",
+     "Int"
+    ],
+    "Percent": {
+     "Expr": "1 + floor(Caster.EvalIntFixed / 100)",
+     "Unit": "percent of the target's base stat"
+    },
+    "Amount": {
+     "Str": {
+      "Expr": "ceil(Target.RawStr * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     },
+     "Dex": {
+      "Expr": "ceil(Target.RawDex * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     },
+     "Int": {
+      "Expr": "ceil(Target.RawInt * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s"
+    },
+    "Stacking": "One buff modifier per stat ('[Magic] <Stat> Buff'); the new offset is max(existing, new) and its timer restarts. Fizzles (mana spent) if the new offset is lower than the existing one for all three stats or is 0."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 17,
+   "Name": "Fireball",
+   "Key": "FireballSpell",
+   "Circle": 3,
+   "Mantra": "Vas Flam",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "FireballScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 19,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Fire": 100
+    },
+    "Delay": 1.0,
+    "Scaling": "EvalIntScaling"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 10-16."
+  },
+  {
+   "Id": 18,
+   "Name": "Magic Lock",
+   "Key": "MagicLockSpell",
+   "Circle": 3,
+   "Mantra": "An Por",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MagicLockScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "MagicLock",
+    "Accepts": "an unlocked lockable container that has a lock (not locked down/secured in a house, not a paragon chest)",
+    "Sets": {
+     "Locked": true,
+     "LockLevel": -255
+    },
+    "Note": "LockLevel -255 marks a magic lock (Unlock restores it to RequiredSkill - 10)."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 19,
+   "Name": "Poison",
+   "Key": "PoisonSpell",
+   "Circle": 3,
+   "Mantra": "In Nox",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "PoisonScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Poison",
+    "Total": {
+     "Expr": "trunc((Caster.MageryFixed + Caster.PoisoningFixed) / 2)",
+     "Note": "tenths, so 1000 = 100.0"
+    },
+    "BaseLevel": [
+     {
+      "MinTotal": 1000,
+      "Level": {
+       "Expr": "randf() < 0.1 ? 4 : 3",
+       "Note": "randf() <= 0.1 in the source"
+      }
+     },
+     {
+      "MinTotal": 851,
+      "Level": 2
+     },
+     {
+      "MinTotal": 651,
+      "Level": 1
+     },
+     {
+      "MinTotal": null,
+      "Level": 0
+     }
+    ],
+    "Level": {
+     "Expr": "Range > 8 ? 0 : max(0, BaseLevel - (Range > 2 ? trunc(trunc(Distance) / 2) : 0))",
+     "Note": "BaseLevel from the table; levels index PoisonLevels"
+    },
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true,
+    "ImmuneIf": "target is in Stone Form, or resists (ResistedFormula, circle 3) -> no poison"
+   },
+   "Resistable": true,
+   "Notes": "The only Magery spell with a full resist roll in the AOS era. Pre-AOS: level from Magery+Poisoning minus distance."
+  },
+  {
+   "Id": 20,
+   "Name": "Telekinesis",
+   "Key": "TelekinesisSpell",
+   "Circle": 3,
+   "Mantra": "Ort Por Ylem",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "TelekinisisScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Telekinesis",
+    "Accepts": "an item that reacts to telekinesis (trapped/levered objects) or a container",
+    "Effect": "Uses the item from range as if double-clicked; a container opens remotely (snooping rules if it is on another mobile; corpse loot rules apply)."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 21,
+   "Name": "Teleport",
+   "Key": "TeleportSpell",
+   "Circle": 3,
+   "Mantra": "Rel Por",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "TeleportScroll",
+   "Target": "Location",
+   "Range": 11,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Teleport",
+    "To": "TargetLocation (surface top)",
+    "FailsIf": [
+     "carrying a faction sigil",
+     "overloaded",
+     "travel rules forbid leaving here or arriving there",
+     "the spot cannot hold a mobile",
+     "the spot is in a house or multi"
+    ],
+    "OnArrival": "Steps on any fire or poison field at the destination (their move-over effect)."
+   },
+   "Resistable": false,
+   "Notes": "Range 11 in ML+ (12 before)."
+  },
+  {
+   "Id": 22,
+   "Name": "Unlock Spell",
+   "Key": "UnlockSpell",
+   "Circle": 3,
+   "Mantra": "Ex Por",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "UnlockScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Unlock",
+    "Power": {
+     "Expr": "trunc(Caster.Magery * 0.8) - 4"
+    },
+    "Succeeds": "Power >= the container's RequiredSkill",
+    "TreasureChests": {
+     "RequiredMagery": {
+      "0": 50,
+      "1": 80,
+      "2": 100
+     },
+     "Level3Plus": "immune"
+    },
+    "Note": "Unlocking a magic-locked container sets its LockLevel to RequiredSkill - 10. Secured containers, mobiles and lockless containers are refused (mana still spent)."
+   },
+   "Resistable": false,
+   "Notes": "ServUO's display name is 'Unlock Spell'."
+  },
+  {
+   "Id": 23,
+   "Name": "Wall of Stone",
+   "Key": "WallOfStoneSpell",
+   "Circle": 3,
+   "Mantra": "In Sanct Ylem",
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "WallOfStoneScroll",
+   "Target": "Location",
+   "Range": 15,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Wall",
+    "Tiles": 3,
+    "Layout": "PerpendicularToCaster",
+    "Duration": 10.0,
+    "BlocksMovement": true,
+    "Note": "Center tile plus one each side, across the line from caster to target point. Tiles on water or blocked spots are skipped."
+   },
+   "Resistable": false,
+   "Notes": "Range 15 (TOL+)."
+  },
+  {
+   "Id": 24,
+   "Name": "Arch Cure",
+   "Key": "ArchCureSpell",
+   "Circle": 4,
+   "Mantra": "Vas An Nox",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ArchCureScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Cure",
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": 2
+    },
+    "Chance": {
+     "Expr": "trunc((10000 + trunc(Caster.Magery * 75) - (Target.PoisonLevel + 1) * 1750) / 100) - 1",
+     "Unit": "percent",
+     "Roll": "cures if Chance > rand(0, 99)"
+    },
+    "AreaFilter": "A mobile targeted directly is always included (beneficial rules). Others in the area: not the caster's aggressors or victims, innocent both ways or an ally; on Felucca-rules maps players only."
+   },
+   "Resistable": false,
+   "Notes": "Cast delay is 0.25 s shorter than its circle's."
+  },
+  {
+   "Id": 25,
+   "Name": "Arch Protection",
+   "Key": "ArchProtectionSpell",
+   "Circle": 4,
+   "Mantra": "Vas Uus Sanct",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ArchProtectionScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "ProtectionToggle",
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": 2
+    },
+    "AppliesTo": "the caster and party members in the area",
+    "Same": "ProtectionSpell (per target; toggles - already protected targets lose it)"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: +Magery/10+1 armor to everyone in radius 3 for min(Magery*1.2, 144) s."
+  },
+  {
+   "Id": 26,
+   "Name": "Curse",
+   "Key": "CurseSpell",
+   "Circle": 4,
+   "Mantra": "Des Sanct",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "CurseScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "StatCurse",
+    "Stats": [
+     "Str",
+     "Dex",
+     "Int"
+    ],
+    "Percent": {
+     "Expr": "max(0, 8 + floor(Caster.EvalIntFixed / 100) - Target.MagicResistFixed / 100)",
+     "Unit": "percent of the target's base stat",
+     "Note": "Target.MagicResist here is lowered by Evil Omen's malus. Each curse also gives the target a Resisting Spells gain check."
+    },
+    "Amount": {
+     "Str": {
+      "Expr": "ceil(Target.RawStr * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     },
+     "Dex": {
+      "Expr": "ceil(Target.RawDex * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     },
+     "Int": {
+      "Expr": "ceil(Target.RawInt * Percent / 100)",
+      "Note": "Percent = the Percent above"
+     }
+    },
+    "Duration": {
+     "Expr": "Target.Resilience ? trunc((floor(6 * Caster.EvalIntFixed / 50) + 1) / 2) : floor(6 * Caster.EvalIntFixed / 50) + 1",
+     "Unit": "s",
+     "Note": "Target.Resilience = 1 when the target has the Resilience mastery active"
+    },
+    "Stacking": "Applies when at least one stat's curse would be stronger (fizzles if all three are weaker or all are 0); replaces weaker Weaken/Clumsy/Feeblemind.",
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true,
+    "ImmuneIf": "target is in Stone Form (Mysticism)",
+    "MaxResists": {
+     "Fire": -10,
+     "Cold": -10,
+     "Poison": -10,
+     "Energy": -10,
+     "Note": "player targets only, and only when that max resist is above 60"
+    }
+   },
+   "Resistable": false,
+   "Notes": "Harmful; no resist roll in the AOS era (Resisting Spells lowers the percent instead)."
+  },
+  {
+   "Id": 27,
+   "Name": "Fire Field",
+   "Key": "FireFieldSpell",
+   "Circle": 4,
+   "Mantra": "In Flam Grav",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "FireFieldScroll",
+   "Target": "Location",
+   "Range": 15,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "Field",
+    "Field": "Fire",
+    "Tiles": 5,
+    "Layout": "PerpendicularToCaster",
+    "TileDelay": 0.3,
+    "Duration": {
+     "Expr": "trunc((15 + trunc(Caster.MageryFixed / 5)) / 4)",
+     "Unit": "s"
+    },
+    "Damage": {
+     "Amount": 2,
+     "Types": {
+      "Fire": 100
+     },
+     "OnEnter": true,
+     "Interval": 1.0,
+     "FirstTick": 0.5
+    },
+    "AffectsCaster": false,
+    "Note": "Center tile at once, then tiles +/-1 after 0.3 s and +/-2 after 0.6 s. Hits mobiles whose height overlaps the tile; reveals the caster when it hurts someone."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS duration: 4 + Magery/2 s."
+  },
+  {
+   "Id": 28,
+   "Name": "Greater Heal",
+   "Key": "GreaterHealSpell",
+   "Circle": 4,
+   "Mantra": "In Vas Mani",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "GreaterHealScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "Heal",
+    "Base": 40,
+    "Dice": 1,
+    "Sides": 10,
+    "Scaling": "HealScaling",
+    "NonPlayerCaster": {
+     "Expr": "trunc(Caster.Magery * 0.4) + rand(1, 10)"
+    },
+    "FailsIf": [
+     "target is poisoned",
+     "target has a Mortal Strike wound",
+     "target is a dead bonded pet",
+     "target is animated dead",
+     "target is a repairable construct (golem)"
+    ]
+   },
+   "Resistable": false,
+   "Notes": "SeriousFun: player casters 1d10+40 scaled by HealScaling."
+  },
+  {
+   "Id": 29,
+   "Name": "Lightning",
+   "Key": "LightningSpell",
+   "Circle": 4,
+   "Mantra": "Por Ort Grav",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "LightningScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 23,
+    "Dice": 1,
+    "Sides": 4,
+    "Types": {
+     "Energy": 100
+    },
+    "Delay": 0.0,
+    "Scaling": "EvalIntScaling"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 12-20."
+  },
+  {
+   "Id": 30,
+   "Name": "Mana Drain",
+   "Key": "ManaDrainSpell",
+   "Circle": 4,
+   "Mantra": "Ort Rel",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ManaDrainScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "ManaDrain",
+    "Amount": {
+     "Expr": "clamp(40 + trunc(Caster.EvalInt - Target.MagicResist), 0, Target.Mana)"
+    },
+    "ReturnAfter": 5.0,
+    "Note": "The mana comes back to the target after 5 s if it is alive. A target still under a drain cannot be drained again.",
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: random 1-100 (resistable), permanent."
+  },
+  {
+   "Id": 31,
+   "Name": "Recall",
+   "Key": "RecallSpell",
+   "Circle": 4,
+   "Mantra": "Kal Ort Por",
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "RecallScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "Travel",
+    "Mode": "Recall",
+    "Destination": "MarkedLocation",
+    "Sources": [
+     "a marked RecallRune",
+     "a Runebook's default entry (uses a charge, no Magery check)",
+     "a boat key / galleon",
+     "a writ of lease"
+    ],
+    "FailsIf": [
+     "criminal",
+     "in combat (aggressed a player or pet in the last 2 minutes)",
+     "overloaded",
+     "holding an item on the cursor",
+     "carrying a faction sigil",
+     "travel rules forbid leaving here or arriving there",
+     "the spot cannot hold a mobile",
+     "a house/multi is there",
+     "a Young player going to Felucca"
+    ],
+    "TakesPets": true
+   },
+   "Resistable": false,
+   "Notes": "SeriousFun: double-clicking a marked rune casts Recall at it."
+  },
+  {
+   "Id": 32,
+   "Name": "Blade Spirits",
+   "Key": "BladeSpiritsSpell",
+   "Circle": 5,
+   "Mantra": "In Jux Hur Ylem",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "BladeSpiritsScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0,
+    "Multiplier": 3
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "BladeSpirits",
+    "At": "TargetLocation",
+    "Duration": 120.0,
+    "Controlled": false,
+    "ControlSlots": 2
+   },
+   "Resistable": false,
+   "Notes": "Cast delay x3. Uncontrolled: it attacks what is near."
+  },
+  {
+   "Id": 33,
+   "Name": "Dispel Field",
+   "Key": "DispelFieldSpell",
+   "Circle": 5,
+   "Mantra": "An Grav",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "DispelFieldScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "DispelField",
+    "Accepts": "a dispellable field item: Fire/Poison/Paralyze/Energy fields, Wall of Stone tiles, Gate Travel gates",
+    "Effect": "Deletes that one tile/item."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 34,
+   "Name": "Incognito",
+   "Key": "IncognitoSpell",
+   "Circle": 5,
+   "Mantra": "Kal In Ex",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "IncognitoScroll",
+   "Target": "Self",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Disguise",
+    "Randomizes": [
+     "Name",
+     "SkinHue",
+     "Hair",
+     "FacialHair",
+     "HairHue"
+    ],
+    "Duration": {
+     "Expr": "min(144, floor(6 * Caster.MageryFixed / 50) + 1)",
+     "Unit": "s"
+    },
+    "FailsIf": [
+     "carrying a faction sigil",
+     "already incognito",
+     "under a disguise kit",
+     "polymorphed or otherwise body-modded (fizzle)"
+    ]
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 35,
+   "Name": "Magic Reflection",
+   "Key": "MagicReflectSpell",
+   "Circle": 5,
+   "Mantra": "In Jux Sanct",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MagicReflectScroll",
+   "Target": "Self",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "ResistToggle",
+    "Resists": {
+     "Physical": {
+      "Expr": "-25 + trunc(Caster.Inscribe / 20)"
+     },
+     "Fire": 10,
+     "Cold": 10,
+     "Poison": 10,
+     "Energy": 10
+    },
+    "Duration": "UntilRecast",
+    "Note": "In the AOS era this does NOT reflect spells; it only shifts resists."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: reflects the next 8-15 circles of spells (MagicDamageAbsorb)."
+  },
+  {
+   "Id": 36,
+   "Name": "Mind Blast",
+   "Key": "MindBlastSpell",
+   "Circle": 5,
+   "Mantra": "Por Corp Wis",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MindBlastScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Formula": {
+     "Expr": "min(60, trunc((Caster.Magery + min(200, Caster.Int)) / 5) + rand(2, 6))",
+     "Note": "Then at impact: rand(F, F + 4)"
+    },
+    "Final": {
+     "Expr": "rand(F, F + 4)",
+     "Note": "F = Formula"
+    },
+    "Types": {
+     "Cold": 100
+    },
+    "Delay": 1.0,
+    "Scaling": null,
+    "SlayerApplies": false
+   },
+   "Resistable": false,
+   "Notes": "No Evaluating Intelligence scaling. Pre-AOS: based on the target's stat spread."
+  },
+  {
+   "Id": 37,
+   "Name": "Paralyze",
+   "Key": "ParalyzeSpell",
+   "Circle": 5,
+   "Mantra": "An Ex Por",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ParalyzeScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Paralyze",
+    "Duration": {
+     "Expr": "max(0, trunc(Caster.EvalInt / 10 - Target.MagicResist / 10) * (Target.IsPlayer ? 1 : 3))",
+     "Unit": "s"
+    },
+    "FailsIf": "the target is already frozen/paralyzed or is casting a non-Chivalry spell (refused before mana is spent)",
+    "Special": "Plague Beast Lord: 120 s",
+    "BreaksOn": "damage (any paralysis ends when the paralyzed mobile is damaged)"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 7 + Magery/5 s, x0.75 if resisted."
+  },
+  {
+   "Id": 38,
+   "Name": "Poison Field",
+   "Key": "PoisonFieldSpell",
+   "Circle": 5,
+   "Mantra": "In Nox Grav",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "PoisonFieldScroll",
+   "Target": "Location",
+   "Range": 15,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Field",
+    "Field": "Poison",
+    "Tiles": 5,
+    "Layout": "PerpendicularToCaster",
+    "TileDelay": 0.3,
+    "Duration": {
+     "Expr": "3 + trunc(Caster.MageryFixed / 25)",
+     "Unit": "s"
+    },
+    "Poison": {
+     "Total": {
+      "Expr": "trunc((Caster.MageryFixed + Caster.PoisoningFixed) / 2)"
+     },
+     "Level": [
+      {
+       "MinTotal": 1000,
+       "Level": 3
+      },
+      {
+       "MinTotal": 851,
+       "Level": 2
+      },
+      {
+       "MinTotal": 651,
+       "Level": 1
+      },
+      {
+       "MinTotal": null,
+       "Level": 0
+      }
+     ],
+     "OnEnter": true,
+     "Interval": 1.5,
+     "FirstTick": 0.5
+    },
+    "AffectsCaster": false,
+    "Note": "Each tick poisons mobiles standing on the tile (its 1x2 footprint along the wall)."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 39,
+   "Name": "Summon Creature",
+   "Key": "SummonCreatureSpell",
+   "Circle": 5,
+   "Mantra": "Kal Xen",
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonCreatureScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.0,
+    "Multiplier": 5
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": {
+     "OneOf": [
+      "PolarBear",
+      "GrizzlyBear",
+      "BlackBear",
+      "Horse",
+      "Walrus",
+      "Chicken",
+      "Scorpion",
+      "GiantSerpent",
+      "Llama",
+      "Alligator",
+      "GreyWolf",
+      "Slime",
+      "Eagle",
+      "Gorilla",
+      "SnowLeopard",
+      "Pig",
+      "Hind",
+      "Rabbit"
+     ]
+    },
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "RequiresFreeSlots": 2,
+    "ControlSlots": "the creature's own (1 for every listed creature)"
+   },
+   "Resistable": false,
+   "Notes": "Cast delay x5. Duration is not scaled."
+  },
+  {
+   "Id": 40,
+   "Name": "Dispel",
+   "Key": "DispelSpell",
+   "Circle": 6,
+   "Mantra": "An Ort",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "DispelScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Dispel",
+    "Accepts": "a dispellable summoned creature",
+    "Chance": {
+     "Expr": "(50 + 100 * (Caster.Magery - DispelDifficulty) / (DispelFocus * 2)) / 100 - EnchantedSummoning / 100",
+     "Roll": "dispels if Chance > randf()",
+     "Note": "DispelDifficulty / DispelFocus are the creature's own numbers; EnchantedSummoning is its summoner's mastery bonus"
+    },
+    "OnFail": "nothing (the act is still harmful)",
+    "Note": "Harmful unless it is the caster's own summon."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 41,
+   "Name": "Energy Bolt",
+   "Key": "EnergyBoltSpell",
+   "Circle": 6,
+   "Mantra": "Corp Por",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "EnergyBoltScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 40,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Energy": 100
+    },
+    "Delay": 1.0,
+    "Scaling": "EvalIntScaling"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 24-41."
+  },
+  {
+   "Id": 42,
+   "Name": "Explosion",
+   "Key": "ExplosionSpell",
+   "Circle": 6,
+   "Mantra": "Vas Ort Flam",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ExplosionScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 40,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Fire": 100
+    },
+    "Delay": 3.0,
+    "Scaling": "EvalIntScaling",
+    "ComputedAt": "detonation"
+   },
+   "Resistable": false,
+   "Notes": "The 3 s fuse starts after casting; damage is rolled when it goes off (if the caster can still harm the target). Pre-AOS: 2.5 s, 23-44."
+  },
+  {
+   "Id": 43,
+   "Name": "Invisibility",
+   "Key": "InvisibilitySpell",
+   "Circle": 6,
+   "Mantra": "An Lor Xen",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "InvisibilityScroll",
+   "Target": "Beneficial",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Invisibility",
+    "Duration": {
+     "Expr": "1.2 * Caster.MageryFixed / 10",
+     "Unit": "s",
+     "Note": "= 1.2 x Magery seconds (not rounded)"
+    },
+    "Also": "clears the target's combatant and war mode; ends early on any revealing action",
+    "FailsIf": "target is a vendor or higher staff level"
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 44,
+   "Name": "Mark",
+   "Key": "MarkSpell",
+   "Circle": 6,
+   "Mantra": "Kal Por Ylem",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MarkScroll",
+   "Target": "Item",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Mark",
+    "Accepts": "a RecallRune in the caster's backpack",
+    "Effect": "The rune remembers the caster's location and map.",
+    "FailsIf": [
+     "travel rules forbid marking here",
+     "standing in a house/multi (on a non-galleon boat too)"
+    ]
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 45,
+   "Name": "Mass Curse",
+   "Key": "MassCurseSpell",
+   "Circle": 6,
+   "Mantra": "Vas Des Sanct",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MassCurseScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "AreaCurse",
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": 2
+    },
+    "Same": "CurseSpell, on every valid harmful target in the area (line of sight from the caster), each at its own Resisting Spells",
+    "Targets": "mobiles only"
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 46,
+   "Name": "Paralyze Field",
+   "Key": "ParalyzeFieldSpell",
+   "Circle": 6,
+   "Mantra": "In Ex Grav",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ParalyzeFieldScroll",
+   "Target": "Location",
+   "Range": 15,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Field",
+    "Field": "Paralyze",
+    "Tiles": 5,
+    "Layout": "PerpendicularToCaster",
+    "TileDelay": 0.3,
+    "Duration": {
+     "Expr": "3 + Caster.Magery / 3",
+     "Unit": "s"
+    },
+    "Paralyze": {
+     "Duration": {
+      "Expr": "max(0, (2 + trunc(Caster.EvalInt / 10) - trunc(Target.MagicResist / 10)) * (Target.IsPlayer ? 1 : 3))",
+      "Unit": "s"
+     },
+     "OnEnter": true,
+     "Interval": null
+    },
+    "AffectsCaster": false
+   },
+   "Resistable": false,
+   "Notes": "Paralyzes only when stepped onto (no repeating tick)."
+  },
+  {
+   "Id": 47,
+   "Name": "Reveal",
+   "Key": "RevealSpell",
+   "Circle": 6,
+   "Mantra": "Wis Quas",
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "RevealScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Reveal",
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": {
+      "Expr": "1 + trunc(Caster.Magery / 20)"
+     }
+    },
+    "Chance": {
+     "Expr": "Target.HidingFixed + Target.StealthFixed > 0 ? trunc(50 * (Caster.MageryFixed + Caster.DetectHiddenFixed) / (Target.HidingFixed + Target.StealthFixed)) : 100",
+     "Unit": "percent",
+     "Roll": "reveals if Chance > rand(0, 99)"
+    },
+    "AlwaysReveals": "anyone hidden by the Invisibility spell",
+    "Note": "Only mobiles the caster could detect with Detect Hidden rules; players, or lower staff."
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 48,
+   "Name": "Chain Lightning",
+   "Key": "ChainLightningSpell",
+   "Circle": 7,
+   "Mantra": "Vas Ort Grav",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ChainLightningScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": false,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "ChainDamage",
+    "Base": 51,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Energy": 100
+    },
+    "Delay": 1.0,
+    "Scaling": "EvalIntScaling (without the target damage scalar)",
+    "Jumps": {
+     "Expr": "3 + trunc(max(0, Caster.Magery - 100) / 25)"
+    },
+    "JumpRange": 6,
+    "JumpFalloff": 0.8,
+    "JumpDelay": 0.3,
+    "Next": "the nearest valid harmful target within JumpRange of the last one, in its line of sight, never one already hit"
+   },
+   "Resistable": false,
+   "Notes": "SeriousFun: a jumping bolt instead of stock's area blast."
+  },
+  {
+   "Id": 49,
+   "Name": "Energy Field",
+   "Key": "EnergyFieldSpell",
+   "Circle": 7,
+   "Mantra": "In Sanct Grav",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "EnergyFieldScroll",
+   "Target": "Location",
+   "Range": 15,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Wall",
+    "Field": "Energy",
+    "Tiles": 5,
+    "Layout": "PerpendicularToCaster",
+    "TileDelay": 0.3,
+    "Duration": {
+     "Expr": "trunc((15 + trunc(Caster.MageryFixed / 5)) / 7)",
+     "Unit": "s"
+    },
+    "BlocksMovement": true
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 2 + Magery x 0.28 s."
+  },
+  {
+   "Id": 50,
+   "Name": "Flame Strike",
+   "Key": "FlameStrikeSpell",
+   "Circle": 7,
+   "Mantra": "Kal Vas Flam",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "FlamestrikeScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 48,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Fire": 100
+    },
+    "Delay": 1.0,
+    "Scaling": "EvalIntScaling"
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 27-48, x0.6 if resisted."
+  },
+  {
+   "Id": 51,
+   "Name": "Gate Travel",
+   "Key": "GateTravelSpell",
+   "Circle": 7,
+   "Mantra": "Vas Rel Por",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "GateTravelScroll",
+   "Target": "Item",
+   "Range": 12,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Travel",
+    "Mode": "Gate",
+    "Destination": "MarkedLocation",
+    "Sources": [
+     "a marked RecallRune",
+     "a Runebook's default entry (no charge used)",
+     "a galleon",
+     "a writ of lease"
+    ],
+    "Gate": {
+     "OpensAfter": 1.0,
+     "Duration": 30.0,
+     "TwoWay": true,
+     "Dispellable": true
+    },
+    "FailsIf": [
+     "criminal",
+     "in combat (2 minutes)",
+     "carrying a faction sigil",
+     "a gate already stands at either end",
+     "travel rules",
+     "Young player to Felucca"
+    ]
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 52,
+   "Name": "Mana Vampire",
+   "Key": "ManaVampireSpell",
+   "Circle": 7,
+   "Mantra": "Ort Sanct",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ManaVampireScroll",
+   "Target": "Harmful",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "ManaDrain",
+    "Amount": {
+     "Expr": "min(clamp(trunc(trunc(Caster.EvalInt - Target.MagicResist) / (Target.IsPlayer ? 1 : 2)), 0, Target.Mana), Caster.ManaMax - Caster.Mana)"
+    },
+    "GivesToCaster": true,
+    "BreaksParalysis": true,
+    "DisruptsTargetCasting": true
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: all the target's mana unless resisted."
+  },
+  {
+   "Id": 53,
+   "Name": "Mass Dispel",
+   "Key": "MassDispelSpell",
+   "Circle": 7,
+   "Mantra": "Vas An Ort",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MassDispelScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Dispel",
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": 8
+    },
+    "Same": "DispelSpell's chance, per dispellable summon (own, or harmful-able)",
+    "OnFail": "the caster becomes harmful to it"
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 54,
+   "Name": "Meteor Swarm",
+   "Key": "MeteorSwarmSpell",
+   "Circle": 7,
+   "Mantra": "Flam Kal Des Ylem",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "MeteorSwarmScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": false,
+   "Reflectable": true,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 51,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Fire": 100
+    },
+    "Delay": 1.0,
+    "Area": {
+     "Center": "TargetLocation",
+     "Radius": 2
+    },
+    "Scaling": "EvalIntScaling",
+    "Split": {
+     "Expr": "Count > 2 ? D * 2 / Count : D",
+     "Note": "D = the scaled damage"
+    },
+    "Note": "Every valid harmful target in the area (line of sight from the caster) is hit."
+   },
+   "Resistable": false,
+   "Notes": "Pre-AOS: 27-48 divided by the number of targets."
+  },
+  {
+   "Id": 55,
+   "Name": "Polymorph",
+   "Key": "PolymorphSpell",
+   "Circle": 7,
+   "Mantra": "Vas Ylem Rel",
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "PolymorphScroll",
+   "Target": "Self",
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Polymorph",
+    "Forms": [
+     {
+      "Name": "Chicken",
+      "Body": 208
+     },
+     {
+      "Name": "Dog",
+      "Body": 217
+     },
+     {
+      "Name": "Wolf",
+      "Body": 225
+     },
+     {
+      "Name": "Panther",
+      "Body": 214
+     },
+     {
+      "Name": "Gorilla",
+      "Body": 29
+     },
+     {
+      "Name": "BlackBear",
+      "Body": 211
+     },
+     {
+      "Name": "GrizzlyBear",
+      "Body": 212
+     },
+     {
+      "Name": "PolarBear",
+      "Body": 213
+     },
+     {
+      "Name": "HumanMale",
+      "Body": 400
+     },
+     {
+      "Name": "HumanFemale",
+      "Body": 401
+     },
+     {
+      "Name": "Slime",
+      "Body": 51
+     },
+     {
+      "Name": "Orc",
+      "Body": 17
+     },
+     {
+      "Name": "LizardMan",
+      "Body": 33
+     },
+     {
+      "Name": "Gargoyle",
+      "Body": 4
+     },
+     {
+      "Name": "Ogre",
+      "Body": 1
+     },
+     {
+      "Name": "Troll",
+      "Body": 54
+     },
+     {
+      "Name": "Ettin",
+      "Body": 2
+     },
+     {
+      "Name": "Daemon",
+      "Body": 9
+     }
+    ],
+    "Duration": "UntilRecast",
+    "Hue": "random skin hue for human forms, otherwise none",
+    "Dismounts": "for non-human forms",
+    "FailsIf": [
+     "flying",
+     "carrying a faction sigil",
+     "under a transformation spell",
+     "disguised",
+     "incognito or body-modded (fizzle)"
+    ],
+    "Recast": "casting it while polymorphed ends the polymorph (no new form)"
+   },
+   "Resistable": false,
+   "Notes": "The form is picked before casting. Pre-ML: lasted min(Magery, 120) s."
+  },
+  {
+   "Id": 56,
+   "Name": "Earthquake",
+   "Key": "EarthquakeSpell",
+   "Circle": 8,
+   "Mantra": "In Vas Por",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "EarthquakeScroll",
+   "Target": "Self",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Area": {
+     "Center": "Caster",
+     "Radius": {
+      "Expr": "1 + trunc(Caster.Magery / 15)"
+     }
+    },
+    "Formula": {
+     "Expr": "(Target.IsPlayer ? trunc(Target.Hits / 2) : clamp(trunc(Target.Hits / 2), 15, 100)) + rand(0, 15)"
+    },
+    "Types": {
+     "Physical": 100
+    },
+    "Delay": 0.0,
+    "Scaling": null
+   },
+   "Resistable": false,
+   "Notes": "Hits every valid harmful target around the caster (line of sight). Pre-AOS: 60% of current hits, 10-75."
+  },
+  {
+   "Id": 57,
+   "Name": "Energy Vortex",
+   "Key": "EnergyVortexSpell",
+   "Circle": 8,
+   "Mantra": "Vas Corp Por",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "EnergyVortexScroll",
+   "Target": "Location",
+   "Range": 10,
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "EnergyVortex",
+    "At": "TargetLocation",
+    "Duration": 90.0,
+    "Controlled": false,
+    "ControlSlots": 2
+   },
+   "Resistable": false,
+   "Notes": "Uncontrolled."
+  },
+  {
+   "Id": 58,
+   "Name": "Resurrection",
+   "Key": "ResurrectionSpell",
+   "Circle": 8,
+   "Mantra": "An Corp",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "ResurrectionScroll",
+   "Target": "Beneficial",
+   "Range": 1,
+   "AllowedInTown": true,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Resurrect",
+    "Accepts": "a dead player (not the caster), adjacent",
+    "Confirm": "the ghost must accept",
+    "Result": {
+     "Hits": 10,
+     "Stam": "StamMax",
+     "Mana": 0,
+     "CompassionBonus": "if the caster is a Seeker/Follower/Knight of Compassion: Hits = 20/40/80 percent of HitsMax"
+    },
+    "FailsIf": [
+     "the body cannot fit there",
+     "in Khaldun"
+    ]
+   },
+   "Resistable": false,
+   "Notes": "Target range 1."
+  },
+  {
+   "Id": 59,
+   "Name": "Air Elemental",
+   "Key": "AirElementalSpell",
+   "Circle": 8,
+   "Mantra": "Kal Vas Xen Hur",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonAirElementalScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "SummonedAirElemental",
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "ControlSlots": 2
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 60,
+   "Name": "Summon Daemon",
+   "Key": "SummonDaemonSpell",
+   "Circle": 8,
+   "Mantra": "Kal Vas Xen Corp",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonDaemonScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "SummonedDaemon",
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "ControlSlots": 4
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 61,
+   "Name": "Earth Elemental",
+   "Key": "EarthElementalSpell",
+   "Circle": 8,
+   "Mantra": "Kal Vas Xen Ylem",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonEarthElementalScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "SummonedEarthElemental",
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "ControlSlots": 2
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 62,
+   "Name": "Fire Elemental",
+   "Key": "FireElementalSpell",
+   "Circle": 8,
+   "Mantra": "Kal Vas Xen Flam",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonFireElementalScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "SummonedFireElemental",
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "ControlSlots": 4
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 63,
+   "Name": "Water Elemental",
+   "Key": "WaterElementalSpell",
+   "Circle": 8,
+   "Mantra": "Kal Vas Xen An Flam",
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Scroll": "SummonWaterElementalScroll",
+   "Target": "None",
+   "AllowedInTown": false,
+   "Reflectable": false,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "Summon",
+    "Creature": "SummonedWaterElemental",
+    "At": "NearCaster",
+    "Duration": {
+     "Expr": "trunc(2 * Caster.MageryFixed / 5)",
+     "Unit": "s",
+     "Note": "= Magery x 4 seconds"
+    },
+    "Controlled": true,
+    "ControlSlots": 3
+   },
+   "Resistable": false,
+   "Notes": ""
+  },
+  {
+   "Id": 100,
+   "Name": "Animate Dead",
+   "Key": "AnimateDeadSpell",
+   "School": "Necromancy",
+   "Mantra": "Uus Corp",
+   "RequiredSkill": 40.0,
+   "Mana": 23,
+   "Reagents": [
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "AnimateDeadScroll",
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "AnimateDead",
+    "Target": "Corpse",
+    "Range": 12,
+    "Note": "raises a creature corpse in range as an undead of its kind's group (by the corpse's fame), controlled, for (Spirit Speak + Necromancy) x 1.5... in the table below; corpses of players and summons can't be raised",
+    "Groups": [
+     {
+      "Corpses": [
+       "AncientLich",
+       "AncientLichRenowned",
+       "Bogle",
+       "BoneKnight",
+       "BoneMagi",
+       "DarkGuardian",
+       "DarknightCreeper",
+       "FleshGolem",
+       "Ghoul",
+       "GoreFiend",
+       "HellSteed",
+       "LadyOfTheSnow",
+       "Lich",
+       "LichLord",
+       "Mummy",
+       "PestilentBandage",
+       "Revenant",
+       "RevenantLion",
+       "RottingCorpse",
+       "Shade",
+       "ShadowKnight",
+       "SkeletalKnight",
+       "SkeletalMage",
+       "SkeletalMount",
+       "Skeleton",
+       "Spectre",
+       "Wraith",
+       "Zombie",
+       "UnfrozenMummy",
+       "RedDeath",
+       "SirPatrick",
+       "LadyJennifyr",
+       "MasterMikael",
+       "MasterJonath",
+       "LadyMarai",
+       "PrimevalLich",
+       "Niporailem",
+       "DreamWraith",
+       "EffeteUndeadGargoyle",
+       "UndeadGargoyle",
+       "UndeadGuardian",
+       "PutridUndeadGargoyle",
+       "PutridUndeadGuardian",
+       "Juonar",
+       "Spellbinder",
+       "AngeredSpirit",
+       "BoneSwordSlinger",
+       "CovetousRevenant",
+       "DiseasedLich",
+       "VileCadaver",
+       "GrizzledMare",
+       "SkeletalCat"
+      ],
+      "Raise": []
+     },
+     {
+      "Corpses": [
+       "DreadSpider",
+       "FrostSpider",
+       "GiantSpider",
+       "GiantBlackWidow",
+       "BlackSolenInfiltratorQueen",
+       "BlackSolenInfiltratorWarrior",
+       "BlackSolenQueen",
+       "BlackSolenWarrior",
+       "BlackSolenWorker",
+       "RedSolenInfiltratorQueen",
+       "RedSolenInfiltratorWarrior",
+       "RedSolenQueen",
+       "RedSolenWarrior",
+       "RedSolenWorker",
+       "TerathanAvenger",
+       "TerathanDrone",
+       "TerathanMatriarch",
+       "TerathanWarrior"
+      ],
+      "Raise": [
+       {
+        "Requirement": 0,
+        "Creatures": [
+         "MoundOfMaggots"
+        ]
+       }
+      ]
+     },
+     {
+      "Corpses": [
+       "Horse",
+       "Nightmare",
+       "FireSteed",
+       "Kirin",
+       "Unicorn"
+      ],
+      "Raise": [
+       {
+        "Requirement": 10000,
+        "Creatures": [
+         "HellSteed"
+        ]
+       },
+       {
+        "Requirement": 0,
+        "Creatures": [
+         "SkeletalMount"
+        ]
+       }
+      ]
+     },
+     {
+      "Corpses": [
+       "BloodElemental",
+       "EarthElemental",
+       "SummonedEarthElemental",
+       "AgapiteElemental",
+       "BronzeElemental",
+       "CopperElemental",
+       "DullCopperElemental",
+       "GoldenElemental",
+       "ShadowIronElemental",
+       "ValoriteElemental",
+       "VeriteElemental",
+       "PoisonElemental",
+       "FireElemental",
+       "SummonedFireElemental",
+       "SnowElemental",
+       "AirElemental",
+       "SummonedAirElemental",
+       "WaterElemental",
+       "SummonedAirElemental",
+       "ToxicElemental"
+      ],
+      "Raise": [
+       {
+        "Requirement": 5000,
+        "Creatures": [
+         "WailingBanshee"
+        ]
+       },
+       {
+        "Requirement": 0,
+        "Creatures": [
+         "Wraith"
+        ]
+       }
+      ]
+     },
+     {
+      "Corpses": [
+       "AncientWyrm",
+       "Dragon",
+       "GreaterDragon",
+       "SerpentineDragon",
+       "ShadowWyrm",
+       "SkeletalDragon",
+       "WhiteWyrm",
+       "Drake",
+       "Wyvern",
+       "LesserHiryu",
+       "Hiryu"
+      ],
+      "Raise": [
+       {
+        "Requirement": 18000,
+        "Creatures": [
+         "SkeletalDragon"
+        ]
+       },
+       {
+        "Requirement": 10000,
+        "Creatures": [
+         "FleshGolem"
+        ]
+       },
+       {
+        "Requirement": 5000,
+        "Creatures": [
+         "Lich"
+        ]
+       },
+       {
+        "Requirement": 3000,
+        "Creatures": [
+         "SkeletalKnight",
+         "BoneKnight"
+        ]
+       },
+       {
+        "Requirement": 2000,
+        "Creatures": [
+         "Mummy"
+        ]
+       },
+       {
+        "Requirement": 1000,
+        "Creatures": [
+         "SkeletalMage",
+         "BoneMagi"
+        ]
+       },
+       {
+        "Requirement": 0,
+        "Creatures": [
+         "PatchworkSkeleton"
+        ]
+       }
+      ]
+     },
+     {
+      "Corpses": "Any",
+      "Raise": [
+       {
+        "Requirement": 18000,
+        "Creatures": [
+         "LichLord"
+        ]
+       },
+       {
+        "Requirement": 10000,
+        "Creatures": [
+         "FleshGolem"
+        ]
+       },
+       {
+        "Requirement": 5000,
+        "Creatures": [
+         "Lich"
+        ]
+       },
+       {
+        "Requirement": 3000,
+        "Creatures": [
+         "SkeletalKnight",
+         "BoneKnight"
+        ]
+       },
+       {
+        "Requirement": 2000,
+        "Creatures": [
+         "Mummy"
+        ]
+       },
+       {
+        "Requirement": 1000,
+        "Creatures": [
+         "SkeletalMage",
+         "BoneMagi"
+        ]
+       },
+       {
+        "Requirement": 0,
+        "Creatures": [
+         "PatchworkSkeleton"
+        ]
+       }
+      ]
+     }
+    ],
+    "Ability": {
+     "Expr": "trunc((trunc(Caster.Necromancy * 30) + trunc(Caster.SpiritSpeak * 70)) / 10) * 18"
+    },
+    "MinFame": 100,
+    "MaxRaised": 3,
+    "Duration": 86400,
+    "Regen": {
+     "Every": 4,
+     "Amount": "1 + HitsMax / 100"
+    },
+    "Order": "Guard",
+    "Shard": "SeriousFun: raised dead are controlled (pet orders, start on Guard), last a day and slowly heal; in plain ServUO they wander uncontrolled and decay"
+   },
+   "Target": "Corpse",
+   "Range": 10
+  },
+  {
+   "Id": 101,
+   "Name": "Blood Oath",
+   "Key": "BloodOathSpell",
+   "School": "Necromancy",
+   "Mantra": "In Jux Mani Xen",
+   "RequiredSkill": 20.0,
+   "Mana": 13,
+   "Reagents": [
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "BloodOathScroll",
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "BloodOath",
+    "Duration": {
+     "Expr": "((Caster.SpiritSpeak - Target.MagicResist) / 8) + 8"
+    },
+    "Increase": 1.2,
+    "Note": "the target's blows to the caster do 20% more, and the target takes the blow's damage too (AOS.Damage)"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 102,
+   "Name": "Corpse Skin",
+   "Key": "CorpseSkinSpell",
+   "School": "Necromancy",
+   "Mantra": "In Agle Corp Ylem",
+   "RequiredSkill": 20.0,
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "CorpseSkinScroll",
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "ResistCurse",
+    "Key": "CorpseSkin",
+    "Duration": {
+     "Expr": "((Caster.SpiritSpeak - Target.MagicResist) / 2.5) + 40"
+    },
+    "Malus": {
+     "Expr": "min(15, (Caster.Necromancy + Caster.SpiritSpeak) * 0.075)"
+    },
+    "Resists": {
+     "Physical": 10,
+     "Fire": "-Malus",
+     "Cold": 10,
+     "Poison": "-Malus",
+     "Energy": 0
+    }
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 103,
+   "Name": "Curse Weapon",
+   "Key": "CurseWeaponSpell",
+   "School": "Necromancy",
+   "Mantra": "An Sanct Gra Char",
+   "RequiredSkill": 0.0,
+   "Mana": 7,
+   "Reagents": [
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "CurseWeaponScroll",
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "CurseWeapon",
+    "Duration": {
+     "Expr": "Caster.SpiritSpeak / 3.4 + 1"
+    },
+    "Leech": 50,
+    "Note": "the weapon in hand heals its wielder half the damage it does"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 104,
+   "Name": "Evil Omen",
+   "Key": "EvilOmenSpell",
+   "School": "Necromancy",
+   "Mantra": "Pas Tym An Sanct",
+   "RequiredSkill": 20.0,
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "EvilOmenScroll",
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "EvilOmen",
+    "Duration": {
+     "Expr": "Caster.SpiritSpeak / 12 + 1"
+    },
+    "DamageBonus": 25,
+    "ResistFixed": 50,
+    "Note": "the next harmful thing to the target does 25% more damage (a poison one level more); its Magic Resist counts as 50 for it"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 105,
+   "Name": "Horrific Beast",
+   "Key": "HorrificBeastSpell",
+   "School": "Necromancy",
+   "Mantra": "Rel Xen Vas Bal",
+   "RequiredSkill": 40.0,
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "HorrificBeastScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "HorrificBeast",
+    "Body": 746,
+    "Bonus": {
+     "WeaponDamage": 25,
+     "RegenHits": 20
+    },
+    "Fists": [
+     5,
+     15
+    ],
+    "BlocksSpells": true
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 106,
+   "Name": "Lich Form",
+   "Key": "LichFormSpell",
+   "School": "Necromancy",
+   "Mantra": "Rel Xen Corp Ort",
+   "RequiredSkill": 70.0,
+   "Mana": 23,
+   "Reagents": [
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    },
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "LichFormScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "LichForm",
+    "Body": 749,
+    "Resists": {
+     "Fire": -10,
+     "Cold": 10,
+     "Poison": 10
+    },
+    "Bonus": {
+     "RegenMana": 13
+    },
+    "HitsLoss": {
+     "Every": 2,
+     "Amount": 1
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 107,
+   "Name": "Mind Rot",
+   "Key": "MindRotSpell",
+   "School": "Necromancy",
+   "Mantra": "Wis An Ben",
+   "RequiredSkill": 30.0,
+   "Mana": 17,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    },
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "MindRotScroll",
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "MindRot",
+    "Duration": {
+     "Expr": "((Caster.SpiritSpeak - Target.MagicResist) / 5 + 20) * (Target.IsPlayer ? 1 : 2)"
+    },
+    "Scalar": {
+     "Expr": "Target.IsPlayer ? 1.25 : 2.0"
+    },
+    "Note": "the target's spells cost this times the mana"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 108,
+   "Name": "Pain Spike",
+   "Key": "PainSpikeSpell",
+   "School": "Necromancy",
+   "Mantra": "In Sar",
+   "RequiredSkill": 20.0,
+   "Mana": 5,
+   "Reagents": [
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "PainSpikeScroll",
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "PainSpike",
+    "Damage": {
+     "Expr": "max(1, (Caster.SpiritSpeak - Target.MagicResist) / 10 + (Target.IsPlayer ? 18 : 30))"
+    },
+    "Again": [
+     3,
+     7
+    ],
+    "Restore": 10,
+    "Note": "direct damage (no resist); the hit points come back after 10 s if the target lives; again while it lasts: 3-7 more and +2 s"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 109,
+   "Name": "Poison Strike",
+   "Key": "PoisonStrikeSpell",
+   "School": "Necromancy",
+   "Mantra": "In Vas Nox",
+   "RequiredSkill": 50.0,
+   "Mana": 17,
+   "Reagents": [
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "PoisonStrikeScroll",
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "AreaDamage",
+    "Damage": {
+     "Expr": "rand(32, 40) * (300 + Caster.SpiritSpeak * 9) / 1000"
+    },
+    "Types": {
+     "Poison": 100
+    },
+    "Radius": 2,
+    "Falloff": [
+     1,
+     2,
+     3
+    ],
+    "Note": "the target full damage, a tile away half, two tiles a third"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 110,
+   "Name": "Strangle",
+   "Key": "StrangleSpell",
+   "School": "Necromancy",
+   "Mantra": "In Bal Nox",
+   "RequiredSkill": 65.0,
+   "Mana": 29,
+   "Reagents": [
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    },
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "StrangleScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Strangle",
+    "Rounds": {
+     "Expr": "max(4, trunc(Caster.SpiritSpeak / 10))"
+    },
+    "Min": {
+     "Expr": "Caster.SpiritSpeak / 10 - 2"
+    },
+    "Max": {
+     "Expr": "Caster.SpiritSpeak / 10 + 1"
+    },
+    "FirstDelay": 5,
+    "CreatureScale": 1.75,
+    "Types": {
+     "Poison": 100
+    },
+    "Note": "poison damage each round, more the more tired the target: x (3 - stamina share x 2), x1.75 on creatures; the delay drops from 5 s by ceil((1 + 5 x rounds left) / rounds)"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 111,
+   "Name": "Summon Familiar",
+   "Key": "SummonFamiliarSpell",
+   "School": "Necromancy",
+   "Mantra": "Kal Xen Bal",
+   "RequiredSkill": 30.0,
+   "Mana": 17,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "DaemonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "SummonFamiliarScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Familiar",
+    "Forms": [
+     {
+      "Creature": "HordeMinionFamiliar",
+      "Name": 1060146,
+      "Necromancy": 30,
+      "SpiritSpeak": 30
+     },
+     {
+      "Creature": "ShadowWispFamiliar",
+      "Name": 1060142,
+      "Necromancy": 50,
+      "SpiritSpeak": 50
+     },
+     {
+      "Creature": "DarkWolfFamiliar",
+      "Name": 1060143,
+      "Necromancy": 60,
+      "SpiritSpeak": 60
+     },
+     {
+      "Creature": "DeathAdder",
+      "Name": 1060145,
+      "Necromancy": 80,
+      "SpiritSpeak": 80
+     },
+     {
+      "Creature": "VampireBatFamiliar",
+      "Name": 1060144,
+      "Necromancy": 100,
+      "SpiritSpeak": 100
+     }
+    ],
+    "Note": "one familiar at a time, controlled; choose which (by your Necromancy and Spirit Speak)"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 112,
+   "Name": "Vampiric Embrace",
+   "Key": "VampiricEmbraceSpell",
+   "School": "Necromancy",
+   "Mantra": "Rel Xen An Sanct",
+   "RequiredSkill": 99.0,
+   "Mana": 23,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "VampiricEmbraceScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "VampiricEmbrace",
+    "Hue": 33918,
+    "Resists": {
+     "Fire": -25
+    },
+    "Bonus": {
+     "RegenStam": 15,
+     "RegenMana": 3
+    },
+    "LifeLeech": 20,
+    "PoisonImmuneBelow": 4,
+    "SkillAbove": [
+     80,
+     120
+    ]
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 113,
+   "Name": "Vengeful Spirit",
+   "Key": "VengefulSpiritSpell",
+   "School": "Necromancy",
+   "Mantra": "Kal Xen Bal Beh",
+   "RequiredSkill": 80.0,
+   "Mana": 41,
+   "Reagents": [
+    {
+     "Type": "BatWing",
+     "Amount": 1
+    },
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "VengefulSpiritScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Revenant",
+    "Creature": "Revenant",
+    "Duration": {
+     "Expr": "(Caster.SpiritSpeak * 80 / 120) + 10"
+    },
+    "Slots": 3,
+    "Note": "a revenant hunts the target until one of them dies or the time runs out"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 114,
+   "Name": "Wither",
+   "Key": "WitherSpell",
+   "School": "Necromancy",
+   "Mantra": "Kal Vas An Flam",
+   "RequiredSkill": 60.0,
+   "Mana": 23,
+   "Reagents": [
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    },
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "WitherScroll",
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "AreaDamage",
+    "Damage": {
+     "Expr": "rand(30, 35) * (300 + Target.Karma / 100 + Caster.SpiritSpeak * 10) / 1000"
+    },
+    "Types": {
+     "Cold": 100
+    },
+    "Radius": 4,
+    "Center": "Caster"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 115,
+   "Name": "Wraith Form",
+   "Key": "WraithFormSpell",
+   "School": "Necromancy",
+   "Mantra": "Rel Xen Um",
+   "RequiredSkill": 20.0,
+   "Mana": 17,
+   "Reagents": [
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    },
+    {
+     "Type": "PigIron",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "WraithFormScroll",
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "WraithForm",
+    "BodyFemale": 747,
+    "Body": 748,
+    "Resists": {
+     "Physical": 15,
+     "Fire": -5,
+     "Energy": -5
+    },
+    "ManaLeech": {
+     "Expr": "Caster.SpiritSpeak / 5"
+    },
+    "Note": "your blows drain mana: Spirit Speak / 5 % of the damage"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 116,
+   "Name": "Exorcism",
+   "Key": "ExorcismSpell",
+   "School": "Necromancy",
+   "Mantra": "Ort Corp Grav",
+   "RequiredSkill": 80.0,
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "NoxCrystal",
+     "Amount": 1
+    },
+    {
+     "Type": "GraveDust",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "ExorcismScroll",
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": null,
+   "Notes": "banishes ghosts from champion spawns; waits for champion spawns",
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 200,
+   "Name": "Cleanse By Fire",
+   "Key": "CleanseByFireSpell",
+   "School": "Chivalry",
+   "Mantra": "Expor Flamus",
+   "RequiredSkill": 5.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060718,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "CleanseByFire",
+    "CureChance": {
+     "Expr": "(10000 + Caster.ChivalryFixed * 7.5 - (PoisonLevel + 1) * 2000) / 100"
+    },
+    "SelfDamage": {
+     "Expr": "clamp(50 - Power(4), 13, 55)"
+    },
+    "Types": {
+     "Fire": 100
+    }
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 201,
+   "Name": "Close Wounds",
+   "Key": "CloseWoundsSpell",
+   "School": "Chivalry",
+   "Mantra": "Obsu Vulni",
+   "RequiredSkill": 0.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060719,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "CloseWounds",
+    "Reach": 2,
+    "Heal": {
+     "Expr": "clamp(Power(6) + rand(0, 2), 7, 39)"
+    }
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 202,
+   "Name": "Consecrate Weapon",
+   "Key": "ConsecrateWeaponSpell",
+   "School": "Chivalry",
+   "Mantra": "Consecrus Arma",
+   "RequiredSkill": 15.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060720,
+   "CastDelay": {
+    "Base": 0.5
+   },
+   "Effect": {
+    "Kind": "Consecrate",
+    "Duration": {
+     "Expr": "Power(20) + (Caster.Karma > 5000 ? 11 : Caster.Karma >= 4999 ? 10 : Caster.Karma >= 3999 ? 8 : Caster.Karma >= 2999 ? 6 : Caster.Karma >= 1999 ? 4 : Caster.Karma >= 999 ? 2 : 0)"
+    },
+    "DamageBonus": {
+     "Expr": "Caster.Chivalry >= 90 ? trunc((Caster.Chivalry - 90) / 2) : 0"
+    },
+    "Note": "the weapon's damage turns wholly to whichever of the target's resists is lowest"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 203,
+   "Name": "Dispel Evil",
+   "Key": "DispelEvilSpell",
+   "School": "Chivalry",
+   "Mantra": "Dispiro Malas",
+   "RequiredSkill": 35.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060721,
+   "CastDelay": {
+    "Base": 0.25
+   },
+   "Effect": {
+    "Kind": "DispelEvil",
+    "Radius": 8,
+    "Chance": {
+     "Expr": "(50 + 100 * (Caster.Chivalry - DispelDifficulty) / (DispelFocus * 2)) / 100 * Power(2) / 100"
+    },
+    "Note": "dispels summoned creatures near you; evil creatures may flee"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 204,
+   "Name": "Divine Fury",
+   "Key": "DivineFurySpell",
+   "School": "Chivalry",
+   "Mantra": "Divinum Furis",
+   "RequiredSkill": 25.0,
+   "Mana": 15,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060722,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "DivineFury",
+    "Duration": {
+     "Expr": "Power(10)"
+    },
+    "Bonus": {
+     "AttackChance": 10,
+     "WeaponDamage": 10,
+     "WeaponSpeed": 10,
+     "DefendChance": -20
+    },
+    "Grand": {
+     "Chivalry": 120,
+     "Karma": 10000,
+     "AttackChance": 15,
+     "WeaponDamage": 20,
+     "WeaponSpeed": 15,
+     "DefendChance": -10
+    },
+    "Note": "your stamina is filled"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 205,
+   "Name": "Enemy of One",
+   "Key": "EnemyOfOneSpell",
+   "School": "Chivalry",
+   "Mantra": "Forul Solum",
+   "RequiredSkill": 45.0,
+   "Mana": 20,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060723,
+   "CastDelay": {
+    "Base": 0.5
+   },
+   "Effect": {
+    "Kind": "EnemyOfOne",
+    "Duration": {
+     "Expr": "clamp(Power(1), 67, 228)"
+    },
+    "DamageScalar": {
+     "Expr": "10 + (Caster.Chivalry - 40) * 9 / 10"
+    },
+    "Note": "the first creature you hit names its kind; your blows do this much more damage to that kind"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 206,
+   "Name": "Holy Light",
+   "Key": "HolyLightSpell",
+   "School": "Chivalry",
+   "Mantra": "Augus Luminos",
+   "RequiredSkill": 55.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060724,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "AreaDamage",
+    "Damage": {
+     "Expr": "clamp(Power(10) + rand(0, 2), 8, 24)"
+    },
+    "Types": {
+     "Energy": 100
+    },
+    "Radius": 3,
+    "Center": "Caster"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 207,
+   "Name": "Noble Sacrifice",
+   "Key": "NobleSacrificeSpell",
+   "School": "Chivalry",
+   "Mantra": "Dium Prostra",
+   "RequiredSkill": 65.0,
+   "Mana": 20,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 30,
+   "MantraCliloc": 1060725,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "NobleSacrifice",
+    "Radius": 6,
+    "Resurrect": {
+     "Expr": "0.1 + 0.9 * Caster.Karma / 10000"
+    },
+    "Heal": {
+     "Expr": "clamp(Power(10) + rand(0, 2), 8, 24)"
+    },
+    "Note": "resurrects, cures and heals everyone friendly around you and lifts their curses; you're left with 1 hit, stamina and mana"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 208,
+   "Name": "Remove Curse",
+   "Key": "RemoveCurseSpell",
+   "School": "Chivalry",
+   "Mantra": "Extermo Vomica",
+   "RequiredSkill": 5.0,
+   "Mana": 20,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 10,
+   "MantraCliloc": 1060726,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "RemoveCurse",
+    "Chance": {
+     "Expr": "Caster.Karma < -5000 ? 0 : Caster.Karma < 0 ? trunc(sqrt(20000 + Caster.Karma)) - 122 : Caster.Karma < 5625 ? trunc(sqrt(Caster.Karma)) + 25 : 100"
+    }
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 209,
+   "Name": "Sacred Journey",
+   "Key": "SacredJourneySpell",
+   "School": "Chivalry",
+   "Mantra": "Sanctum Viatas",
+   "RequiredSkill": 15.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Tithing": 15,
+   "MantraCliloc": 1060727,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Travel",
+    "Mode": "Recall",
+    "Note": "Recall by chivalry (a marked rune), not while in combat"
+   },
+   "Target": "Item",
+   "Range": 10
+  },
+  {
+   "Id": 400,
+   "Name": "Honorable Execution",
+   "Key": "HonorableExecution",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 25.0,
+   "Mana": 0,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "HonorableExecution",
+    "DamageScalar": {
+     "Expr": "1 + Caster.Bushido * 20 / 10000"
+    },
+    "KillHeal": {
+     "Expr": "20 + trunc(Caster.Bushido * Caster.Bushido / 480)"
+    },
+    "KillSwing": {
+     "Expr": "max(1, trunc(Caster.Bushido * Caster.Bushido / 720))"
+    },
+    "KillSeconds": 20,
+    "PenaltyResists": -40,
+    "PenaltySeconds": 7,
+    "Note": "kill with this blow: hits back and faster swings for 20 s; fail: -40 to every resist and no Magic Resist for 7 s (a parry ends it)",
+    "Text": {
+     "Ready": "You better kill your enemy with your next hit or you'll be rather sorry..."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 401,
+   "Name": "Confidence",
+   "Key": "Confidence",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 25.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 0.25
+   },
+   "Effect": {
+    "Kind": "Stance",
+    "Stance": "Confidence",
+    "Seconds": 15,
+    "ParryHeal": {
+     "Expr": "rand(1, max(1, trunc(Caster.Bushido / 12)))"
+    },
+    "ParryStam": {
+     "Expr": "rand(1, max(1, trunc(Caster.Bushido / 5)))"
+    },
+    "Regen": {
+     "Expr": "15 + trunc(Caster.BushidoFixed * Caster.BushidoFixed / 57600)"
+    },
+    "RegenSeconds": 5,
+    "Note": "15 s: each parried blow gives back hits and stamina; meanwhile the regen hits come back over 5 s (a fifth a second), stopped by a blow",
+    "Text": {
+     "Begin": "You exude confidence.",
+     "Ends": "Your confidence wanes.",
+     "Parried": "Your confidence reassures you as you successfully block your opponent's blow."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 402,
+   "Name": "Evasion",
+   "Key": "Evasion",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 60.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 0.25
+   },
+   "Effect": {
+    "Kind": "Stance",
+    "Stance": "Evasion",
+    "WeaponSkill": 50,
+    "Cooldown": 20,
+    "Seconds": {
+     "Expr": "trunc(3 + (Caster.Bushido > 60 ? (Caster.Bushido - 60) / 20 : 0) + (Caster.Anatomy >= 100 && Caster.Tactics >= 100 && Caster.Bushido > 100 ? 1 : 0))"
+    },
+    "ParryScalar": {
+     "Expr": "1 + (Caster.Bushido >= 60 ? (Caster.Bushido - 60) * 0.004 + 0.16 : 0) + (Caster.Anatomy >= 100 && Caster.Tactics >= 100 && Caster.Bushido > 100 ? 0.1 : 0)"
+    },
+    "Note": "parrying is likelier, and a parry check can turn aside harmful spells; needs a shield or 50 in your weapon's skill; again after 20 s",
+    "Text": {
+     "Begin": "You feel that you might be able to deflect any attack!",
+     "Ends": "You no longer feel that you could deflect any attack.",
+     "Skill": "Your skill with your equipped weapon must be 50 or higher to use Evasion.",
+     "Wait": "You must wait before trying again.",
+     "Evades": "*evades*"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 403,
+   "Name": "Counter Attack",
+   "Key": "CounterAttack",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 40.0,
+   "Mana": 5,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 0.25
+   },
+   "Effect": {
+    "Kind": "Stance",
+    "Stance": "CounterAttack",
+    "Seconds": 30,
+    "Reach": 1,
+    "NeedsWeaponOrShield": true,
+    "Note": "the next blow you parry from a foe beside you, you strike straight back",
+    "Text": {
+     "Begin": "You prepare to respond immediately to the next blocked blow.",
+     "Ends": "You return to your normal stance."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 404,
+   "Name": "Lightning Strike",
+   "Key": "LightningStrike",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 50.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "LightningStrike",
+    "Accuracy": 50,
+    "Critical": {
+     "Expr": "Caster.Bushido * Caster.Bushido / 72000"
+    },
+    "Note": "+50% hit chance (within the 45% cap); a chance to ignore armour",
+    "Text": {
+     "Ready": "You prepare to strike quickly.",
+     "Hit": "You attack with lightning precision!",
+     "Struck": "Your opponent's quick strike causes extra damage!"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 405,
+   "Name": "Momentum Strike",
+   "Key": "MomentumStrike",
+   "School": "Bushido",
+   "Mantra": null,
+   "RequiredSkill": 70.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "MomentumStrike",
+    "DamageBonus": {
+     "Expr": "Caster.Bushido / 100"
+    },
+    "KilledScalar": 1.5,
+    "Note": "the blow carries on into another foe in reach, with a damage bonus (half again if the first fell)",
+    "Text": {
+     "Ready": "You prepare to strike two enemies with one blow.",
+     "Hit": "You transfer the momentum of your weapon into another enemy!",
+     "Struck": "You were hit by the momentum of a Samurai's weapon!",
+     "None": "There are no valid targets to attack!"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 500,
+   "Name": "Focus Attack",
+   "Key": "FocusAttack",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 30.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "FocusAttack",
+    "Melee": true,
+    "NoShield": true,
+    "DamageScalar": {
+     "Expr": "1 + Caster.Ninjitsu * Caster.Ninjitsu / 43636"
+    },
+    "PropertyScalar": {
+     "Expr": "1 + Caster.Ninjitsu * Caster.Ninjitsu / 43636 * 3 + 0.01"
+    },
+    "Note": "more damage, and the weapon's hit properties (leech, hit spells, areas) are stronger",
+    "Text": {
+     "Ready": "You prepare to focus all of your abilities into your next strike.",
+     "Hit": "You focus all of your abilities and strike with deadly force!",
+     "Shield": "You cannot use this ability while holding a shield.",
+     "Weapon": "You must be wielding a melee weapon without a shield to use this ability."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 501,
+   "Name": "Death Strike",
+   "Key": "DeathStrike",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 85.0,
+   "Mana": 30,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "DeathStrike",
+    "DamageScalar": 0.5,
+    "Seconds": 5,
+    "Steps": 5,
+    "Chance": {
+     "Expr": "Caster.Ninjitsu < 100 ? 30 + (Caster.Ninjitsu - 85) * 2.2 : 63 + (Caster.Ninjitsu - 100) * 1.1"
+    },
+    "Full": {
+     "Expr": "trunc(min(60, Caster.Ninjitsu / 3 * (0.3 + 0.7 * min(1, (Caster.Hiding + Caster.Stealth) / 220))))"
+    },
+    "Partial": {
+     "Expr": "trunc(min(30, Caster.Ninjitsu / 9 * (0.3 + 0.7 * min(1, (Caster.Hiding + Caster.Stealth) / 220))))"
+    },
+    "Note": "half damage now; after 5 s, or 5 steps by the target, direct damage (full if it moved 5 steps, halved with a ranged weapon)",
+    "Text": {
+     "Ready": "You prepare to hit your opponent with a Death Strike.",
+     "Hit": "You inflict a Death Strike upon your opponent!",
+     "Struck": "You have been hit by a Death Strike!  Move with caution!",
+     "Again": "Your opponent lands another Death Strike!",
+     "Missed": "You missed your opponent with a Death Strike."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 502,
+   "Name": "Animal Form",
+   "Key": "AnimalForm",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 0.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "AnimalForm",
+    "Forms": [
+     {
+      "Creature": "Kirin",
+      "Name": "kirin",
+      "Skill": 100.0,
+      "Body": 132,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1070811,
+      "Speed": true,
+      "RegenStam": 20
+     },
+     {
+      "Creature": "Unicorn",
+      "Name": "unicorn",
+      "Skill": 100.0,
+      "Body": 122,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1070812,
+      "Speed": true,
+      "CuresPoison": true
+     },
+     {
+      "Creature": "BakeKitsune",
+      "Name": "bake-kitsune",
+      "Skill": 82.5,
+      "Body": 246,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1070810,
+      "Speed": true,
+      "BonusHits": 20
+     },
+     {
+      "Creature": "GreyWolf",
+      "Name": "wolf",
+      "Skill": 82.5,
+      "Body": 25,
+      "HueMin": 2301,
+      "HueMax": 2318,
+      "Tooltip": 1070810,
+      "Speed": true,
+      "BonusHits": 20
+     },
+     {
+      "Creature": "Llama",
+      "Name": "llama",
+      "Skill": 70.0,
+      "Body": 220,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1070809,
+      "Speed": true
+     },
+     {
+      "Creature": "ForestOstard",
+      "Name": "ostard",
+      "Skill": 70.0,
+      "Body": 219,
+      "HueMin": 2201,
+      "HueMax": 2224,
+      "Tooltip": 1070809,
+      "Speed": true
+     },
+     {
+      "Creature": "BullFrog",
+      "Name": "bullfrog",
+      "Skill": 50.0,
+      "Body": 81,
+      "HueMin": 2001,
+      "HueMax": 2006,
+      "Tooltip": 1070807,
+      "PoisonAttacker": 1
+     },
+     {
+      "Creature": "GiantSerpent",
+      "Name": "giant serpent",
+      "Skill": 50.0,
+      "Body": 21,
+      "HueMin": 2001,
+      "HueMax": 2018,
+      "Tooltip": 1070808,
+      "PoisonOnHit": 0
+     },
+     {
+      "Creature": "Dog",
+      "Name": "dog",
+      "Skill": 40.0,
+      "Body": 217,
+      "HueMin": 2301,
+      "HueMax": 2318,
+      "Tooltip": 1070806,
+      "RegenHits": "NinjitsuFixed / 30"
+     },
+     {
+      "Creature": "Cat",
+      "Name": "cat",
+      "Skill": 40.0,
+      "Body": 201,
+      "HueMin": 2301,
+      "HueMax": 2318,
+      "Tooltip": 1070806,
+      "RegenHits": "NinjitsuFixed / 30"
+     },
+     {
+      "Creature": "Rat",
+      "Name": "rat",
+      "Skill": 20.0,
+      "Body": 238,
+      "HueMin": 2301,
+      "HueMax": 2318,
+      "Tooltip": 1070805,
+      "StealthBonus": 20
+     },
+     {
+      "Creature": "Rabbit",
+      "Name": "rabbit",
+      "Skill": 20.0,
+      "Body": 205,
+      "HueMin": 2301,
+      "HueMax": 2318,
+      "Tooltip": 1070805,
+      "StealthBonus": 20
+     },
+     {
+      "Creature": "Squirrel",
+      "Name": "squirrel",
+      "Skill": 20.0,
+      "Body": 278,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 0
+     },
+     {
+      "Creature": "Ferret",
+      "Name": "ferret",
+      "Skill": 40.0,
+      "Body": 279,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1075220,
+      "StealingBonus": 10
+     },
+     {
+      "Creature": "CuSidhe",
+      "Name": "cu sidhe",
+      "Skill": 60.0,
+      "Body": 277,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1075221,
+      "Bandage": {
+       "Every": 8,
+       "Min": 20,
+       "Max": 50
+      }
+     },
+     {
+      "Creature": "Reptalon",
+      "Name": "reptalon",
+      "Skill": 90.0,
+      "Body": 276,
+      "HueMin": 0,
+      "HueMax": 0,
+      "Tooltip": 1075222,
+      "Breath": {
+       "Damage": 20,
+       "Types": {
+        "Fire": 100
+       },
+       "MaxEvery": 10
+      }
+     }
+    ],
+    "BlockedSkills": [
+     "ArmsLore",
+     "Begging",
+     "Discordance",
+     "Forensics",
+     "Inscribe",
+     "ItemID",
+     "Meditation",
+     "Peacemaking",
+     "Provocation",
+     "RemoveTrap",
+     "SpiritSpeak",
+     "Stealing",
+     "TasteID"
+    ],
+    "Window": 37.5,
+    "InAnimalForm": true,
+    "Undisturbable": true,
+    "NoSkillCheck": true,
+    "OwnMana": true,
+    "Recovery": 10,
+    "Note": "choose an animal (by your Ninjitsu): below its skill + 37.5 the change may fail (no mana spent); in a form no other spells or moves but Mirror Image and Shadowjump, and the listed skills can't be used; cast again to return",
+    "Text": {
+     "Polymorphed": "You can't do that while polymorphed.",
+     "Transformed": "You cannot mimic an animal while in that form.",
+     "Skill": "You cannot use that skill in this form."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 503,
+   "Name": "Ki Attack",
+   "Key": "KiAttack",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 80.0,
+   "Mana": 25,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "KiAttack",
+    "Melee": true,
+    "Seconds": 2,
+    "MaxTiles": 20,
+    "DamageScalar": {
+     "Expr": "1 + Tiles / 10"
+    },
+    "Note": "rush your target within 2 s: +10% damage a tile from where you started (up to 20 tiles); not from stealth",
+    "Text": {
+     "Ready": "Your Ki Attack must be complete within 2 seconds for the damage bonus!",
+     "Hit": "Your quick flight to your target causes extra damage as you strike!",
+     "Close": "You were too close to your target to cause any additional damage.",
+     "Late": "You failed to complete your Ki Attack in time.",
+     "Stealth": "You cannot use this ability while in stealth mode.",
+     "Ranged": "You can only use this with melee attacks."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 504,
+   "Name": "Surprise Attack",
+   "Key": "SurpriseAttack",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 60.0,
+   "Mana": 20,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "SurpriseAttack",
+    "Stealthed": true,
+    "DefenseMalus": {
+     "Expr": "trunc(Caster.NinjitsuFixed / 60)"
+    },
+    "Seconds": 8,
+    "Note": "from stealth: the target's defence chance drops for 8 s",
+    "Text": {
+     "Ready": "You prepare to surprise your prey.",
+     "Hit": "You catch your opponent off guard with your Surprise Attack!",
+     "Struck": "Your defenses are lowered as your opponent surprises you!",
+     "Ends": "Your defenses have returned to normal.",
+     "Missed": "You failed to properly use the element of surprise."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 505,
+   "Name": "Backstab",
+   "Key": "Backstab",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 40.0,
+   "Mana": 30,
+   "Reagents": [],
+   "Move": true,
+   "Effect": {
+    "Kind": "Move",
+    "Move": "Backstab",
+    "Stealthed": true,
+    "DamageScalar": {
+     "Expr": "1 + Caster.Ninjitsu / 360"
+    },
+    "Note": "from stealth: more damage",
+    "Text": {
+     "Ready": "You prepare to Backstab your opponent.",
+     "Hit": "You quickly stab your opponent as you come out of hiding!",
+     "Missed": "You failed to properly use the element of surprise."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 506,
+   "Name": "Shadowjump",
+   "Key": "Shadowjump",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 50.0,
+   "Mana": 15,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "Shadowjump",
+    "Range": 11,
+    "Stealthed": true,
+    "InAnimalForm": true,
+    "Undisturbable": true,
+    "Note": "from stealth: jump up to 11 tiles ahead and stay hidden (a stealth check after)",
+    "Text": {
+     "Begin": "You prepare to perform a Shadowjump."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 507,
+   "Name": "Mirror Image",
+   "Key": "MirrorImage",
+   "School": "Ninjitsu",
+   "Mantra": null,
+   "RequiredSkill": 20.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "MirrorImage",
+    "Creature": "Clone",
+    "Seconds": {
+     "Expr": "30 + Caster.NinjitsuFixed / 40"
+    },
+    "Slots": 1,
+    "Deflect": {
+     "Expr": "Caster.Ninjitsu / 150"
+    },
+    "DeflectRange": 4,
+    "InAnimalForm": true,
+    "Undisturbable": true,
+    "Note": "a copy of you follows you; a blow at you may land on an image within 4 tiles instead; any harm ends an image",
+    "Text": {
+     "Begin": "You begin to summon a mirror image of yourself.",
+     "Mounted": "You cannot use this ability while mounted.",
+     "Followers": "You cannot summon a mirror image because you have too many followers.",
+     "Diverted": "Your attack has been diverted to a nearby mirror image of your target!",
+     "Divert": "You manage to divert the attack onto one of your nearby mirror images."
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 600,
+   "Name": "Arcane Circle",
+   "Key": "ArcaneCircleSpell",
+   "School": "Spellweaving",
+   "Mantra": "Myrshalee",
+   "RequiredSkill": 0.0,
+   "Mana": 24,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "ArcaneCircleScroll",
+   "CastDelay": {
+    "Base": 0.5
+   },
+   "Effect": {
+    "Kind": "ArcaneCircle",
+    "Station": "ArcaneCircle",
+    "Reach": 1,
+    "MinArcanists": 2,
+    "WithinSkill": 20,
+    "Item": "ArcaneFocus",
+    "Hours": {
+     "Expr": "max(1, trunc(Caster.Spellweaving / 24)) + min(6, Arcanists)"
+    },
+    "Strength": {
+     "Expr": "min(5, Arcanists)"
+    },
+    "Note": "standing on an arcane circle or pentagram with at least one other spellweaver beside you (within 20 skill): each gets an arcane focus (strength = how many of you, up to 5) and that much strength while it lasts"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 601,
+   "Name": "Gift of Renewal",
+   "Key": "GiftOfRenewalSpell",
+   "School": "Spellweaving",
+   "Mantra": "Olorisstra",
+   "RequiredSkill": 0.0,
+   "Mana": 24,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "GiftOfRenewalScroll",
+   "CastDelay": {
+    "Base": 3.0
+   },
+   "Effect": {
+    "Kind": "GiftOfRenewal",
+    "PerTick": {
+     "Expr": "5 + trunc(Caster.Spellweaving / 24) + Focus"
+    },
+    "Every": 2,
+    "Seconds": {
+     "Expr": "30 + Focus * 10"
+    },
+    "Cooldown": 60,
+    "Note": "heals every 2 s while it lasts (cures poison instead if poisoned); again 60 s after it ends"
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 602,
+   "Name": "Immolating Weapon",
+   "Key": "ImmolatingWeaponSpell",
+   "School": "Spellweaving",
+   "Mantra": "Thalshara",
+   "RequiredSkill": 10.0,
+   "Mana": 32,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "ImmolatingWeaponScroll",
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "ImmolatingWeapon",
+    "Seconds": {
+     "Expr": "10 + trunc(Caster.Spellweaving / 24) + Focus"
+    },
+    "Damage": {
+     "Expr": "5 + trunc(Caster.Spellweaving / 24) + Focus"
+    },
+    "Types": {
+     "Fire": 100
+    },
+    "BurnDelay": 0.25,
+    "Note": "your melee blows burn for extra fire damage"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 603,
+   "Name": "Attune Weapon",
+   "Key": "AttuneWeaponSpell",
+   "School": "Spellweaving",
+   "Mantra": "Haeldril",
+   "RequiredSkill": 0.0,
+   "Mana": 24,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "AttuneWeaponScroll",
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "AttuneWeapon",
+    "Absorb": {
+     "Expr": "trunc(18 + (Caster.Spellweaving - 10) / 10 * 3 + Focus * 6)"
+    },
+    "Seconds": {
+     "Expr": "60 + Focus * 12"
+    },
+    "Cooldown": 120,
+    "Note": "absorbs melee damage up to the amount; again 120 s after it ends"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 604,
+   "Name": "Thunderstorm",
+   "Key": "ThunderstormSpell",
+   "School": "Spellweaving",
+   "Mantra": "Erelonia",
+   "RequiredSkill": 10.0,
+   "Mana": 32,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "ThunderstormScroll",
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "WeaveArea",
+    "Center": "Caster",
+    "Radius": {
+     "Expr": "3 + Focus"
+    },
+    "Damage": {
+     "Expr": "max(11, 10 + trunc(Caster.Spellweaving / 24)) + Focus"
+    },
+    "Types": {
+     "Energy": 100
+    },
+    "Debuff": {
+     "CastRecovery": "-6"
+    },
+    "DebuffSeconds": {
+     "Expr": "5 + Focus"
+    },
+    "Note": "those who don't resist recover from casting more slowly"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 605,
+   "Name": "Nature's Fury",
+   "Key": "NatureFurySpell",
+   "School": "Spellweaving",
+   "Mantra": "Rauvvrae",
+   "RequiredSkill": 0.0,
+   "Mana": 24,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "NatureFuryScroll",
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "WeaveSummon",
+    "Creature": "NatureFury",
+    "Count": 1,
+    "Seconds": {
+     "Expr": "Caster.Spellweaving / 24 + 25 + Focus * 2"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 606,
+   "Name": "Summon Fey",
+   "Key": "SummonFeySpell",
+   "School": "Spellweaving",
+   "Mantra": "Alalithra",
+   "RequiredSkill": 38.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "SummonFeyScroll",
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "WeaveSummon",
+    "Creature": "ArcaneFey",
+    "Count": {
+     "Expr": "1 + Focus"
+    },
+    "Seconds": {
+     "Expr": "(Caster.Spellweaving / 24 + Focus * 2) * 60"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 607,
+   "Name": "Summon Fiend",
+   "Key": "SummonFiendSpell",
+   "School": "Spellweaving",
+   "Mantra": "Nylisstra",
+   "RequiredSkill": 38.0,
+   "Mana": 10,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "SummonFiendScroll",
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "WeaveSummon",
+    "Creature": "ArcaneFiend",
+    "Count": {
+     "Expr": "1 + Focus"
+    },
+    "Seconds": {
+     "Expr": "(Caster.Spellweaving / 24 + Focus * 2) * 60"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 608,
+   "Name": "Reaper Form",
+   "Key": "ReaperFormSpell",
+   "School": "Spellweaving",
+   "Mantra": "Tarisstree",
+   "RequiredSkill": 24.0,
+   "Mana": 34,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "ReaperFormScroll",
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "ReaperForm",
+    "Body": 285,
+    "Resists": {
+     "Physical": "5 + Focus",
+     "Fire": -25,
+     "Cold": "5 + Focus",
+     "Poison": "5 + Focus",
+     "Energy": "5 + Focus"
+    },
+    "Bonus": {
+     "WeaponSpeed": "10 + Focus",
+     "SpellDamage": "10 + Focus"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 609,
+   "Name": "Wildfire",
+   "Key": "WildfireSpell",
+   "School": "Spellweaving",
+   "Mantra": "Haelyn",
+   "RequiredSkill": 66.0,
+   "Mana": 50,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "WildfireScroll",
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "Wildfire",
+    "Radius": {
+     "Expr": "5 + Focus"
+    },
+    "Damage": {
+     "Expr": "10 + max(1, trunc(Caster.Spellweaving / 24)) + Focus"
+    },
+    "Seconds": {
+     "Expr": "max(1, trunc(Caster.Spellweaving / 24)) + Focus"
+    },
+    "Types": {
+     "Fire": 100
+    },
+    "SplitMax": 3,
+    "Note": "a burning area around your target: every second its fire damage, shared when several stand in it (up to a third each)"
+   },
+   "Target": "Location",
+   "Range": 10
+  },
+  {
+   "Id": 610,
+   "Name": "Essence of Wind",
+   "Key": "EssenceOfWindSpell",
+   "School": "Spellweaving",
+   "Mantra": "Anathrae",
+   "RequiredSkill": 52.0,
+   "Mana": 40,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "EssenceOfWindScroll",
+   "CastDelay": {
+    "Base": 3.0
+   },
+   "Effect": {
+    "Kind": "WeaveArea",
+    "Center": "Caster",
+    "Radius": {
+     "Expr": "5 + Focus"
+    },
+    "Damage": {
+     "Expr": "10 + Focus + max(1, trunc(Caster.Spellweaving / 24))"
+    },
+    "Types": {
+     "Cold": 100
+    },
+    "Debuff": {
+     "CastSpeed": "-(Focus + 1)",
+     "WeaponSpeed": "-2 * (Focus + 1)"
+    },
+    "DebuffSeconds": {
+     "Expr": "trunc(Caster.Spellweaving / 24) + Focus"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 611,
+   "Name": "Dryad Allure",
+   "Key": "DryadAllureSpell",
+   "School": "Spellweaving",
+   "Mantra": "Rathril",
+   "RequiredSkill": 52.0,
+   "Mana": 40,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "DryadAllureScroll",
+   "CastDelay": {
+    "Base": 3.0
+   },
+   "Effect": {
+    "Kind": "Allure",
+    "Slayer": "Repond",
+    "Chance": {
+     "Expr": "Caster.Spellweaving / 150 + Focus / 50"
+    },
+    "Slots": 3,
+    "Note": "charms a humanoid (orcs, ogres, ratmen...) into your service; failing enrages it"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 612,
+   "Name": "Ethereal Voyage",
+   "Key": "EtherealVoyageSpell",
+   "School": "Spellweaving",
+   "Mantra": "Orlavdra",
+   "RequiredSkill": 24.0,
+   "Mana": 32,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "EtherealVoyageScroll",
+   "CastDelay": {
+    "Base": 3.5
+   },
+   "Effect": {
+    "Kind": "EtherealVoyage",
+    "Body": 770,
+    "Seconds": {
+     "Expr": "12 + trunc(Caster.Spellweaving / 24) + Focus * 2"
+    },
+    "Cooldown": 300,
+    "Note": "creatures ignore you until it ends or you act against anyone; not in combat"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 613,
+   "Name": "Word of Death",
+   "Key": "WordOfDeathSpell",
+   "School": "Spellweaving",
+   "Mantra": "Nyraxle",
+   "RequiredSkill": 83.0,
+   "Mana": 50,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "WordOfDeathScroll",
+   "CastDelay": {
+    "Base": 3.5
+   },
+   "Effect": {
+    "Kind": "WordOfDeath",
+    "Threshold": {
+     "Expr": "0.05 * Focus"
+    },
+    "ThresholdDamage": 300,
+    "Min": {
+     "Expr": "trunc(Caster.Spellweaving / 5)"
+    },
+    "Max": {
+     "Expr": "trunc(Caster.Spellweaving / 3)"
+    },
+    "Note": "chaos damage; a creature below Focus x 5% of its hits takes 300 direct"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 614,
+   "Name": "Gift of Life",
+   "Key": "GiftOfLifeSpell",
+   "School": "Spellweaving",
+   "Mantra": "Illorae",
+   "RequiredSkill": 38.0,
+   "Mana": 70,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "GiftOfLifeScroll",
+   "CastDelay": {
+    "Base": 4.0
+   },
+   "Effect": {
+    "Kind": "GiftOfLife",
+    "Minutes": {
+     "Expr": "trunc(Caster.Spellweaving / 24) * 2 + Focus"
+    },
+    "HitsScalar": {
+     "Expr": "(Caster.Spellweaving / 2.4 + Focus) / 100"
+    },
+    "RiseDelay": [
+     2,
+     4
+    ],
+    "Note": "you (or your bonded pet) come back to life soon after dying while it lasts"
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 615,
+   "Name": "Arcane Empowerment",
+   "Key": "ArcaneEmpowermentSpell",
+   "School": "Spellweaving",
+   "Mantra": "Aslavdra",
+   "RequiredSkill": 24.0,
+   "Mana": 50,
+   "Reagents": [],
+   "Move": false,
+   "Scroll": "ArcaneEmpowermentScroll",
+   "CastDelay": {
+    "Base": 3.0
+   },
+   "Effect": {
+    "Kind": "ArcaneEmpowerment",
+    "Seconds": {
+     "Expr": "15 + trunc(Caster.Spellweaving / 24) + Focus * 2"
+    },
+    "Bonus": {
+     "Expr": "trunc(Caster.Spellweaving / 12) + Focus * 5"
+    },
+    "HealBonus": 10,
+    "Note": "spell damage increase by Bonus, and heals 10 + Bonus % stronger"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 677,
+   "Name": "Nether Bolt",
+   "Key": "NetherBoltSpell",
+   "School": "Mysticism",
+   "Mantra": "In Corp Ylem",
+   "RequiredSkill": 0.0,
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "NetherBoltScroll",
+   "Circle": 1,
+   "CastDelay": {
+    "Base": 1.0
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 10,
+    "Dice": 1,
+    "Sides": 4,
+    "Types": {
+     "Chaos": 100
+    }
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 678,
+   "Name": "Healing Stone",
+   "Key": "HealingStoneSpell",
+   "School": "Mysticism",
+   "Mantra": "Kal In Mani",
+   "RequiredSkill": 0.0,
+   "Mana": 4,
+   "Reagents": [
+    {
+     "Type": "Bone",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "HealingStoneScroll",
+   "Circle": 1,
+   "CastDelay": {
+    "Base": 5.0
+   },
+   "Effect": {
+    "Kind": "HealingStone",
+    "Item": "HealingStone",
+    "LifeForce": {
+     "Expr": "trunc((Caster.Mysticism + Boost) * 1.5)"
+    },
+    "MaxHeal": {
+     "Expr": "trunc((Caster.Mysticism + Boost) / 5)"
+    },
+    "CurePerLevel": 25,
+    "Lock": 2,
+    "Note": "a stone that heals up to MaxHeal a use from its life force, or cures poison for 25 a level"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 679,
+   "Name": "Purge",
+   "Key": "PurgeMagicSpell",
+   "School": "Mysticism",
+   "Mantra": "An Ort Sanct ",
+   "RequiredSkill": 0.0,
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "FertileDirt",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "PurgeMagicScroll",
+   "Circle": 2,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "Purge",
+    "Immunity": {
+     "Expr": "max(1, trunc((Caster.Mysticism + Boost) / 15))"
+    },
+    "Note": "takes away one of the target's magical blessings"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 680,
+   "Name": "Enchant",
+   "Key": "EnchantSpell",
+   "School": "Mysticism",
+   "Mantra": "In Ort Ylem",
+   "RequiredSkill": 0.0,
+   "Mana": 6,
+   "Reagents": [
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "EnchantScroll",
+   "Circle": 2,
+   "CastDelay": {
+    "Base": 1.25
+   },
+   "Effect": {
+    "Kind": "Enchant",
+    "Options": [
+     "HitLightning",
+     "HitFireball",
+     "HitHarm",
+     "HitMagicArrow",
+     "HitDispel"
+    ],
+    "Value": {
+     "Expr": "trunc(60 * (Caster.Mysticism + Boost) / 240)"
+    },
+    "Seconds": {
+     "Expr": "(Caster.Mysticism + Boost) / 2 + 30"
+    },
+    "Channeling": 80,
+    "Note": "your weapon gains the chosen hit spell for a while; at 80 in both skills it also channels spells (-1 faster casting)"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 681,
+   "Name": "Sleep",
+   "Key": "SleepSpell",
+   "School": "Mysticism",
+   "Mantra": "In Zu",
+   "RequiredSkill": 8.6,
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "SleepScroll",
+   "Circle": 3,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Sleep",
+    "Seconds": {
+     "Expr": "(Caster.Mysticism + Boost) / 20 + 2 - Target.MagicResist / 10"
+    },
+    "Penalty": {
+     "CastSpeed": -2,
+     "CastRecovery": -3,
+     "WeaponSpeed": -45,
+     "AttackChance": -45
+    },
+    "Immunity": {
+     "Expr": "Target.MagicResist / 10"
+    },
+    "Note": "slows casting and swings and spoils aim; any harm wakes it; then immune for a while"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 682,
+   "Name": "Eagle Strike",
+   "Key": "EagleStrikeSpell",
+   "School": "Mysticism",
+   "Mantra": "Kal Por Xen",
+   "RequiredSkill": 8.6,
+   "Mana": 9,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Bone",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "EagleStrikeScroll",
+   "Circle": 3,
+   "CastDelay": {
+    "Base": 1.5
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 19,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Energy": 100
+    }
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 683,
+   "Name": "Animated Weapon",
+   "Key": "AnimatedWeaponSpell",
+   "School": "Mysticism",
+   "Mantra": "In Jux Por Ylem",
+   "RequiredSkill": 22.9,
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "Bone",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "AnimatedWeaponScroll",
+   "Circle": 4,
+   "CastDelay": {
+    "Base": 1.75
+   },
+   "Effect": {
+    "Kind": "MysticSummon",
+    "Creature": "AnimatedWeapon",
+    "Slots": 4,
+    "Level": {
+     "Expr": "trunc((Caster.Mysticism + Boost) / 2)"
+    },
+    "Seconds": {
+     "Expr": "10 + Level"
+    },
+    "Stats": {
+     "Str": "10 + Level",
+     "Dex": "10 + Level",
+     "Hits": "20 + trunc(Level * 3 / 2)",
+     "DamageMin": "Level >= 120 ? 14 : Level >= 105 ? 13 : Level >= 90 ? 12 : Level >= 75 ? 11 : Level >= 60 ? 10 : Level >= 45 ? 9 : Level >= 30 ? 8 : 7",
+     "DamageMax": "Level >= 120 ? 18 : Level >= 105 ? 17 : Level >= 90 ? 15 : Level >= 75 ? 14 : Level >= 60 ? 12 : Level >= 45 ? 11 : Level >= 30 ? 9 : 8",
+     "Skill": "Level"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 684,
+   "Name": "Stone Form",
+   "Key": "StoneFormSpell",
+   "School": "Mysticism",
+   "Mantra": "In Rel Ylem",
+   "RequiredSkill": 22.9,
+   "Mana": 11,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "FertileDirt",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "StoneFormScroll",
+   "Circle": 4,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Transform",
+    "Form": "StoneForm",
+    "Body": 705,
+    "Resists": {
+     "Physical": "max(2, trunc((Caster.Mysticism + Boost) / 24))",
+     "Fire": "max(2, trunc((Caster.Mysticism + Boost) / 24))",
+     "Cold": "max(2, trunc((Caster.Mysticism + Boost) / 24))",
+     "Poison": "max(2, trunc((Caster.Mysticism + Boost) / 24))",
+     "Energy": "max(2, trunc((Caster.Mysticism + Boost) / 24))"
+    },
+    "Bonus": {
+     "CastSpeed": -2,
+     "WeaponSpeed": -10,
+     "WeaponDamage": "max(0, trunc((Caster.Mysticism + Boost) / 12))"
+    },
+    "PoisonImmune": true,
+    "SleepImmune": true,
+    "Note": "stone skin: resists up, slower casting and swings, harder blows, no poison or sleep"
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 685,
+   "Name": "Spell Trigger",
+   "Key": "SpellTriggerSpell",
+   "School": "Mysticism",
+   "Mantra": "In Vas Ort Ex ",
+   "RequiredSkill": 37.1,
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "SpellTriggerScroll",
+   "Circle": 5,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "SpellTrigger",
+    "Item": "SpellStone",
+    "RankSkill": 40,
+    "Cooldown": 300,
+    "Note": "a stone holding one Mysticism spell (as your Mysticism + Boost allow: 40 a rank) that casts it at once when used; one every 5 minutes",
+    "Spells": [
+     {
+      "Spell": 677,
+      "Rank": 1
+     },
+     {
+      "Spell": 678,
+      "Rank": 1
+     },
+     {
+      "Spell": 679,
+      "Rank": 2
+     },
+     {
+      "Spell": 680,
+      "Rank": 2
+     },
+     {
+      "Spell": 681,
+      "Rank": 3
+     },
+     {
+      "Spell": 682,
+      "Rank": 3
+     },
+     {
+      "Spell": 683,
+      "Rank": 4
+     },
+     {
+      "Spell": 684,
+      "Rank": 4
+     },
+     {
+      "Spell": 686,
+      "Rank": 5
+     },
+     {
+      "Spell": 687,
+      "Rank": 6
+     },
+     {
+      "Spell": 688,
+      "Rank": 6
+     }
+    ]
+   },
+   "Target": "Self",
+   "Range": 10
+  },
+  {
+   "Id": 686,
+   "Name": "Mass Sleep",
+   "Key": "MassSleepSpell",
+   "School": "Mysticism",
+   "Mantra": "Vas Zu",
+   "RequiredSkill": 37.1,
+   "Mana": 14,
+   "Reagents": [
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SpidersSilk",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "MassSleepScroll",
+   "Circle": 5,
+   "CastDelay": {
+    "Base": 2.0
+   },
+   "Effect": {
+    "Kind": "Sleep",
+    "Radius": 3,
+    "Seconds": {
+     "Expr": "(Caster.Mysticism + Boost) / 20 + 3 - Target.MagicResist / 10"
+    },
+    "Penalty": {
+     "CastSpeed": -2,
+     "CastRecovery": -3,
+     "WeaponSpeed": -45,
+     "AttackChance": -45
+    },
+    "Immunity": {
+     "Expr": "Target.MagicResist / 10"
+    }
+   },
+   "Target": "Location",
+   "Range": 10
+  },
+  {
+   "Id": 687,
+   "Name": "Cleansing Winds",
+   "Key": "CleansingWindsSpell",
+   "School": "Mysticism",
+   "Mantra": "In Vas Mani Hur",
+   "RequiredSkill": 51.4,
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "Ginseng",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "CleansingWindsScroll",
+   "Circle": 6,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "CleansingWinds",
+    "Heal": {
+     "Expr": "trunc((Caster.Mysticism + Boost) / 4) + rand(-3, 3)"
+    },
+    "Extra": 3,
+    "Radius": 2,
+    "CureChance": {
+     "Expr": "(10000 + (Caster.Mysticism + Boost) / 2 * 75 - PoisonLevel * 1750) / 100"
+    },
+    "PoisonCut": 0.15,
+    "CurseCut": 3,
+    "Note": "heals, cures and lifts curses from the target and up to 3 friends near it, shared between them"
+   },
+   "Target": "Beneficial",
+   "Range": 10
+  },
+  {
+   "Id": 688,
+   "Name": "Bombard",
+   "Key": "BombardSpell",
+   "School": "Mysticism",
+   "Mantra": "Corp Por Ylem",
+   "RequiredSkill": 51.4,
+   "Mana": 20,
+   "Reagents": [
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "Garlic",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "BombardScroll",
+   "Circle": 6,
+   "CastDelay": {
+    "Base": 2.25
+   },
+   "Effect": {
+    "Kind": "Damage",
+    "Base": 40,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Physical": 100
+    },
+    "Paralyze": {
+     "Expr": "trunc(Boost / 10) - trunc(Target.MagicResist / 10)"
+    },
+    "Note": "and holds the target if it doesn't resist"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 689,
+   "Name": "Spell Plague",
+   "Key": "SpellPlagueSpell",
+   "School": "Mysticism",
+   "Mantra": "Vas Rel Jux Ort",
+   "RequiredSkill": 65.7,
+   "Mana": 40,
+   "Reagents": [
+    {
+     "Type": "DaemonBone",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "SpellPlagueScroll",
+   "Circle": 7,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "SpellPlague",
+    "Seconds": 8,
+    "Chances": [
+     0.9,
+     0.6,
+     0.3
+    ],
+    "Every": 1.5,
+    "Damage": {
+     "Expr": "trunc((Caster.Mysticism + Boost) / 12) + rand(1, 6)"
+    },
+    "Types": {
+     "Chaos": 100
+    },
+    "Note": "while it lasts, harm to the target may set it off (up to 3 times), each weaker"
+   },
+   "Target": "Harmful",
+   "Range": 10
+  },
+  {
+   "Id": 690,
+   "Name": "Hail Storm",
+   "Key": "HailStormSpell",
+   "School": "Mysticism",
+   "Mantra": "Kal Des Ylem",
+   "RequiredSkill": 65.7,
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "BlackPearl",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    },
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "HailStormScroll",
+   "Circle": 7,
+   "CastDelay": {
+    "Base": 2.5
+   },
+   "Effect": {
+    "Kind": "MysticArea",
+    "Radius": 2,
+    "Base": 51,
+    "Dice": 1,
+    "Sides": 5,
+    "Types": {
+     "Cold": 100
+    },
+    "Split": true,
+    "Note": "several victims share it (x2 / count)"
+   },
+   "Target": "Location",
+   "Range": 10
+  },
+  {
+   "Id": 691,
+   "Name": "Nether Cyclone",
+   "Key": "NetherCycloneSpell",
+   "School": "Mysticism",
+   "Mantra": "Grav Hur",
+   "RequiredSkill": 80.0,
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "MandrakeRoot",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    },
+    {
+     "Type": "SulfurousAsh",
+     "Amount": 1
+    },
+    {
+     "Type": "Bloodmoss",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "NetherCycloneScroll",
+   "Circle": 8,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "MysticArea",
+    "Radius": 3,
+    "Damage": {
+     "Expr": "(Caster.Mysticism + Boost / 2) * 0.66 + rand(1, 6)"
+    },
+    "Types": {
+     "Chaos": 100
+    },
+    "Sap": {
+     "Share": 0.3333,
+     "Return": 10
+    },
+    "Note": "also saps a third of the damage as stamina and mana, returned after 10 s"
+   },
+   "Target": "Location",
+   "Range": 10
+  },
+  {
+   "Id": 692,
+   "Name": "Rising Colossus",
+   "Key": "RisingColossusSpell",
+   "School": "Mysticism",
+   "Mantra": "Kal Vas Xen Corp Ylem",
+   "RequiredSkill": 80.0,
+   "Mana": 50,
+   "Reagents": [
+    {
+     "Type": "DaemonBone",
+     "Amount": 1
+    },
+    {
+     "Type": "DragonBlood",
+     "Amount": 1
+    },
+    {
+     "Type": "FertileDirt",
+     "Amount": 1
+    },
+    {
+     "Type": "Nightshade",
+     "Amount": 1
+    }
+   ],
+   "Move": false,
+   "Scroll": "RisingColossusScroll",
+   "Circle": 8,
+   "CastDelay": {
+    "Base": 2.75
+   },
+   "Effect": {
+    "Kind": "MysticSummon",
+    "Creature": "RisingColossus",
+    "Slots": 5,
+    "Level": {
+     "Expr": "Caster.Mysticism + Boost"
+    },
+    "Seconds": {
+     "Expr": "Level / 3"
+    },
+    "Stats": {
+     "Str": "677 + trunc((Caster.Mysticism - 83) / 1.3 + (Boost - 30) / 1.3 + 6)",
+     "Dex": "107 + trunc((Caster.Mysticism - 83) / 1.3 + (Boost - 30) / 1.3 + 6)",
+     "Hits": "315 + trunc((Caster.Mysticism - 83) * 1.14 + (Boost - 30) * 1.03 + 20)",
+     "DamageMin": "trunc(Level / 12)",
+     "DamageMax": "trunc(Level / 10)",
+     "Skill": "Boost > 0 ? (Caster.Mysticism + Boost) / 2 : (Caster.Mysticism + 20) / 2"
+    }
+   },
+   "Target": "Self",
+   "Range": 10
+  }
+ ],
+ "CreatureCasting": {
+  "Source": "Scripts/Mobiles/AI/Magical AI/MageAI.cs: the plain (non-SmartAI) path, magery only",
+  "AI": [
+   "AI_Mage",
+   "AI_NecroMage",
+   "AI_Spellweaving",
+   "AI_Mystic",
+   "AI_Spellbinder"
+  ],
+  "Skill": "Magery",
+  "Range": 10,
+  "AfterCast": 1.0,
+  "NoSpellWait": 0.5,
+  "CanCast": "UO's CheckCanCastMagery with Core.SA: enough mana for the circle (CircleMana) is all; the Magery check at the end of the cast can still fizzle it",
+  "Cure": {
+   "Spell": "Cure",
+   "Circle": 2
+  },
+  "Dispel": {
+   "Spell": "Dispel",
+   "Circle": 6,
+   "Chance": 0.75,
+   "MinInt": 95,
+   "Note": "its target is a summoned creature: 75% at GM Magery (scaled by Magery), only with Int 95+"
+  },
+  "DispelField": {
+   "Spell": "Dispel Field",
+   "Circle": 5,
+   "MinRawInt": 80,
+   "Note": "standing in an enemy's field"
+  },
+  "Heal": {
+   "Chance": 0.25,
+   "Greater": "Greater Heal",
+   "GreaterCircle": 4,
+   "GreaterBelow": 50,
+   "Lesser": "Heal",
+   "LesserBelow": 10,
+   "Note": "not summoned; chance scaled by Magery; then Random(0, 4 + HitsMax / Hits) must be 3 or more; Greater Heal when 50+ hits down, Heal when 10+"
+  },
+  "Choices": [
+   {
+    "Weight": 2,
+    "Action": "Poison",
+    "Spell": "Poison",
+    "Circle": 3,
+    "Note": "only if the target isn't poisoned, else damage"
+   },
+   {
+    "Weight": 1,
+    "Action": "Buff",
+    "Note": "Bless (if not blessed, circle 3), else Invisibility (not a pet, circle 6), else damage"
+   },
+   {
+    "Weight": 2,
+    "Action": "Curse",
+    "Note": "half the time Curse (if circle 5 is castable), else Weaken, Clumsy or Feeblemind"
+   },
+   {
+    "Weight": 1,
+    "Action": "Paralyze",
+    "Spell": "Paralyze",
+    "Circle": 5,
+    "Note": "else a curse"
+   },
+   {
+    "Weight": 1,
+    "Action": "ManaDrain",
+    "Note": "half the time Mana Vampire (circle 7), else Mana Drain (circle 4), else damage"
+   },
+   {
+    "Weight": 8,
+    "Action": "Damage"
+   }
+  ],
+  "Buff": [
+   {
+    "Spell": "Bless",
+    "Circle": 3
+   },
+   {
+    "Spell": "Invisibility",
+    "Circle": 6,
+    "NotPets": true
+   }
+  ],
+  "Curse": {
+   "Strong": "Curse",
+   "StrongCircle": 5,
+   "Weak": [
+    "Weaken",
+    "Clumsy",
+    "Feeblemind"
+   ]
+  },
+  "ManaDrain": {
+   "Strong": "Mana Vampire",
+   "StrongCircle": 7,
+   "Weak": "Mana Drain",
+   "WeakCircle": 4
+  },
+  "Damage": {
+   "Ladder": [
+    8,
+    6,
+    5,
+    4,
+    3,
+    2
+   ],
+   "Spells": [
+    "Magic Arrow",
+    "Harm",
+    "Fireball",
+    "Lightning",
+    "Mind Blast",
+    "Energy Bolt",
+    "Explosion",
+    "Flame Strike"
+   ],
+   "Note": "select = the highest castable of the ladder (else 1); the spell is Spells[Random(select)]"
+  }
+ },
+ "Schools": {
+  "Necromancy": {
+   "Book": {
+    "Type": "NecromancerSpellbook",
+    "Offset": 100,
+    "Count": 17,
+    "Content": 0,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Necromancy",
+   "DamageSkill": "SpiritSpeak",
+   "Window": 40,
+   "Reagents": true,
+   "Karma": "-(40 + trunc(10 * CastDelay / 0.25))",
+   "Notes": "Necromancy isn't sped by Faster Casting in the newest era (it is: CastDelayFastScalar 1 since SE); it uses reagents (pig iron, bat wing, grave dust, daemon blood, nox crystal); casting costs karma.",
+   "Ids": [
+    100,
+    116
+   ]
+  },
+  "Chivalry": {
+   "Book": {
+    "Type": "BookOfChivalry",
+    "Offset": 200,
+    "Count": 10,
+    "Content": 1023,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Chivalry",
+   "DamageSkill": "Chivalry",
+   "Window": 50,
+   "Tithing": true,
+   "RecoveryBase": 7,
+   "Undisturbable": true,
+   "Power": "trunc(sqrt(Karma + 20000 + ChivalryFixed * 10)) / Div",
+   "Notes": "Chivalry costs tithing points (gold given at an ankh) and mana, no reagents; its words are spoken by everyone; blows can't disturb it; recovery is 7 quarter seconds; spell power comes from karma and Chivalry (ComputePowerValue).",
+   "Ids": [
+    200,
+    209
+   ]
+  },
+  "Bushido": {
+   "Book": {
+    "Type": "BookOfBushido",
+    "Offset": 400,
+    "Count": 6,
+    "Content": 63,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Bushido",
+   "DamageSkill": "Bushido",
+   "Window": 37.5,
+   "Below": 12.5,
+   "NeedsSkill": true,
+   "RecoveryBase": 7,
+   "NoFasterCasting": true,
+   "Notes": "Bushido: stances (Confidence, Evasion, Counter Attack; one at a time) and moves readied for the next blow; the skill must reach the requirement, success runs from 12.5 below it to 37.5 above; casting isn't sped by faster casting; recovery is 7 quarter seconds.",
+   "Ids": [
+    400,
+    405
+   ]
+  },
+  "Ninjitsu": {
+   "Book": {
+    "Type": "BookOfNinjitsu",
+    "Offset": 500,
+    "Count": 8,
+    "Content": 255,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Ninjitsu",
+   "DamageSkill": "Ninjitsu",
+   "Window": 37.5,
+   "Below": 12.5,
+   "NeedsSkill": true,
+   "RecoveryBase": 7,
+   "Hidden": true,
+   "Notes": "Ninjitsu: moves readied for the next blow (Backstab and Surprise Attack from stealth), Animal Form, Mirror Image and Shadowjump; casting doesn't reveal you; recovery is 7 quarter seconds.",
+   "Ids": [
+    500,
+    507
+   ]
+  },
+  "Spellweaving": {
+   "Book": {
+    "Type": "SpellweavingBook",
+    "Offset": 600,
+    "Count": 16,
+    "Content": 0,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Spellweaving",
+   "DamageSkill": "Spellweaving",
+   "Window": 37.5,
+   "Below": 12.5,
+   "NeedsSkill": true,
+   "ArcaneFocus": true,
+   "Notes": "Spellweaving: power grows with an arcane focus (Focus 0-6 in the formulas), made by Arcane Circle; success from 12.5 below the requirement to 37.5 above; resisted at (50 + 2 x (target's Magic Resist - caster's Spellweaving))%. The epic arcanist quest that unlocks it in UO isn't required (quests come later).",
+   "Ids": [
+    600,
+    615
+   ]
+  },
+  "Mysticism": {
+   "Book": {
+    "Type": "MysticBook",
+    "Offset": 677,
+    "Count": 16,
+    "Content": 0,
+    "Note": "Content: what a new book holds, one bit per spell from Offset"
+   },
+   "Skill": "Mysticism",
+   "DamageSkill": "Focus|Imbuing",
+   "Window": 40,
+   "Circles": {
+    "Length": 14.2857,
+    "Offset": 20,
+    "ScrollDrop": 2,
+    "Mana": [
+     4,
+     6,
+     9,
+     11,
+     14,
+     20,
+     40,
+     50
+    ]
+   },
+   "Notes": "Mysticism: eight circles like Magery (mana 4-50, cast time (4 + circle) quarter seconds); success from 100/7 x circle - 20 to + 20 (a scroll counts two circles lower); its damage skill is the better of Focus and Imbuing (Boost in the formulas); resisted like Magery by circle.",
+   "Ids": [
+    677,
+    692
+   ]
+  }
+ },
+ "Titles": {
+  "Source": "Misc/Titles.cs, Mobiles/Normal/BaseCreature.cs OnDeath",
+  "Fame": [
+   0,
+   32000
+  ],
+  "Karma": [
+   -32000,
+   32000
+  ],
+  "Kill": {
+   "Fame": "Fame / 100",
+   "Karma": "-Karma / 100",
+   "Note": "the killer (a pet's or summon's master) gets the creature's fame / 100 and minus its karma / 100, then AwardFame/AwardKarma: a gain shrinks by the current value / 100 (a loss by the same), never past the limits"
+  },
+  "MaxTithing": 100000,
+  "Ankh": {
+   "Static": [
+    2,
+    3,
+    4,
+    5,
+    7575,
+    7576,
+    7772,
+    7773
+   ],
+   "Note": "ankh halves (Items/Functional/Ankhs.cs: 0x2-0x5, bloodied 0x1D97, 0x1D98, 0x1E5C, 0x1E5D): stand by one to tithe gold from your bank"
+  }
+ }
+}

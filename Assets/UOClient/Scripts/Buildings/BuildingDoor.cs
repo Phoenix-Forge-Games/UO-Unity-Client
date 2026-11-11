@@ -156,8 +156,60 @@ namespace UOClient.Buildings
 
         // ------------------------------------------------------------------ runtime
 
+        private static readonly List<BuildingDoor> _all = new List<BuildingDoor>();
+
+        /// <summary>The door's stable map ID (from the baked world), which the server and clients name it by; 0 if none.</summary>
+        public ulong WorldId { get; set; }
+
+        private Vector3? _opening;
+
+        /// <summary>
+        /// The middle of the doorway: the centre of the leaves as they hang shut (measured once). Picking a door and
+        /// checking a player can reach it both measure from here, so the client and the server agree.
+        /// </summary>
+        public Vector3 OpeningCentre
+        {
+            get
+            {
+                if (_opening.HasValue)
+                {
+                    return _opening.Value;
+                }
+
+                var bounds = new Bounds(transform.position + Vector3.up, Vector3.zero);
+                bool any = false;
+                foreach (DoorLeafPose pose in _leaves)
+                {
+                    if (pose == null || pose.Leaf == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (Renderer r in pose.Leaf.GetComponentsInChildren<Renderer>())
+                    {
+                        if (!any) { bounds = r.bounds; any = true; } else { bounds.Encapsulate(r.bounds); }
+                    }
+                }
+
+                // Measured while open, the leaves have swung out: use the panel instead until it's shut.
+                if (State == DoorState.Open && any)
+                {
+                    return bounds.center;
+                }
+
+                _opening = bounds.center;
+                return _opening.Value;
+            }
+        }
+
+        /// <summary>Every door in the world.</summary>
+        public static IReadOnlyList<BuildingDoor> All => _all;
+
+        private void OnDestroy() => _all.Remove(this);
+
         private void Awake()
         {
+            _all.Add(this);
             _target = _open;
             _t = 1f;
             Apply(_open ? 1f : 0f);
@@ -171,8 +223,20 @@ namespace UOClient.Buildings
             _target = open;
             _open = open;
             _t = 0f;
-            enabled = true;
         }
+
+        /// <summary>
+        /// Opens the door and shuts it again after <paramref name="seconds"/>: the door's own logic for a door no
+        /// server owns yet. (On the server, using a door sends the open trigger to every nearby client and the
+        /// door's code sends the close trigger a moment later; clients only ever follow those triggers.)
+        /// </summary>
+        public void OpenFor(float seconds)
+        {
+            SetOpen(true);
+            _closeAt = Time.time + seconds;
+        }
+
+        private float _closeAt = float.PositiveInfinity;
 
         public void Toggle() => SetOpen(!_target);
 
@@ -195,7 +259,13 @@ namespace UOClient.Buildings
 
         private void Update()
         {
-            if (_t >= 1f) { enabled = false; return; }
+            if (_t >= 1f && Time.time >= _closeAt)
+            {
+                _closeAt = float.PositiveInfinity;
+                SetOpen(false);
+            }
+
+            if (_t >= 1f) return; // always on: a door is a permanent part of the map, it just waits for triggers
             _t = SwingSeconds <= 0f ? 1f : Mathf.Min(1f, _t + Time.deltaTime / SwingSeconds);
             float e = 1f - (1f - _t) * (1f - _t);   // ease out, so it settles rather than stopping dead
             Apply(_target ? e : 1f - e);

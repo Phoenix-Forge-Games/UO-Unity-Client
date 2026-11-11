@@ -1,0 +1,1977 @@
+{
+ "Source": "ServUO Scripts/Misc/LootPack.cs and Loot.cs (numbers only)",
+ "EraRule": "an alias lists eras newest first; use the first one the shard is at or past (Old = pre-AOS, Any = always)",
+ "Packs": {
+  "MlRich": {
+   "ML": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "4d50+450",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 3,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 80.0,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 3,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 60.0,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 1.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SePoor": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "2d10+20",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 1.0,
+     "Items": "AosMagicItemsPoor",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 0.02,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeMeager": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "4d10+40",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 20.4,
+     "Items": "AosMagicItemsMeagerType1",
+     "Quantity": 1,
+     "MaxProps": 2,
+     "MinIntensity": 0,
+     "MaxIntensity": 50
+    },
+    {
+     "Chance": 10.2,
+     "Items": "AosMagicItemsMeagerType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 0.1,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeAverage": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "8d10+100",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 32.8,
+     "Items": "AosMagicItemsAverageType1",
+     "Quantity": 1,
+     "MaxProps": 3,
+     "MinIntensity": 0,
+     "MaxIntensity": 50
+    },
+    {
+     "Chance": 32.8,
+     "Items": "AosMagicItemsAverageType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 19.5,
+     "Items": "AosMagicItemsAverageType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 0.4,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeRich": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "15d10+225",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 76.3,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 76.3,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 61.7,
+     "Items": "AosMagicItemsRichType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 1.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeFilthyRich": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "3d100+400",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 79.5,
+     "Items": "AosMagicItemsFilthyRichType1",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 79.5,
+     "Items": "AosMagicItemsFilthyRichType1",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 77.6,
+     "Items": "AosMagicItemsFilthyRichType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeUltraRich": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "6d100+600",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "SeSuperBoss": {
+   "SE": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "10d100+800",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosPoor": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "1d10+10",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 0.02,
+     "Items": "AosMagicItemsPoor",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 90
+    },
+    {
+     "Chance": 0.02,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosMeager": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "3d10+20",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 1.0,
+     "Items": "AosMagicItemsMeagerType1",
+     "Quantity": 1,
+     "MaxProps": 2,
+     "MinIntensity": 0,
+     "MaxIntensity": 10
+    },
+    {
+     "Chance": 0.2,
+     "Items": "AosMagicItemsMeagerType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 90
+    },
+    {
+     "Chance": 0.1,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosAverage": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d10+50",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 5.0,
+     "Items": "AosMagicItemsAverageType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 20
+    },
+    {
+     "Chance": 2.0,
+     "Items": "AosMagicItemsAverageType1",
+     "Quantity": 1,
+     "MaxProps": 3,
+     "MinIntensity": 0,
+     "MaxIntensity": 50
+    },
+    {
+     "Chance": 0.5,
+     "Items": "AosMagicItemsAverageType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 90
+    },
+    {
+     "Chance": 0.4,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosRich": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "10d10+150",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 20.0,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 40
+    },
+    {
+     "Chance": 10.0,
+     "Items": "AosMagicItemsRichType1",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 60
+    },
+    {
+     "Chance": 1.0,
+     "Items": "AosMagicItemsRichType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 90
+    },
+    {
+     "Chance": 1.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosFilthyRich": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "2d100+200",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 33.0,
+     "Items": "AosMagicItemsFilthyRichType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 50
+    },
+    {
+     "Chance": 33.0,
+     "Items": "AosMagicItemsFilthyRichType1",
+     "Quantity": 1,
+     "MaxProps": 4,
+     "MinIntensity": 0,
+     "MaxIntensity": 60
+    },
+    {
+     "Chance": 20.0,
+     "Items": "AosMagicItemsFilthyRichType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 75
+    },
+    {
+     "Chance": 5.0,
+     "Items": "AosMagicItemsFilthyRichType2",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 0,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosUltraRich": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d100+500",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 35,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "AosSuperBoss": {
+   "AOS": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d100+500",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 25,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 33,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "AosMagicItemsUltraRich",
+     "Quantity": 1,
+     "MaxProps": 5,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "OldPoor": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "1d25",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 0.02,
+     "Items": "Instruments",
+     "Quantity": 1
+    }
+   ]
+  },
+  "OldMeager": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d10+25",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 0.1,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 1.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 0,
+     "MaxIntensity": 60
+    },
+    {
+     "Chance": 0.2,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 10,
+     "MaxIntensity": 70
+    }
+   ]
+  },
+  "OldAverage": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "10d10+50",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 0.4,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 5.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 20,
+     "MaxIntensity": 80
+    },
+    {
+     "Chance": 2.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 30,
+     "MaxIntensity": 90
+    },
+    {
+     "Chance": 0.5,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    }
+   ]
+  },
+  "OldRich": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "10d10+250",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 1.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 20.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 10.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 65,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 1.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 70,
+     "MaxIntensity": 100
+    }
+   ]
+  },
+  "OldFilthyRich": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "2d125+400",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 33.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 33.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 20.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 70,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 5.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 80,
+     "MaxIntensity": 100
+    }
+   ]
+  },
+  "OldUltraRich": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d100+500",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    }
+   ]
+  },
+  "OldSuperBoss": {
+   "Old": [
+    {
+     "Chance": 100.0,
+     "Items": "Gold",
+     "Quantity": "5d100+500",
+     "AtSpawn": true
+    },
+    {
+     "Chance": 2.0,
+     "Items": "Instruments",
+     "Quantity": 1
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 40,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 50,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 60,
+     "MaxIntensity": 100
+    },
+    {
+     "Chance": 100.0,
+     "Items": "OldMagicItems",
+     "Quantity": 1,
+     "MaxProps": 1,
+     "MinIntensity": 70,
+     "MaxIntensity": 100
+    }
+   ]
+  },
+  "LowScrolls": {
+   "Any": [
+    {
+     "Chance": 100.0,
+     "Items": "LowScrollItems",
+     "Quantity": 1
+    }
+   ]
+  },
+  "MedScrolls": {
+   "Any": [
+    {
+     "Chance": 100.0,
+     "Items": "MedScrollItems",
+     "Quantity": 1
+    }
+   ]
+  },
+  "HighScrolls": {
+   "Any": [
+    {
+     "Chance": 100.0,
+     "Items": "HighScrollItems",
+     "Quantity": 1
+    }
+   ]
+  },
+  "Gems": {
+   "Any": [
+    {
+     "Chance": 100.0,
+     "Items": "GemItems",
+     "Quantity": 1
+    }
+   ]
+  },
+  "Potions": {
+   "Any": [
+    {
+     "Chance": 100.0,
+     "Items": "PotionItems",
+     "Quantity": 1
+    }
+   ]
+  },
+  "Parrot": {
+   "Any": [
+    {
+     "Chance": 10.0,
+     "Items": "ParrotItem",
+     "Quantity": 1
+    }
+   ]
+  }
+ },
+ "Aliases": {
+  "Poor": {
+   "SE": "SePoor",
+   "AOS": "AosPoor",
+   "Old": "OldPoor"
+  },
+  "Meager": {
+   "SE": "SeMeager",
+   "AOS": "AosMeager",
+   "Old": "OldMeager"
+  },
+  "Average": {
+   "SE": "SeAverage",
+   "AOS": "AosAverage",
+   "Old": "OldAverage"
+  },
+  "Rich": {
+   "SE": "SeRich",
+   "AOS": "AosRich",
+   "Old": "OldRich"
+  },
+  "FilthyRich": {
+   "SE": "SeFilthyRich",
+   "AOS": "AosFilthyRich",
+   "Old": "OldFilthyRich"
+  },
+  "UltraRich": {
+   "SE": "SeUltraRich",
+   "AOS": "AosUltraRich",
+   "Old": "OldUltraRich"
+  },
+  "SuperBoss": {
+   "SE": "SeSuperBoss",
+   "AOS": "AosSuperBoss",
+   "Old": "OldSuperBoss"
+  },
+  "MlRich": {
+   "Any": "MlRich"
+  },
+  "SePoor": {
+   "Any": "SePoor"
+  },
+  "SeMeager": {
+   "Any": "SeMeager"
+  },
+  "SeAverage": {
+   "Any": "SeAverage"
+  },
+  "SeRich": {
+   "Any": "SeRich"
+  },
+  "SeFilthyRich": {
+   "Any": "SeFilthyRich"
+  },
+  "SeUltraRich": {
+   "Any": "SeUltraRich"
+  },
+  "SeSuperBoss": {
+   "Any": "SeSuperBoss"
+  },
+  "AosPoor": {
+   "Any": "AosPoor"
+  },
+  "AosMeager": {
+   "Any": "AosMeager"
+  },
+  "AosAverage": {
+   "Any": "AosAverage"
+  },
+  "AosRich": {
+   "Any": "AosRich"
+  },
+  "AosFilthyRich": {
+   "Any": "AosFilthyRich"
+  },
+  "AosUltraRich": {
+   "Any": "AosUltraRich"
+  },
+  "AosSuperBoss": {
+   "Any": "AosSuperBoss"
+  },
+  "OldPoor": {
+   "Any": "OldPoor"
+  },
+  "OldMeager": {
+   "Any": "OldMeager"
+  },
+  "OldAverage": {
+   "Any": "OldAverage"
+  },
+  "OldRich": {
+   "Any": "OldRich"
+  },
+  "OldFilthyRich": {
+   "Any": "OldFilthyRich"
+  },
+  "OldUltraRich": {
+   "Any": "OldUltraRich"
+  },
+  "OldSuperBoss": {
+   "Any": "OldSuperBoss"
+  },
+  "LowScrolls": {
+   "Any": "LowScrolls"
+  },
+  "MedScrolls": {
+   "Any": "MedScrolls"
+  },
+  "HighScrolls": {
+   "Any": "HighScrolls"
+  },
+  "Gems": {
+   "Any": "Gems"
+  },
+  "Potions": {
+   "Any": "Potions"
+  },
+  "Parrot": {
+   "Any": "Parrot"
+  }
+ },
+ "Groups": {
+  "Gold": [
+   "Gold"
+  ],
+  "Instruments": [
+   "BaseInstrument"
+  ],
+  "LowScrollItems": [
+   "ClumsyScroll"
+  ],
+  "MedScrollItems": [
+   "ArchCureScroll"
+  ],
+  "HighScrollItems": [
+   "SummonAirElementalScroll"
+  ],
+  "GemItems": [
+   "Amber"
+  ],
+  "PotionItems": [
+   "AgilityPotion",
+   "StrengthPotion",
+   "RefreshPotion",
+   "LesserCurePotion",
+   "LesserHealPotion",
+   "LesserPoisonPotion"
+  ],
+  "OldMagicItems": [
+   "BaseJewel",
+   "BaseArmor",
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseShield"
+  ],
+  "AosMagicItemsPoor": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsMeagerType1": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsMeagerType2": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsAverageType1": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsAverageType2": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsRichType1": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsRichType2": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsFilthyRichType1": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsFilthyRichType2": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "AosMagicItemsUltraRich": [
+   "BaseWeapon",
+   "BaseRanged",
+   "BaseArmor",
+   "BaseShield",
+   "BaseJewel"
+  ],
+  "ParrotItem": [
+   "ParrotItem"
+  ]
+ },
+ "GroupWeights": {
+  "OldMagicItems": [
+   1,
+   4,
+   3,
+   1,
+   1
+  ],
+  "AosMagicItemsPoor": [
+   3,
+   1,
+   4,
+   1,
+   2
+  ],
+  "AosMagicItemsMeagerType1": [
+   56,
+   14,
+   81,
+   11,
+   42
+  ],
+  "AosMagicItemsMeagerType2": [
+   28,
+   7,
+   40,
+   5,
+   21
+  ],
+  "AosMagicItemsAverageType1": [
+   90,
+   23,
+   130,
+   17,
+   68
+  ],
+  "AosMagicItemsAverageType2": [
+   54,
+   13,
+   77,
+   10,
+   40
+  ],
+  "AosMagicItemsRichType1": [
+   211,
+   53,
+   303,
+   39,
+   158
+  ],
+  "AosMagicItemsRichType2": [
+   170,
+   43,
+   245,
+   32,
+   128
+  ],
+  "AosMagicItemsFilthyRichType1": [
+   219,
+   55,
+   315,
+   41,
+   164
+  ],
+  "AosMagicItemsFilthyRichType2": [
+   239,
+   60,
+   343,
+   90,
+   45
+  ],
+  "AosMagicItemsUltraRich": [
+   276,
+   69,
+   397,
+   52,
+   207
+  ]
+ },
+ "Special": {
+  "BaseWeapon": {
+   "Picks": "random weapon",
+   "Tables": {
+    "SA": [
+     "SAWeaponTypes",
+     "AosWeaponTypes",
+     "WeaponTypes"
+    ],
+    "ML": [
+     "MLWeaponTypes",
+     "AosWeaponTypes",
+     "WeaponTypes"
+    ],
+    "SE": [
+     "SEWeaponTypes",
+     "AosWeaponTypes",
+     "WeaponTypes"
+    ],
+    "AOS": [
+     "AosWeaponTypes",
+     "WeaponTypes"
+    ],
+    "Old": [
+     "WeaponTypes"
+    ]
+   }
+  },
+  "BaseRanged": {
+   "Picks": "random ranged weapon",
+   "Tables": {
+    "SA": [
+     "SARangedWeaponTypes",
+     "AosRangedWeaponTypes",
+     "RangedWeaponTypes"
+    ],
+    "ML": [
+     "MLRangedWeaponTypes",
+     "AosRangedWeaponTypes",
+     "RangedWeaponTypes"
+    ],
+    "SE": [
+     "SERangedWeaponTypes",
+     "AosRangedWeaponTypes",
+     "RangedWeaponTypes"
+    ],
+    "AOS": [
+     "AosRangedWeaponTypes",
+     "RangedWeaponTypes"
+    ],
+    "Old": [
+     "RangedWeaponTypes"
+    ]
+   }
+  },
+  "BaseArmor": {
+   "Picks": "random armour or hat",
+   "Tables": {
+    "SA": [
+     "SAArmorTypes",
+     "ArmorTypes",
+     "AosHatTypes",
+     "HatTypes"
+    ],
+    "ML": [
+     "MLArmorTypes",
+     "ArmorTypes",
+     "AosHatTypes",
+     "HatTypes"
+    ],
+    "SE": [
+     "SEArmorTypes",
+     "ArmorTypes",
+     "SEHatTypes",
+     "AosHatTypes",
+     "HatTypes"
+    ],
+    "AOS": [
+     "ArmorTypes",
+     "AosHatTypes",
+     "HatTypes"
+    ],
+    "Old": [
+     "ArmorTypes",
+     "HatTypes"
+    ]
+   }
+  },
+  "BaseShield": {
+   "Picks": "random shield",
+   "Tables": {
+    "SA": [
+     "AosShieldTypes",
+     "ShieldTypes",
+     "SAShieldTypes"
+    ],
+    "AOS": [
+     "AosShieldTypes",
+     "ShieldTypes"
+    ],
+    "Old": [
+     "ShieldTypes"
+    ]
+   }
+  },
+  "BaseJewel": {
+   "Picks": "random jewellery (AOS+); before AOS a random armour, shield or weapon",
+   "Tables": {
+    "SA": [
+     "SAJewelryTypes",
+     "JewelryTypes"
+    ],
+    "AOS": [
+     "JewelryTypes"
+    ],
+    "Old": [
+     "ArmorTypes",
+     "ShieldTypes",
+     "WeaponTypes",
+     "RangedWeaponTypes"
+    ]
+   }
+  },
+  "BaseInstrument": {
+   "Picks": "random instrument; kept only if it rolls a slayer",
+   "Tables": {
+    "SE": [
+     "InstrumentTypes",
+     "SEInstrumentTypes"
+    ],
+    "Old": [
+     "InstrumentTypes"
+    ]
+   }
+  },
+  "Amber": {
+   "Picks": "random gem",
+   "Tables": {
+    "Any": [
+     "GemTypes"
+    ]
+   }
+  },
+  "ClumsyScroll": {
+   "Picks": "random scroll, circles 1-3 (magery weighted 4, plus necromancy/mysticism)",
+   "Tables": {
+    "Any": [
+     "RegularScrollTypes",
+     "NecromancyScrollTypes",
+     "MysticismScrollTypes"
+    ]
+   }
+  },
+  "ArchCureScroll": {
+   "Picks": "random scroll, circles 4-7",
+   "Tables": {
+    "Any": [
+     "RegularScrollTypes",
+     "NecromancyScrollTypes",
+     "MysticismScrollTypes"
+    ]
+   }
+  },
+  "SummonAirElementalScroll": {
+   "Picks": "random scroll, circle 8",
+   "Tables": {
+    "Any": [
+     "RegularScrollTypes",
+     "NecromancyScrollTypes",
+     "MysticismScrollTypes"
+    ]
+   }
+  }
+ },
+ "Tables": {
+  "AosHatTypes": [
+   "FlowerGarland",
+   "BearMask",
+   "DeerMask"
+  ],
+  "AosRangedWeaponTypes": [
+   "CompositeBow",
+   "RepeatingCrossbow"
+  ],
+  "AosShieldTypes": [
+   "ChaosShield",
+   "OrderShield"
+  ],
+  "AosWeaponTypes": [
+   "Scythe",
+   "BoneHarvester",
+   "Scepter",
+   "BladedStaff",
+   "Pike",
+   "DoubleBladedStaff",
+   "Lance",
+   "CrescentBlade",
+   "SmithyHammer",
+   "SledgeHammerWeapon"
+  ],
+  "ArmorTypes": [
+   "BoneArms",
+   "BoneChest",
+   "BoneGloves",
+   "BoneLegs",
+   "BoneHelm",
+   "ChainChest",
+   "ChainLegs",
+   "ChainCoif",
+   "Bascinet",
+   "CloseHelm",
+   "Helmet",
+   "NorseHelm",
+   "OrcHelm",
+   "FemaleLeatherChest",
+   "LeatherArms",
+   "LeatherBustierArms",
+   "LeatherChest",
+   "LeatherGloves",
+   "LeatherGorget",
+   "LeatherLegs",
+   "LeatherShorts",
+   "LeatherSkirt",
+   "LeatherCap",
+   "FemalePlateChest",
+   "PlateArms",
+   "PlateChest",
+   "PlateGloves",
+   "PlateGorget",
+   "PlateHelm",
+   "PlateLegs",
+   "RingmailArms",
+   "RingmailChest",
+   "RingmailGloves",
+   "RingmailLegs",
+   "FemaleStuddedChest",
+   "StuddedArms",
+   "StuddedBustierArms",
+   "StuddedChest",
+   "StuddedGloves",
+   "StuddedGorget",
+   "StuddedLegs"
+  ],
+  "GemTypes": [
+   "Amber",
+   "Amethyst",
+   "Citrine",
+   "Diamond",
+   "Emerald",
+   "Ruby",
+   "Sapphire",
+   "StarSapphire",
+   "Tourmaline"
+  ],
+  "HatTypes": [
+   "SkullCap",
+   "Bandana",
+   "FloppyHat",
+   "Cap",
+   "WideBrimHat",
+   "StrawHat",
+   "TallStrawHat",
+   "WizardsHat",
+   "Bonnet",
+   "FeatheredHat",
+   "TricorneHat",
+   "JesterHat",
+   "OrcMask",
+   "TribalMask"
+  ],
+  "InstrumentTypes": [
+   "Drums",
+   "Harp",
+   "LapHarp",
+   "Lute",
+   "Tambourine",
+   "TambourineTassel"
+  ],
+  "JewelryTypes": [
+   "GoldRing",
+   "GoldBracelet",
+   "SilverRing",
+   "SilverBracelet"
+  ],
+  "MLArmorTypes": [
+   "Circlet",
+   "GemmedCirclet",
+   "LeafTonlet",
+   "RavenHelm",
+   "RoyalCirclet",
+   "VultureHelm",
+   "WingedHelm",
+   "LeafArms",
+   "LeafChest",
+   "LeafGloves",
+   "LeafGorget",
+   "LeafLegs",
+   "WoodlandArms",
+   "WoodlandChest",
+   "WoodlandGloves",
+   "WoodlandGorget",
+   "WoodlandLegs",
+   "HideChest",
+   "HideGloves",
+   "HideGorget",
+   "HidePants",
+   "HidePauldrons"
+  ],
+  "MLRangedWeaponTypes": [
+   "ElvenCompositeLongbow",
+   "MagicalShortbow"
+  ],
+  "MLWeaponTypes": [
+   "AssassinSpike",
+   "DiamondMace",
+   "ElvenMachete",
+   "ElvenSpellblade",
+   "Leafblade",
+   "OrnateAxe",
+   "RadiantScimitar",
+   "RuneBlade",
+   "WarCleaver",
+   "WildStaff"
+  ],
+  "MysticismScrollTypes": [
+   "NetherBoltScroll",
+   "HealingStoneScroll",
+   "PurgeMagicScroll",
+   "EagleStrikeScroll",
+   "AnimatedWeaponScroll",
+   "StoneFormScroll",
+   "SpellTriggerScroll",
+   "CleansingWindsScroll",
+   "BombardScroll",
+   "SpellPlagueScroll",
+   "HailStormScroll",
+   "NetherCycloneScroll",
+   "RisingColossusScroll",
+   "SleepScroll",
+   "MassSleepScroll",
+   "EnchantScroll"
+  ],
+  "NecromancyScrollTypes": [
+   "AnimateDeadScroll",
+   "BloodOathScroll",
+   "CorpseSkinScroll",
+   "CurseWeaponScroll",
+   "EvilOmenScroll",
+   "HorrificBeastScroll",
+   "LichFormScroll",
+   "MindRotScroll",
+   "PainSpikeScroll",
+   "PoisonStrikeScroll",
+   "StrangleScroll",
+   "SummonFamiliarScroll",
+   "VampiricEmbraceScroll",
+   "VengefulSpiritScroll",
+   "WitherScroll",
+   "WraithFormScroll"
+  ],
+  "RangedWeaponTypes": [
+   "Bow",
+   "Crossbow",
+   "HeavyCrossbow"
+  ],
+  "RegularScrollTypes": [
+   "ReactiveArmorScroll",
+   "ClumsyScroll",
+   "CreateFoodScroll",
+   "FeeblemindScroll",
+   "HealScroll",
+   "MagicArrowScroll",
+   "NightSightScroll",
+   "WeakenScroll",
+   "AgilityScroll",
+   "CunningScroll",
+   "CureScroll",
+   "HarmScroll",
+   "MagicTrapScroll",
+   "MagicUnTrapScroll",
+   "ProtectionScroll",
+   "StrengthScroll",
+   "BlessScroll",
+   "FireballScroll",
+   "MagicLockScroll",
+   "PoisonScroll",
+   "TelekinisisScroll",
+   "TeleportScroll",
+   "UnlockScroll",
+   "WallOfStoneScroll",
+   "ArchCureScroll",
+   "ArchProtectionScroll",
+   "CurseScroll",
+   "FireFieldScroll",
+   "GreaterHealScroll",
+   "LightningScroll",
+   "ManaDrainScroll",
+   "RecallScroll",
+   "BladeSpiritsScroll",
+   "DispelFieldScroll",
+   "IncognitoScroll",
+   "MagicReflectScroll",
+   "MindBlastScroll",
+   "ParalyzeScroll",
+   "PoisonFieldScroll",
+   "SummonCreatureScroll",
+   "DispelScroll",
+   "EnergyBoltScroll",
+   "ExplosionScroll",
+   "InvisibilityScroll",
+   "MarkScroll",
+   "MassCurseScroll",
+   "ParalyzeFieldScroll",
+   "RevealScroll",
+   "ChainLightningScroll",
+   "EnergyFieldScroll",
+   "FlamestrikeScroll",
+   "GateTravelScroll",
+   "ManaVampireScroll",
+   "MassDispelScroll",
+   "MeteorSwarmScroll",
+   "PolymorphScroll",
+   "EarthquakeScroll",
+   "EnergyVortexScroll",
+   "ResurrectionScroll",
+   "SummonAirElementalScroll",
+   "SummonDaemonScroll",
+   "SummonEarthElementalScroll",
+   "SummonFireElementalScroll",
+   "SummonWaterElementalScroll"
+  ],
+  "SAArmorTypes": [
+   "GargishLeatherChest",
+   "GargishLeatherLegs",
+   "GargishLeatherArms",
+   "GargishLeatherKilt",
+   "GargishStoneChest",
+   "GargishStoneLegs",
+   "GargishStoneArms",
+   "GargishStoneKilt",
+   "GargishPlateChest",
+   "GargishPlateLegs",
+   "GargishPlateArms",
+   "GargishPlateKilt",
+   "GargishNecklace",
+   "GargishEarrings"
+  ],
+  "SAJewelryTypes": [
+   "GargishRing",
+   "GargishBracelet"
+  ],
+  "SARangedWeaponTypes": [
+   "Boomerang",
+   "Cyclone",
+   "SoulGlaive"
+  ],
+  "SAShieldTypes": [
+   "GargishChaosShield",
+   "GargishKiteShield",
+   "GargishOrderShield",
+   "GargishWoodenShield",
+   "LargeStoneShield"
+  ],
+  "SAWeaponTypes": [
+   "DiscMace",
+   "GargishTalwar",
+   "Shortblade",
+   "DualPointedSpear",
+   "GlassStaff",
+   "StoneWarSword",
+   "DualShortAxes",
+   "GlassSword",
+   "GargishDagger"
+  ],
+  "SEArmorTypes": [
+   "ChainHatsuburi",
+   "LeatherDo",
+   "LeatherHaidate",
+   "LeatherHiroSode",
+   "LeatherJingasa",
+   "LeatherMempo",
+   "LeatherNinjaHood",
+   "LeatherNinjaJacket",
+   "LeatherNinjaMitts",
+   "LeatherNinjaPants",
+   "LeatherSuneate",
+   "DecorativePlateKabuto",
+   "HeavyPlateJingasa",
+   "LightPlateJingasa",
+   "PlateBattleKabuto",
+   "PlateDo",
+   "PlateHaidate",
+   "PlateHatsuburi",
+   "PlateHiroSode",
+   "PlateMempo",
+   "PlateSuneate",
+   "SmallPlateJingasa",
+   "StandardPlateKabuto",
+   "StuddedDo",
+   "StuddedHaidate",
+   "StuddedHiroSode",
+   "StuddedMempo",
+   "StuddedSuneate"
+  ],
+  "SEHatTypes": [
+   "ClothNinjaHood",
+   "Kasa"
+  ],
+  "SEInstrumentTypes": [
+   "BambooFlute"
+  ],
+  "SERangedWeaponTypes": [
+   "Yumi"
+  ],
+  "SEWeaponTypes": [
+   "Bokuto",
+   "Daisho",
+   "Kama",
+   "Lajatang",
+   "NoDachi",
+   "Nunchaku",
+   "Sai",
+   "Tekagi",
+   "Tessen",
+   "Tetsubo",
+   "Wakizashi"
+  ],
+  "ShieldTypes": [
+   "BronzeShield",
+   "Buckler",
+   "HeaterShield",
+   "MetalShield",
+   "MetalKiteShield",
+   "WoodenKiteShield",
+   "WoodenShield"
+  ],
+  "WeaponTypes": [
+   "Axe",
+   "BattleAxe",
+   "DoubleAxe",
+   "ExecutionersAxe",
+   "Hatchet",
+   "LargeBattleAxe",
+   "TwoHandedAxe",
+   "WarAxe",
+   "Club",
+   "Mace",
+   "Maul",
+   "WarHammer",
+   "WarMace",
+   "Bardiche",
+   "Halberd",
+   "Spear",
+   "ShortSpear",
+   "Pitchfork",
+   "WarFork",
+   "BlackStaff",
+   "GnarledStaff",
+   "QuarterStaff",
+   "Broadsword",
+   "Cutlass",
+   "Katana",
+   "Kryss",
+   "Longsword",
+   "Scimitar",
+   "VikingSword",
+   "Pickaxe",
+   "HammerPick",
+   "ButcherKnife",
+   "Cleaver",
+   "Dagger",
+   "SkinningKnife",
+   "ShepherdsCrook"
+  ]
+ }
+}

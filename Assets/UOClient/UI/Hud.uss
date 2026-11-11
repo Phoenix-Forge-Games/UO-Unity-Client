@@ -1,0 +1,840 @@
+/* In-world HUD. Placeholder flat styling in the login screen's palette; Synty INTERFACE art replaces it later. */
+
+.hud {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ---- Unit frames ---- */
+
+.unit-frame {
+    position: absolute;
+    width: 340px;
+    padding: 8px 10px;
+    background-color: rgba(24, 20, 16, 0.82);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 5px;
+}
+
+.player-frame {
+    left: 16px;
+    top: 16px;
+}
+
+.target-frame {
+    top: 16px;
+    left: 50%;
+    translate: -50% 0;
+}
+
+.frame-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.frame-name {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(226, 190, 116);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+.war-badge {
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: rgb(255, 230, 220);
+    background-color: rgb(150, 30, 24);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.bar {
+    height: 22px;
+    margin-top: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 100%;
+}
+
+.bar-hits .bar-fill { background-color: rgb(176, 40, 32); }
+.bar-mana .bar-fill { background-color: rgb(44, 86, 190); }
+.bar-stamina .bar-fill { background-color: rgb(196, 160, 40); }
+
+.bar-text {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    -unity-text-align: middle-center;
+    font-size: 15px;
+    color: rgb(240, 236, 228);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    padding: 0;
+    margin: 0;
+}
+
+/* ---- Chat ---- */
+
+.chat {
+    position: absolute;
+    left: 16px;
+    bottom: 36px;
+    width: 600px;
+    height: 290px;
+    background-color: rgba(10, 8, 6, 0.45);
+    border-radius: 5px;
+    padding: 4px 6px;
+}
+
+.chat-log {
+    flex-grow: 1;
+}
+
+.chat-line {
+    font-size: 18px;
+    white-space: normal;
+    margin: 0;
+    padding: 1px 0;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+}
+
+.chat-input {
+    margin: 4px 0 0 0;
+}
+
+.chat-input > .unity-base-text-field__input {
+    background-color: rgba(32, 26, 20, 0.95);
+    border-color: rgb(150, 116, 58);
+    color: rgb(240, 236, 228);
+    font-size: 18px;
+}
+
+.controls-hint {
+    position: absolute;
+    left: 16px;
+    bottom: 10px;
+    font-size: 15px;
+    color: rgba(230, 220, 200, 0.7);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+}
+
+/* ---- Over the world ---- */
+
+.overhead-layer {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.plate {
+    position: absolute;
+    align-items: center;
+    translate: -50% -100%;
+}
+
+.plate-speech {
+    font-size: 18px;
+    color: rgb(255, 255, 255);
+    background-color: rgba(10, 8, 6, 0.55);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-bottom: 2px;
+    max-width: 420px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.plate-name {
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-text-align: middle-center;
+}
+
+.plate-target .plate-name {
+    font-size: 20px;
+}
+
+.plate-health {
+    width: 90px;
+    height: 7px;
+    margin-top: 2px;
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+
+.plate-health-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background-color: rgb(200, 44, 36);
+}
+
+.damage {
+    position: absolute;
+    translate: -50% -100%;
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: rgb(255, 80, 60);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+/* ---- Windows ---- */
+
+.layer {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.window {
+    position: absolute;
+    background-color: rgba(24, 20, 16, 0.95);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 6px;
+    flex-direction: column;
+}
+
+.window-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    padding: 0 6px 0 12px;
+    background-color: rgba(48, 38, 26, 0.95);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.window-title {
+    font-size: 19px;
+    -unity-font-style: bold;
+    color: rgb(226, 190, 116);
+}
+
+.window-close {
+    width: 30px;
+    height: 28px;
+    font-size: 20px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    color: rgb(220, 200, 170);
+}
+
+.window-close:hover {
+    color: rgb(255, 120, 100);
+}
+
+.window-body {
+    flex-grow: 1;
+    padding: 8px 10px;
+    flex-direction: column;
+}
+
+.window-footer {
+    font-size: 15px;
+    color: rgb(190, 176, 150);
+    margin-top: 6px;
+}
+
+.hud-button, .menu-button, .tab, .npc-option, .context-entry, .use-button, .lock-button, .spell-button {
+    background-color: rgba(60, 48, 32, 0.95);
+    border-color: rgb(120, 94, 50);
+    border-width: 1px;
+    border-radius: 4px;
+    color: rgb(236, 226, 206);
+    font-size: 16px;
+}
+
+.hud-button:hover, .menu-button:hover, .tab:hover, .npc-option:hover, .context-entry:hover, .use-button:hover, .lock-button:hover, .spell-button:hover {
+    background-color: rgba(96, 74, 44, 0.95);
+}
+
+.tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.tab {
+    padding: 4px 12px;
+    margin: 0 4px 4px 0;
+}
+
+.tab-active {
+    background-color: rgb(150, 116, 58);
+    color: rgb(20, 16, 10);
+}
+
+.tab-page {
+    flex-grow: 1;
+}
+
+.empty-note {
+    font-size: 15px;
+    color: rgb(170, 160, 140);
+    white-space: normal;
+    margin: 6px 0;
+}
+
+/* Item grid */
+
+.grid-scroll {
+    flex-grow: 1;
+}
+
+.item-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.item-tile {
+    width: 82px;
+    height: 82px;
+    margin: 3px;
+    padding: 4px;
+    background-color: rgba(44, 36, 26, 0.95);
+    border-width: 1px;
+    border-color: rgb(90, 74, 50);
+    border-left-width: 4px;
+    border-radius: 4px;
+}
+
+.item-tile:hover {
+    border-color: rgb(226, 190, 116);
+}
+
+.item-name {
+    font-size: 13px;
+    white-space: normal;
+    color: rgb(236, 226, 206);
+    margin: 0;
+    padding: 0;
+}
+
+/* Stack counts: bottom centre, lifted off the edge, outlined so they read over the item picture. */
+.item-amount {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 5px;
+    font-size: 15px;
+    -unity-font-style: bold;
+    -unity-text-align: lower-center;
+    color: rgb(255, 236, 170);
+    -unity-text-outline-width: 1.5px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+
+/* An item's rendered picture (ItemIcons): fills the tile inside its rounded frame, black behind. */
+.item-picture {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(0, 0, 0);
+    border-radius: 3px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* The worn item's picture on a paperdoll slot, at its right end. */
+.slot-picture {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 42px;
+    height: 42px;
+    background-color: rgb(0, 0, 0);
+    border-width: 1px;
+    border-color: rgb(80, 66, 44);
+    border-radius: 5px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.cat-gold { border-left-color: rgb(230, 190, 60); }
+.cat-reagent { border-left-color: rgb(120, 200, 110); }
+.cat-gem { border-left-color: rgb(120, 200, 240); }
+.cat-potion { border-left-color: rgb(220, 90, 180); }
+.cat-scroll { border-left-color: rgb(230, 220, 170); }
+.cat-container { border-left-color: rgb(170, 120, 70); }
+.cat-equipment { border-left-color: rgb(170, 170, 190); }
+.cat-other { border-left-color: rgb(110, 100, 90); }
+
+.tooltip {
+    position: absolute;
+    max-width: 380px;
+    padding: 6px 10px;
+    font-size: 15px;
+    white-space: normal;
+    color: rgb(236, 226, 206);
+    background-color: rgba(12, 10, 8, 0.95);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 4px;
+}
+
+.drag-ghost {
+    position: absolute;
+    padding: 4px 8px;
+    font-size: 15px;
+    color: rgb(255, 236, 170);
+    background-color: rgba(48, 38, 26, 0.85);
+    border-radius: 4px;
+}
+
+.context-menu {
+    position: absolute;
+    flex-direction: column;
+    min-width: 180px;
+    padding: 4px;
+    background-color: rgba(18, 14, 10, 0.97);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 4px;
+}
+
+.context-entry {
+    -unity-text-align: middle-left;
+    margin: 1px 0;
+}
+
+/* Character window */
+
+.paperdoll {
+    flex-direction: row;
+}
+
+.slot-column {
+    width: 150px;
+    flex-direction: column;
+}
+
+.doll {
+    flex-grow: 1;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.slot {
+    height: 50px;
+    margin: 2px 0;
+    padding: 3px 6px;
+    background-color: rgba(40, 32, 22, 0.9);
+    border-width: 1px;
+    border-color: rgb(80, 66, 44);
+    border-radius: 4px;
+}
+
+.slot:hover {
+    border-color: rgb(226, 190, 116);
+}
+
+.slot-filled {
+    border-color: rgb(150, 116, 58);
+}
+
+.slot-name {
+    font-size: 12px;
+    color: rgb(160, 146, 120);
+    margin: 0; padding: 0;
+}
+
+.slot-item {
+    font-size: 13px;
+    color: rgb(236, 226, 206);
+    white-space: normal;
+    margin: 0; padding: 0;
+}
+
+.stats-heading {
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: rgb(226, 190, 116);
+    margin: 10px 0 4px 0;
+}
+
+.stat-row, .skill-row {
+    flex-direction: row;
+    align-items: center;
+    height: 30px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(90, 74, 50, 0.5);
+}
+
+.stat-name, .skill-name {
+    flex-grow: 1;
+    font-size: 16px;
+    color: rgb(236, 226, 206);
+}
+
+.stat-value, .skill-value, .skill-cap {
+    width: 90px;
+    font-size: 16px;
+    -unity-text-align: middle-right;
+    color: rgb(255, 236, 170);
+}
+
+.skill-cap {
+    width: 70px;
+    color: rgb(170, 160, 140);
+}
+
+.skill-zero .skill-name, .skill-zero .skill-value {
+    color: rgb(140, 130, 112);
+}
+
+.use-button {
+    width: 52px;
+    height: 24px;
+    font-size: 13px;
+    margin-right: 8px;
+}
+
+.lock-button {
+    width: 34px;
+    height: 24px;
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.list-scroll {
+    flex-grow: 1;
+}
+
+.spell-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.spell-button {
+    width: 180px;
+    height: 32px;
+    margin: 2px;
+    font-size: 14px;
+}
+
+/* Menu and dialogue */
+
+.menu-main {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-button {
+    width: 300px;
+    height: 48px;
+    margin: 8px;
+    font-size: 20px;
+}
+
+.menu-settings {
+    flex-grow: 1;
+}
+
+.settings-page {
+    flex-grow: 1;
+}
+
+.setting {
+    margin: 4px 0;
+}
+
+.setting Label {
+    font-size: 16px;
+    color: rgb(236, 226, 206);
+    min-width: 260px;
+}
+
+.menu-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.menu-row .hud-button {
+    width: 120px;
+    height: 34px;
+    margin-left: 8px;
+}
+
+.npc-said {
+    font-size: 16px;
+    color: rgb(236, 226, 206);
+    white-space: normal;
+    -unity-font-style: italic;
+    margin-bottom: 10px;
+    min-height: 24px;
+}
+
+.npc-options {
+    flex-direction: column;
+}
+
+.npc-option {
+    height: 38px;
+    margin: 3px 0;
+    -unity-text-align: middle-left;
+    padding-left: 12px;
+}
+
+/* Shop */
+
+.shop-row {
+    flex-direction: row;
+    align-items: center;
+    height: 36px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(90, 74, 50, 0.5);
+}
+
+.shop-name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 16px;
+    color: rgb(236, 226, 206);
+    overflow: hidden;
+}
+
+.shop-price {
+    width: 80px;
+    font-size: 15px;
+    -unity-text-align: middle-right;
+    color: rgb(255, 236, 170);
+}
+
+.shop-stock {
+    width: 70px;
+    font-size: 13px;
+    -unity-text-align: middle-right;
+    color: rgb(170, 160, 140);
+    margin-right: 6px;
+}
+
+.shop-qty {
+    width: 36px;
+    font-size: 16px;
+    -unity-text-align: middle-center;
+    color: rgb(236, 226, 206);
+}
+
+.qty-button {
+    min-width: 28px;
+    height: 26px;
+    font-size: 14px;
+    background-color: rgba(60, 48, 32, 0.95);
+    border-color: rgb(120, 94, 50);
+    border-width: 1px;
+    border-radius: 4px;
+    color: rgb(236, 226, 206);
+}
+
+.qty-button:hover {
+    background-color: rgba(96, 74, 44, 0.95);
+}
+
+.shop-total {
+    flex-grow: 1;
+    font-size: 16px;
+    -unity-text-align: middle-left;
+    color: rgb(255, 236, 170);
+}
+
+.shop-short {
+    color: rgb(255, 110, 90);
+}
+
+.menu-heading {
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: rgb(226, 190, 116);
+    margin: 2px 4px 4px 4px;
+}
+
+/* Hotbar and buffs */
+
+.hotbar {
+    position: absolute;
+    bottom: 34px;
+    left: 50%;
+    translate: -50% 0;
+    flex-direction: row;
+    padding: 4px;
+    background-color: rgba(10, 8, 6, 0.55);
+    border-radius: 6px;
+}
+
+.hotbar-slot {
+    width: 74px;
+    height: 74px;
+    margin: 2px;
+    padding: 3px;
+    background-color: rgba(30, 24, 18, 0.9);
+    border-width: 1px;
+    border-color: rgb(80, 66, 44);
+    border-radius: 5px;
+}
+
+.hotbar-slot:hover {
+    border-color: rgb(226, 190, 116);
+}
+
+.hotbar-filled {
+    background-color: rgba(52, 42, 28, 0.95);
+}
+
+.hotbar-active {
+    border-color: rgb(255, 210, 90);
+    border-width: 2px;
+    background-color: rgba(110, 84, 36, 0.95);
+}
+
+.hotbar-pressed {
+    background-color: rgba(150, 116, 58, 0.95);
+}
+
+.hotbar-empty-stock .hotbar-label {
+    color: rgb(150, 110, 100);
+}
+
+.hotbar-key {
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(226, 190, 116);
+}
+
+.hotbar-label {
+    margin-top: 14px;
+    font-size: 13px;
+    white-space: normal;
+    -unity-text-align: upper-center;
+    color: rgb(236, 226, 206);
+}
+
+.buff-bar {
+    position: absolute;
+    bottom: 128px;
+    left: 50%;
+    translate: -50% 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+}
+
+.buff-chip {
+    font-size: 14px;
+    color: rgb(236, 226, 206);
+    background-color: rgba(30, 50, 80, 0.85);
+    border-color: rgb(90, 130, 190);
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px;
+}
+
+/* Minimap */
+
+.minimap {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    padding: 4px;
+    background-color: rgba(24, 20, 16, 0.85);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 6px;
+}
+
+.minimap-map {
+    width: 280px;
+    height: 280px;
+    overflow: hidden;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.minimap-overlay {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.minimap-arrow {
+    position: absolute;
+    left: 140px;
+    top: 140px;
+    translate: -50% -50%;
+    font-size: 20px;
+    color: rgb(255, 236, 170);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    padding: 0;
+    margin: 0;
+}
+
+.minimap-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    translate: -50% -50%;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.8);
+}
+
+.minimap-place {
+    position: absolute;
+    translate: -50% -50%;
+    font-size: 13px;
+    color: rgb(236, 226, 206);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    padding: 0;
+    margin: 0;
+}
+
+.minimap-town {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 230, 160);
+}
+
+.minimap-dungeon {
+    color: rgb(255, 140, 120);
+}
+
+.minimap-bar {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.minimap-caption {
+    flex-grow: 1;
+    font-size: 13px;
+    color: rgb(226, 190, 116);
+}
+
+.news-point {
+    font-size: 15px;
+    white-space: normal;
+    color: rgb(236, 226, 206);
+    margin: 2px 0 4px 8px;
+}

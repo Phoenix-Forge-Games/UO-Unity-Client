@@ -132,3 +132,73 @@
 .hidden {
     display: none;
 }
+
+/* Character creation: a wide overlay over the menu, preview on the left, choices on the right. */
+.creator {
+    position: absolute;
+    left: 4%; right: 4%; top: 5%; bottom: 5%;
+    flex-direction: row;
+    background-color: rgba(18, 14, 10, 0.96);
+    border-width: 2px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.creator-doll {
+    width: 40%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.creator-side {
+    flex-grow: 1;
+    padding-left: 18px;
+}
+
+.creator-row {
+    flex-direction: row;
+    align-items: center;
+    margin: 3px 0;
+}
+
+.creator-label {
+    min-width: 120px;
+    color: rgb(200, 186, 160);
+    font-size: 15px;
+}
+
+.creator-style {
+    min-width: 200px;
+    -unity-text-align: middle-center;
+    color: rgb(236, 226, 206);
+    font-size: 15px;
+}
+
+.creator-choice {
+    margin: 2px 4px 2px 0;
+    padding: 0 12px;
+}
+
+.creator-chosen {
+    background-color: rgb(150, 116, 58);
+    color: rgb(20, 16, 10);
+}
+
+.creator-professions {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.creator-skill {
+    width: 45%;
+}
+
+.creator-skill-value {
+    flex-grow: 1;
+}
+
+.creator-note {
+    color: rgb(190, 176, 150);
+    font-size: 14px;
+    margin: 2px 0 6px 120px;
+}

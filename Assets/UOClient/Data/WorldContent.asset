@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d8847c17424df549a923c447ba2b2d1, type: 3}
+  m_Name: WorldContent
+  m_EditorClassIdentifier: UOClient::UOClient.Bake.WorldContent
+  WorldMaterial: {fileID: 2100000, guid: 4518140a0ba02a54bbf76c397bc28c66, type: 2}
+  TerrainMaterial: {fileID: 2100000, guid: f499d40ffb340f242995bde29dd8951c, type: 2}
+  WaterMaterial: {fileID: 2100000, guid: ba4ba0607edb5754bb79b829283324a4, type: 2}
+  LandLayers:
+  - {fileID: 8574412962073106934, guid: 1b99f5ad535e43179221919835c084b2, type: 2}
+  - {fileID: 8574412962073106934, guid: 895e52106cf94ca597703857d3f2d1e1, type: 2}
+  - {fileID: 8574412962073106934, guid: 373390ecf559427aa28b5f302dbab436, type: 2}
+  - {fileID: 8574412962073106934, guid: fed28b647bca4804a1ff2d82a8d60e47, type: 2}
+  - {fileID: 8574412962073106934, guid: 319310e424f9404e9c0eb03685d1d6e3, type: 2}
+  - {fileID: 8574412962073106934, guid: 76f8f662ff5244918cf18bb4325c4932, type: 2}
+  - {fileID: 8574412962073106934, guid: 59deea00284e4d98a0039053e96942e1, type: 2}
+  - {fileID: 8574412962073106934, guid: 2dc01f3dbcdf4fa6bd0f56c4bd0cd11e, type: 2}
+  - {fileID: 8574412962073106934, guid: 518dc95633c04075b3aa11d0a4cf69b9, type: 2}
+  - {fileID: 8574412962073106934, guid: c7d7a57107b547678cdcee361d21d23c, type: 2}
+  - {fileID: 8574412962073106934, guid: 5b40953a46d74db7973334793604a44c, type: 2}
+  - {fileID: 8574412962073106934, guid: 7850a9fae7a14786911f0dee8c399eaa, type: 2}
+  - {fileID: 8574412962073106934, guid: f09312b5f3e77fc4b8d8a7b5b357079a, type: 2}
+  - {fileID: 8574412962073106934, guid: 004aef76c9a412c4bbcdedde04a7bad9, type: 2}
+  - {fileID: 8574412962073106934, guid: b9eeac332a356f34fb08017f0ee61631, type: 2}
+  - {fileID: 8574412962073106934, guid: 0ee09df919e207049be7831697d82e38, type: 2}
+  Vegetation: {fileID: 11400000, guid: bb82d77de805d6745a723e52b273ace3, type: 2}
+  WallKit: {fileID: 11400000, guid: 8b3760e13db262e4896d9be8b062a33f, type: 2}
+  Props: {fileID: 11400000, guid: daf1a96d8ff022f4ba232d920c405634, type: 2}
+  Grass: {fileID: 8926484042661614526, guid: 1672a4ef00767534c9f01df01bf6676f, type: 3}
+  GenerateHouses: 1

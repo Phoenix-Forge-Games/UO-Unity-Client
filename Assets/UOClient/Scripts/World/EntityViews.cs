@@ -76,12 +76,21 @@ namespace UOClient
             return Mathf.Clamp(h * WorldSpace.ZScale, 0.12f, 0.6f);
         }
 
+        /// <summary>Optional: models for creatures and animals by UO body; bodies it lacks stay capsules.</summary>
+        public CreatureCatalog Creatures { get; set; }
+
         /// <summary>Optional: dresses humanoids in Sidekick parts from their equipment, instead of fixed prefabs.</summary>
         public SidekickDresser Dresser { get; set; }
 
         private readonly Dictionary<uint, string> _outfits = new Dictionary<uint, string>();
 
         public MobileView Get(uint serial) => _mobiles.TryGetValue(serial, out MobileView view) ? view : null;
+
+        /// <summary>Every mobile's view, for picking and name plates.</summary>
+        public IEnumerable<KeyValuePair<uint, MobileView>> Mobiles => _mobiles;
+
+        /// <summary>Every ground item's view (placeholders and props; doors drawn by houses aren't here).</summary>
+        public IEnumerable<KeyValuePair<uint, GameObject>> Items => _items;
 
         public void OnMobileUpdated(Mobile mobile)
         {
@@ -159,10 +168,16 @@ namespace UOClient
                 }
 
                 DropItemView(item.Serial);
-                GameObject placed = Props.Place(_root, prop, item.Graphic, item.X, item.Y, item.X, item.Y, item.Z);
+                GameObject placed = Props.Place(_root, prop, item.Graphic, item.X, item.Y, item.X, item.Y, item.Z, serverItem: true);
                 if (placed != null)
                 {
                     placed.name = key;
+                    placed.AddComponent<Pickable>().Serial = item.Serial;
+                    string tileName = Tiles != null && item.Graphic < Tiles.Statics.Length ? (Tiles.GetStatic(item.Graphic).Name ?? string.Empty).ToLowerInvariant() : string.Empty;
+                    if (tileName.Contains("post") || tileName.Contains("pole"))
+                    {
+                        placed.AddComponent<GroundedPole>(); // never floats over lower ground
+                    }
                     _items[item.Serial] = placed;
                     _propItems.Add(item.Serial);
                     return;
@@ -180,6 +195,7 @@ namespace UOClient
                 go.transform.localScale = Vector3.one * PlaceholderSize(item.Graphic);
                 go.GetComponent<Renderer>().sharedMaterial = _material;
                 SetColor(go, new Color(0.85f, 0.7f, 0.25f));
+                go.AddComponent<Pickable>().Serial = item.Serial;
                 _items[item.Serial] = go;
             }
 
@@ -325,6 +341,12 @@ namespace UOClient
                     animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
                 }
             }
+            else if (!mobile.IsHumanoid && Creatures != null && Creatures.Find(mobile.Body) is CreatureCatalog.Entry creature)
+            {
+                go = new GameObject();
+                go.transform.SetParent(_root, false);
+                CreatureCatalog.Spawn(creature, go.transform, out animator);
+            }
             else
             {
                 go = new GameObject();
@@ -339,6 +361,7 @@ namespace UOClient
             }
 
             go.name = $"Mobile 0x{mobile.Serial:X8} (body {mobile.Body})";
+            go.AddComponent<Pickable>().Serial = mobile.Serial;
             return go.AddComponent<MobileView>();
         }
 

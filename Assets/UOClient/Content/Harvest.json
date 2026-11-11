@@ -1,0 +1,2897 @@
+{
+ "Source": "ServUO scripts: Services/Harvest (Mining, Lumberjacking, Fishing), tool classes, High Seas fish tables, SeriousFun Custom/Gathering. Core expansions on, Siege off. Tile ids are expanded (no ranges); seconds for times; chances in percent unless named BaseChance (a 0..1 probability).",
+ "Rules": {
+  "Target": "The player targets a land tile or static; its id picks the first definition (in order) whose Tiles contain it. Static ids are matched after masking with 0x3FFF, so a graphic >= 0x4000 counts as graphic & 0x3FFF.",
+  "Range": "The target must be within MaxRange tiles (Chebyshev) when starting and on every effect tick.",
+  "Bank": "The world is cut into Width x Height cells per map; each cell holds a random MinTotal..MaxTotal and one vein. With RandomizeVeins the vein is picked at random (by Veins' Chance) when the cell is created and again on each refill; without it, it is fixed per cell. The first harvest from a full cell starts a MinRespawnSeconds..MaxRespawnSeconds timer after which the cell is full again. A harvest needs ConsumedPerHarvest left and takes ConsumedPerHarvest (whatever the yield).",
+  "Timing": "Effect: Count (random from Counts) ticks, the first at once and then every DelaySeconds; each tick plays an action from Actions and, SoundDelaySeconds later, a sound from Sounds; the last tick's sound also resolves the harvest. DurationSeconds is therefore (Count-1) x Delay + SoundDelay.",
+  "Vein": "Resource = the vein's Fallback when FallbackChance > random, or when the player's skill is below the Primary's ReqSkill or MinSkill and there is a Fallback; otherwise the Primary.",
+  "Skill": "Success needs skill >= ReqSkill and a skill check on MinSkill..MaxSkill (ServUO: chance (skill - Min) / (Max - Min), gains possible while skill < cap and the chance is between 0 and 1). On failure the definition's Fail message.",
+  "Yield": "One random type of the resource's Types (system-specific selection noted per definition). Stackable yield amount: on Felucca ConsumedPerFeluccaHarvest (granite 3) when the bank has that many, else ConsumedPerHarvest; with HumanBonus a human gets ceil(amount x 1.1) 10% of the time (if the bank has it). Felucca is treated as a special map: everywhere else uses ConsumedPerHarvest.",
+  "Bonus": "After each successful harvest one roll on BonusResources (Chance in %, the null-Type entry is 'nothing'); a find needs skill base >= ReqSkill and the Map when one is given.",
+  "Tools": "Tool uses: UsesPerHarvest is taken on each successful skill roll and the tool is destroyed at 0 (ToolBroke message). DurabilityLossChance is the shard's rule for pickaxes and hatchets: that % chance per successful roll to lose 1 hit point, then 1 max hit point, and break at 1.",
+  "ShardToolMods": "SeriousFun (Custom/Gathering/GatherMods.cs, not exported): pickaxes, shovels and hatchets can carry modifiers: Yield +5..50%, NodeSaving 5..50% chance not to deplete the bank, SkillBonus, CarryWeight, ResourceWeight; artifact ones Weightless, EndlessNode, Motherlode (15% chance of also getting the next resource's first type if skill allows), Swift (half DelaySeconds), Bountiful (second bonus roll when the first gives nothing)."
+ },
+ "Systems": {
+  "Mining": {
+   "Skill": "Mining",
+   "Tools": {
+    "CaddellitePickaxe": {
+     "UsesRemaining": 50,
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "GargoylesPickaxe": {
+     "UsesRemaining": [
+      101,
+      125
+     ],
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0,
+     "Effect": "Ore: the bank's vein is treated as the next vein in the list (Iron->Dull Copper ... Verite->Valorite; Valorite stays). On a harvest of the vein's primary resource, 10% chance to spawn that resource's Elemental (25% ore-elemental creature) next to the miner, attacking."
+    },
+    "ImprovedRockHammer": {
+     "UsesRemaining": 500,
+     "UsesPerHarvest": 1,
+     "ExceptionalUsesMultiplier": 2,
+     "Effect": "Ore: always gives the resource's granite when Mining base >= 100, otherwise nothing."
+    },
+    "JacobsPickaxe": {
+     "UsesRemaining": 20,
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "Pickaxe": {
+     "UsesRemaining": 50,
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "RockHammer": {
+     "UsesRemaining": 500,
+     "UsesPerHarvest": 1,
+     "ExceptionalUsesMultiplier": 2,
+     "Effect": "Ore: stone mining (when learned and toggled, Mining base >= 100) succeeds 50% instead of 15%."
+    },
+    "Shovel": {
+     "UsesRemaining": 50,
+     "UsesPerHarvest": 0
+    },
+    "SturdyPickaxe": {
+     "UsesRemaining": 180,
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "SturdyShovel": {
+     "UsesRemaining": 180,
+     "UsesPerHarvest": 1,
+     "ExceptionalUsesMultiplier": 2
+    }
+   },
+   "SystemMessages": {
+    "Prompt": {
+     "Cliloc": 503033,
+     "Text": "Where do you wish to dig?"
+    },
+    "CantMineThere": {
+     "Cliloc": 501862,
+     "Text": "You can't mine there."
+    },
+    "CantMineThat": {
+     "Cliloc": 501863,
+     "Text": "You can't mine that."
+    },
+    "Mounted": {
+     "Cliloc": 501864,
+     "Text": "You can't mine while riding."
+    },
+    "Polymorphed": {
+     "Cliloc": 501865,
+     "Text": "You can't mine while polymorphed."
+    },
+    "StoneFound": {
+     "Cliloc": 1044606,
+     "Text": "You carefully extract some workable stone from the ore vein!"
+    },
+    "GemFound": {
+     "Cliloc": 1112233,
+     "Text": "You carefully extract a glistening gem from the vein!"
+    }
+   },
+   "Notes": [
+    "Pickaxes, shovels, the sturdy and gargoyle's pickaxes have unlimited uses on this shard; the sturdy shovel and rock hammers still count uses."
+   ],
+   "Definitions": [
+    {
+     "Name": "Ore",
+     "Skill": "Mining",
+     "Tools": [
+      "CaddellitePickaxe",
+      "GargoylesPickaxe",
+      "ImprovedRockHammer",
+      "JacobsPickaxe",
+      "Pickaxe",
+      "RockHammer",
+      "Shovel",
+      "SturdyPickaxe",
+      "SturdyShovel"
+     ],
+     "TileIds": "expanded",
+     "Tiles": {
+      "Land": [
+       220,
+       221,
+       222,
+       223,
+       224,
+       225,
+       226,
+       227,
+       228,
+       229,
+       230,
+       231,
+       236,
+       237,
+       238,
+       239,
+       240,
+       241,
+       242,
+       243,
+       244,
+       245,
+       246,
+       247,
+       252,
+       253,
+       254,
+       255,
+       256,
+       257,
+       258,
+       259,
+       260,
+       261,
+       262,
+       263,
+       268,
+       269,
+       270,
+       271,
+       272,
+       273,
+       274,
+       275,
+       276,
+       277,
+       278,
+       279,
+       286,
+       287,
+       288,
+       289,
+       290,
+       291,
+       292,
+       293,
+       294,
+       296,
+       297,
+       321,
+       322,
+       323,
+       324,
+       467,
+       468,
+       469,
+       470,
+       471,
+       472,
+       473,
+       474,
+       476,
+       477,
+       478,
+       479,
+       480,
+       481,
+       482,
+       483,
+       484,
+       485,
+       486,
+       487,
+       492,
+       493,
+       494,
+       495,
+       543,
+       544,
+       545,
+       546,
+       547,
+       548,
+       549,
+       550,
+       551,
+       552,
+       553,
+       554,
+       555,
+       556,
+       557,
+       558,
+       559,
+       560,
+       561,
+       562,
+       563,
+       564,
+       565,
+       566,
+       567,
+       568,
+       569,
+       570,
+       571,
+       572,
+       573,
+       574,
+       575,
+       576,
+       577,
+       578,
+       579,
+       581,
+       582,
+       583,
+       584,
+       585,
+       586,
+       587,
+       588,
+       589,
+       590,
+       591,
+       592,
+       593,
+       594,
+       595,
+       596,
+       597,
+       598,
+       599,
+       600,
+       601,
+       610,
+       611,
+       612,
+       613,
+       1010,
+       1741,
+       1742,
+       1743,
+       1744,
+       1745,
+       1746,
+       1747,
+       1748,
+       1749,
+       1750,
+       1751,
+       1752,
+       1753,
+       1754,
+       1755,
+       1756,
+       1757,
+       1771,
+       1772,
+       1773,
+       1774,
+       1775,
+       1776,
+       1777,
+       1778,
+       1779,
+       1780,
+       1781,
+       1782,
+       1783,
+       1784,
+       1785,
+       1786,
+       1787,
+       1788,
+       1789,
+       1790,
+       1801,
+       1802,
+       1803,
+       1804,
+       1805,
+       1806,
+       1807,
+       1808,
+       1809,
+       1811,
+       1812,
+       1813,
+       1814,
+       1815,
+       1816,
+       1817,
+       1818,
+       1819,
+       1820,
+       1821,
+       1822,
+       1823,
+       1824,
+       1831,
+       1832,
+       1833,
+       1834,
+       1835,
+       1836,
+       1837,
+       1838,
+       1839,
+       1840,
+       1841,
+       1842,
+       1843,
+       1844,
+       1845,
+       1846,
+       1847,
+       1848,
+       1849,
+       1850,
+       1851,
+       1852,
+       1853,
+       1854,
+       1861,
+       1862,
+       1863,
+       1864,
+       1865,
+       1866,
+       1867,
+       1868,
+       1869,
+       1870,
+       1871,
+       1872,
+       1873,
+       1874,
+       1875,
+       1876,
+       1877,
+       1878,
+       1879,
+       1880,
+       1881,
+       1882,
+       1883,
+       1884,
+       1981,
+       1982,
+       1983,
+       1984,
+       1985,
+       1986,
+       1987,
+       1988,
+       1989,
+       1990,
+       1991,
+       1992,
+       1993,
+       1994,
+       1995,
+       1996,
+       1997,
+       1998,
+       1999,
+       2000,
+       2001,
+       2002,
+       2003,
+       2004,
+       2028,
+       2029,
+       2030,
+       2031,
+       2032,
+       2033,
+       2100,
+       2101,
+       2102,
+       2103,
+       2104,
+       2105
+      ],
+      "Static": [
+       1339,
+       1340,
+       1341,
+       1342,
+       1343,
+       1344,
+       1345,
+       1346,
+       1347,
+       1348,
+       1349,
+       1350,
+       1351,
+       1352,
+       1353,
+       1354,
+       1355,
+       1356,
+       1357,
+       1358,
+       1359
+      ]
+     },
+     "Bank": {
+      "Width": 8,
+      "Height": 8,
+      "MinTotal": 10,
+      "MaxTotal": 34,
+      "MinRespawnSeconds": 600.0,
+      "MaxRespawnSeconds": 1200.0,
+      "RandomizeVeins": true
+     },
+     "MaxRange": 2,
+     "ConsumedPerHarvest": 1,
+     "ConsumedPerFeluccaHarvest": 2,
+     "PlaceAtFeetIfFull": false,
+     "HumanBonus": {
+      "Chance": 10.0,
+      "Multiplier": 1.1,
+      "Rounding": "Ceiling"
+     },
+     "Requires": {
+      "NotMounted": true,
+      "NotPolymorphed": true,
+      "MiningToolInHand": true
+     },
+     "Effect": {
+      "Actions": [
+       3
+      ],
+      "Sounds": [
+       293,
+       294
+      ],
+      "Counts": [
+       1
+      ],
+      "DelaySeconds": 1.6,
+      "SoundDelaySeconds": 0.9,
+      "DurationSeconds": [
+       0.9,
+       0.9
+      ]
+     },
+     "Resources": [
+      {
+       "Name": "Iron",
+       "ReqSkill": 0.0,
+       "MinSkill": 0.0,
+       "MaxSkill": 100.0,
+       "Message": {
+        "Cliloc": 1007072
+       },
+       "Types": [
+        "IronOre"
+       ],
+       "Stone": "Granite"
+      },
+      {
+       "Name": "DullCopper",
+       "ReqSkill": 65.0,
+       "MinSkill": 25.0,
+       "MaxSkill": 105.0,
+       "Message": {
+        "Cliloc": 1007073
+       },
+       "Types": [
+        "DullCopperOre"
+       ],
+       "Stone": "DullCopperGranite",
+       "Elemental": "DullCopperElemental"
+      },
+      {
+       "Name": "ShadowIron",
+       "ReqSkill": 70.0,
+       "MinSkill": 30.0,
+       "MaxSkill": 110.0,
+       "Message": {
+        "Cliloc": 1007074
+       },
+       "Types": [
+        "ShadowIronOre"
+       ],
+       "Stone": "ShadowIronGranite",
+       "Elemental": "ShadowIronElemental"
+      },
+      {
+       "Name": "Copper",
+       "ReqSkill": 75.0,
+       "MinSkill": 35.0,
+       "MaxSkill": 115.0,
+       "Message": {
+        "Cliloc": 1007075
+       },
+       "Types": [
+        "CopperOre"
+       ],
+       "Stone": "CopperGranite",
+       "Elemental": "CopperElemental"
+      },
+      {
+       "Name": "Bronze",
+       "ReqSkill": 80.0,
+       "MinSkill": 40.0,
+       "MaxSkill": 120.0,
+       "Message": {
+        "Cliloc": 1007076
+       },
+       "Types": [
+        "BronzeOre"
+       ],
+       "Stone": "BronzeGranite",
+       "Elemental": "BronzeElemental"
+      },
+      {
+       "Name": "Gold",
+       "ReqSkill": 85.0,
+       "MinSkill": 45.0,
+       "MaxSkill": 125.0,
+       "Message": {
+        "Cliloc": 1007077
+       },
+       "Types": [
+        "GoldOre"
+       ],
+       "Stone": "GoldGranite",
+       "Elemental": "GoldenElemental"
+      },
+      {
+       "Name": "Agapite",
+       "ReqSkill": 90.0,
+       "MinSkill": 50.0,
+       "MaxSkill": 130.0,
+       "Message": {
+        "Cliloc": 1007078
+       },
+       "Types": [
+        "AgapiteOre"
+       ],
+       "Stone": "AgapiteGranite",
+       "Elemental": "AgapiteElemental"
+      },
+      {
+       "Name": "Verite",
+       "ReqSkill": 95.0,
+       "MinSkill": 55.0,
+       "MaxSkill": 135.0,
+       "Message": {
+        "Cliloc": 1007079
+       },
+       "Types": [
+        "VeriteOre"
+       ],
+       "Stone": "VeriteGranite",
+       "Elemental": "VeriteElemental"
+      },
+      {
+       "Name": "Valorite",
+       "ReqSkill": 99.0,
+       "MinSkill": 59.0,
+       "MaxSkill": 139.0,
+       "Message": {
+        "Cliloc": 1007080
+       },
+       "Types": [
+        "ValoriteOre"
+       ],
+       "Stone": "ValoriteGranite",
+       "Elemental": "ValoriteElemental"
+      }
+     ],
+     "Veins": [
+      {
+       "Chance": 49.6,
+       "Primary": "Iron",
+       "Fallback": null,
+       "FallbackChance": 0.0
+      },
+      {
+       "Chance": 11.2,
+       "Primary": "DullCopper",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 9.8,
+       "Primary": "ShadowIron",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 8.4,
+       "Primary": "Copper",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 7.0,
+       "Primary": "Bronze",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 5.6,
+       "Primary": "Gold",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 4.2,
+       "Primary": "Agapite",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 2.8,
+       "Primary": "Verite",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 1.4,
+       "Primary": "Valorite",
+       "Fallback": "Iron",
+       "FallbackChance": 0.5
+      }
+     ],
+     "BonusResources": [
+      {
+       "ReqSkill": 0,
+       "Chance": 99.2,
+       "Type": null,
+       "Message": null
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "BlueDiamond",
+       "Message": {
+        "Cliloc": 1072562
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "DarkSapphire",
+       "Message": {
+        "Cliloc": 1072567
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "EcruCitrine",
+       "Message": {
+        "Cliloc": 1072570
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "FireRuby",
+       "Message": {
+        "Cliloc": 1072564
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "PerfectEmerald",
+       "Message": {
+        "Cliloc": 1072566
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "Turquoise",
+       "Message": {
+        "Cliloc": 1072568
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "SmallPieceofBlackrock",
+       "Message": {
+        "Cliloc": 1077180
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 0.1,
+       "Type": "CrystallineBlackrock",
+       "Message": {
+        "Cliloc": 1113344
+       },
+       "Map": "TerMur"
+      }
+     ],
+     "ResourceSelection": {
+      "Default": "the resource's Types[0] (its ore)",
+      "Gem": {
+       "Learned": "GemMining",
+       "Toggle": "ToggleMiningGem",
+       "MinSkillBase": 100.0,
+       "Chance": 10.0,
+       "Types": [
+        "Amber",
+        "Amethyst",
+        "Citrine",
+        "Diamond",
+        "Emerald",
+        "Ruby",
+        "Sapphire",
+        "StarSapphire",
+        "Tourmaline"
+       ],
+       "Message": {
+        "Cliloc": 1112233,
+        "Text": "You carefully extract a glistening gem from the vein!"
+       }
+      },
+      "Stone": {
+       "Learned": "StoneMining",
+       "Toggle": "ToggleMiningStone or ToggleStoneOnly",
+       "MinSkillBase": 100.0,
+       "Chance": 15.0,
+       "RockHammerChance": 50.0,
+       "Type": "the resource's Stone",
+       "StoneOnlyOtherwise": "nothing (fail)",
+       "FeluccaAmount": 3,
+       "Message": {
+        "Cliloc": 1044606,
+        "Text": "You carefully extract some workable stone from the ore vein!"
+       }
+      },
+      "Order": "ImprovedRockHammer rule, then Gem, then Stone, then Default"
+     },
+     "Messages": {
+      "NoResources": {
+       "Cliloc": 503040,
+       "Text": "There is no metal here to mine."
+      },
+      "OutOfRange": {
+       "Cliloc": 500446,
+       "Text": "That is too far away."
+      },
+      "TimedOutOfRange": {
+       "Cliloc": 503041,
+       "Text": "You have moved too far away to continue mining."
+      },
+      "DoubleHarvest": {
+       "Cliloc": 503042,
+       "Text": "Someone has gotten to the metal before you."
+      },
+      "Fail": {
+       "Cliloc": 503043,
+       "Text": "You loosen some rocks but fail to find any useable ore."
+      },
+      "PackFull": {
+       "Cliloc": 1010481,
+       "Text": "Your backpack is full, so the ore you mined is lost."
+      },
+      "ToolBroke": {
+       "Cliloc": 1044038,
+       "Text": "You have worn out your tool!"
+      }
+     },
+     "ShardOreVeins": {
+      "Amount": [
+       20,
+       35
+      ],
+      "RespawnSeconds": [
+       1800.0,
+       3600.0
+      ],
+      "OutdoorWeights": {
+       "DullCopper": 28,
+       "ShadowIron": 22,
+       "Copper": 17,
+       "Bronze": 12,
+       "Gold": 9,
+       "Agapite": 6,
+       "Verite": 4,
+       "Valorite": 2
+      },
+      "DungeonWeights": {
+       "DullCopper": 18,
+       "ShadowIron": 17,
+       "Copper": 16,
+       "Bronze": 14,
+       "Gold": 12,
+       "Agapite": 10,
+       "Verite": 8,
+       "Valorite": 5
+      },
+      "Notes": "SeriousFun custom: a visible outcrop (graphic 0x9CB0-0x9CB3, or spire 0x9CAC for Agapite and up 40% of the time) that always yields its own metal (its vein = that resource with 100% chance, no fallback), holds Amount ore, needs Mining >= that resource's ReqSkill, ignores the area bank, and regrows elsewhere in its zone after RespawnSeconds. Mined like an Ore tile (gems, stone, tool mods, human bonus all apply)."
+     },
+     "Notes": [
+      "Tile list m_MountainAndCaveTiles repeats [296] (harmless).",
+      "Every resource's Stone (granite) and Elemental (a creature, see the Gargoyle's pickaxe) come from the third and second types of ServUO's HarvestResource; normal mining gives only the ore.",
+      "Bonus resources: CrystallineBlackrock only on Ter Mur (Map). Rolled after every successful harvest; the find needs Mining base >= ReqSkill and is placed at the feet if the pack is full.",
+      "High Seas niter: on a boat or in a dungeon (not the Trammel/Felucca surface; Ilshenar counts as dungeon) a harvest may uncover a NiterDeposit of size 1-5 (+1 by luck) instead, chance Mining/9999 + luck/150000 (a third less on a boat); a dungeon bank rolls only once - not exported as a rule.",
+      "Void-pool HarvestMaps, Caddellite (Khaldun) and the region's resource swap (Region.GetResource) can change the result - not exported.",
+      "Iron beetles mine the land tile in front of them with this definition.",
+      "Mining reveals the miner when it starts."
+     ]
+    },
+    {
+     "Name": "Sand",
+     "Skill": "Mining",
+     "Tools": [
+      "CaddellitePickaxe",
+      "GargoylesPickaxe",
+      "ImprovedRockHammer",
+      "JacobsPickaxe",
+      "Pickaxe",
+      "RockHammer",
+      "Shovel",
+      "SturdyPickaxe",
+      "SturdyShovel"
+     ],
+     "TileIds": "expanded",
+     "Tiles": {
+      "Land": [
+       22,
+       23,
+       24,
+       25,
+       26,
+       27,
+       28,
+       29,
+       30,
+       31,
+       32,
+       33,
+       34,
+       35,
+       36,
+       37,
+       38,
+       39,
+       40,
+       41,
+       42,
+       43,
+       44,
+       45,
+       46,
+       47,
+       48,
+       49,
+       50,
+       51,
+       52,
+       53,
+       54,
+       55,
+       56,
+       57,
+       58,
+       59,
+       60,
+       61,
+       62,
+       68,
+       69,
+       70,
+       71,
+       72,
+       73,
+       74,
+       75,
+       286,
+       287,
+       288,
+       289,
+       290,
+       291,
+       292,
+       293,
+       294,
+       295,
+       296,
+       297,
+       298,
+       299,
+       300,
+       301,
+       402,
+       424,
+       425,
+       426,
+       427,
+       441,
+       442,
+       443,
+       444,
+       445,
+       446,
+       447,
+       448,
+       449,
+       450,
+       451,
+       452,
+       453,
+       454,
+       455,
+       456,
+       457,
+       458,
+       459,
+       460,
+       461,
+       462,
+       463,
+       464,
+       465,
+       642,
+       643,
+       644,
+       645,
+       650,
+       651,
+       652,
+       653,
+       654,
+       655,
+       656,
+       657,
+       821,
+       822,
+       823,
+       824,
+       825,
+       826,
+       827,
+       828,
+       833,
+       834,
+       835,
+       836,
+       845,
+       846,
+       847,
+       848,
+       849,
+       850,
+       851,
+       852,
+       857,
+       858,
+       859,
+       860,
+       951,
+       952,
+       953,
+       954,
+       955,
+       956,
+       957,
+       958,
+       967,
+       968,
+       969,
+       970,
+       1447,
+       1448,
+       1449,
+       1450,
+       1451,
+       1452,
+       1453,
+       1454,
+       1455,
+       1456,
+       1457,
+       1458,
+       1611,
+       1612,
+       1613,
+       1614,
+       1615,
+       1616,
+       1617,
+       1618,
+       1623,
+       1624,
+       1625,
+       1626,
+       1635,
+       1636,
+       1637,
+       1638,
+       1639,
+       1640,
+       1641,
+       1642,
+       1647,
+       1648,
+       1649,
+       1650
+      ],
+      "Static": []
+     },
+     "Bank": {
+      "Width": 8,
+      "Height": 8,
+      "MinTotal": 6,
+      "MaxTotal": 13,
+      "MinRespawnSeconds": 600.0,
+      "MaxRespawnSeconds": 1200.0,
+      "RandomizeVeins": false
+     },
+     "MaxRange": 2,
+     "ConsumedPerHarvest": 1,
+     "ConsumedPerFeluccaHarvest": 2,
+     "PlaceAtFeetIfFull": false,
+     "Requires": {
+      "NotMounted": true,
+      "NotPolymorphed": true,
+      "MiningToolInHand": true,
+      "Learned": "SandMining",
+      "MinSkillBase": 100.0
+     },
+     "Effect": {
+      "Actions": [
+       3
+      ],
+      "Sounds": [
+       293,
+       294
+      ],
+      "Counts": [
+       6
+      ],
+      "DelaySeconds": 1.6,
+      "SoundDelaySeconds": 0.9,
+      "DurationSeconds": [
+       8.9,
+       8.9
+      ]
+     },
+     "Resources": [
+      {
+       "Name": "Sand",
+       "ReqSkill": 100.0,
+       "MinSkill": 70.0,
+       "MaxSkill": 100.0,
+       "Message": {
+        "Cliloc": 1044631
+       },
+       "Types": [
+        "Sand"
+       ]
+      }
+     ],
+     "Veins": [
+      {
+       "Chance": 100.0,
+       "Primary": "Sand",
+       "Fallback": null,
+       "FallbackChance": 0.0
+      }
+     ],
+     "Messages": {
+      "NoResources": {
+       "Cliloc": 1044629,
+       "Text": "There is no sand here to mine."
+      },
+      "OutOfRange": {
+       "Cliloc": 500446,
+       "Text": "That is too far away."
+      },
+      "TimedOutOfRange": {
+       "Cliloc": 503041,
+       "Text": "You have moved too far away to continue mining."
+      },
+      "DoubleHarvest": {
+       "Cliloc": 1044629,
+       "Text": "There is no sand here to mine."
+      },
+      "Fail": {
+       "Cliloc": 1044630,
+       "Text": "You dig for a while but fail to find any of sufficient quality for glassblowing."
+      },
+      "PackFull": {
+       "Cliloc": 1044632,
+       "Text": "Your backpack can't hold the sand, and it is lost!"
+      },
+      "ToolBroke": {
+       "Cliloc": 1044038,
+       "Text": "You have worn out your tool!"
+      }
+     },
+     "Notes": [
+      "Land tiles [286, 287, 288, 289, 290, 291, 292, 293, 294, 296, 297] are also Ore tiles; Ore comes first, so targeting them harvests Ore.",
+      "Sand is mined with the same tools; it is only allowed for players who learned SandMining and have Mining base >= 100 (otherwise the tile counts as a bad target)."
+     ]
+    }
+   ]
+  },
+  "Lumberjacking": {
+   "Skill": "Lumberjacking",
+   "Tools": {
+    "Axe": {
+     "UsesPerHarvest": 0
+    },
+    "AxeOfAbandon": {
+     "UsesPerHarvest": 0
+    },
+    "AxeOfTheHeavens": {
+     "UsesPerHarvest": 0
+    },
+    "AxesOfFury": {
+     "UsesPerHarvest": 0
+    },
+    "Bardiche": {
+     "UsesPerHarvest": 0
+    },
+    "BattleAxe": {
+     "UsesPerHarvest": 0
+    },
+    "BlazeOfDeath": {
+     "UsesPerHarvest": 0
+    },
+    "CaddelliteHatchet": {
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "Calm": {
+     "UsesPerHarvest": 0
+    },
+    "DoubleAxe": {
+     "UsesPerHarvest": 0
+    },
+    "DualShortAxes": {
+     "UsesPerHarvest": 0
+    },
+    "ExecutionersAxe": {
+     "UsesPerHarvest": 0
+    },
+    "GargishAxe": {
+     "UsesPerHarvest": 0
+    },
+    "GargishBardiche": {
+     "UsesPerHarvest": 0
+    },
+    "GargishBattleAxe": {
+     "UsesPerHarvest": 0
+    },
+    "GargishPincer": {
+     "UsesPerHarvest": 0
+    },
+    "GeoffreysAxe": {
+     "UsesPerHarvest": 0
+    },
+    "GuardianAxe": {
+     "UsesPerHarvest": 0
+    },
+    "Halberd": {
+     "UsesPerHarvest": 0
+    },
+    "HarvestersAxe": {
+     "UsesPerHarvest": 0,
+     "Effect": "While Charges > 0, logs come out as the matching boards (Log->Board, OakLog->OakBoard, AshLog->AshBoard, YewLog->YewBoard, HeartwoodLog->HeartwoodBoard, BloodwoodLog->BloodwoodBoard, FrostwoodLog->FrostwoodBoard), one charge per conversion; message 1158776."
+    },
+    "Hatchet": {
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "HeavyOrnateAxe": {
+     "UsesPerHarvest": 0
+    },
+    "Hoe": {
+     "UsesPerHarvest": 0
+    },
+    "LargeBattleAxe": {
+     "UsesPerHarvest": 0
+    },
+    "LegacyOfTheDreadLord": {
+     "UsesPerHarvest": 0
+    },
+    "MelisandesCorrodedHatchet": {
+     "UsesPerHarvest": 0,
+     "DurabilityLossChance": 2.0
+    },
+    "OrnateAxe": {
+     "UsesPerHarvest": 0
+    },
+    "Pincer": {
+     "UsesPerHarvest": 0
+    },
+    "Quell": {
+     "UsesPerHarvest": 0
+    },
+    "SingingAxe": {
+     "UsesPerHarvest": 0
+    },
+    "TalonBite": {
+     "UsesPerHarvest": 0
+    },
+    "TheDeceiver": {
+     "UsesPerHarvest": 0
+    },
+    "ThunderingAxe": {
+     "UsesPerHarvest": 0
+    },
+    "TwoHandedAxe": {
+     "UsesPerHarvest": 0
+    },
+    "ZyronicClaw": {
+     "UsesPerHarvest": 0
+    }
+   },
+   "SystemMessages": {
+    "BadTarget": {
+     "Cliloc": 500489,
+     "Text": "You can't use an axe on that."
+    },
+    "MustBeInPack": {
+     "Cliloc": 1080058,
+     "Text": "This must be in your backpack to use it."
+    },
+    "BoardsMade": {
+     "Cliloc": 1158776,
+     "Text": "The axe magically creates boards from your logs."
+    }
+   },
+   "Notes": [
+    "Tools are every axe (BaseAxe) and polearm (BasePoleArm) except WarAxe, Scythe and GargishScythe (their HarvestSystem is null) and the pickaxes (Mining)."
+   ],
+   "Definitions": [
+    {
+     "Name": "Logs",
+     "Skill": "Lumberjacking",
+     "Tools": [
+      "Axe",
+      "AxeOfAbandon",
+      "AxeOfTheHeavens",
+      "AxesOfFury",
+      "Bardiche",
+      "BattleAxe",
+      "BlazeOfDeath",
+      "CaddelliteHatchet",
+      "Calm",
+      "DoubleAxe",
+      "DualShortAxes",
+      "ExecutionersAxe",
+      "GargishAxe",
+      "GargishBardiche",
+      "GargishBattleAxe",
+      "GargishPincer",
+      "GeoffreysAxe",
+      "GuardianAxe",
+      "Halberd",
+      "HarvestersAxe",
+      "Hatchet",
+      "HeavyOrnateAxe",
+      "Hoe",
+      "LargeBattleAxe",
+      "LegacyOfTheDreadLord",
+      "MelisandesCorrodedHatchet",
+      "OrnateAxe",
+      "Pincer",
+      "Quell",
+      "SingingAxe",
+      "TalonBite",
+      "TheDeceiver",
+      "ThunderingAxe",
+      "TwoHandedAxe",
+      "ZyronicClaw"
+     ],
+     "TileIds": "expanded",
+     "Tiles": {
+      "Land": [],
+      "Static": [
+       3274,
+       3275,
+       3276,
+       3277,
+       3278,
+       3279,
+       3280,
+       3281,
+       3282,
+       3283,
+       3284,
+       3285,
+       3286,
+       3287,
+       3288,
+       3289,
+       3290,
+       3291,
+       3292,
+       3293,
+       3294,
+       3295,
+       3296,
+       3297,
+       3298,
+       3299,
+       3300,
+       3301,
+       3302,
+       3303,
+       3304,
+       3320,
+       3321,
+       3322,
+       3323,
+       3324,
+       3325,
+       3326,
+       3327,
+       3328,
+       3329,
+       3330,
+       3331,
+       3393,
+       3394,
+       3395,
+       3396,
+       3397,
+       3398,
+       3399,
+       3400,
+       3401,
+       3402,
+       3403,
+       3404,
+       3405,
+       3406,
+       3407,
+       3408,
+       3409,
+       3410,
+       3411,
+       3415,
+       3416,
+       3417,
+       3418,
+       3419,
+       3420,
+       3421,
+       3422,
+       3423,
+       3424,
+       3425,
+       3426,
+       3427,
+       3428,
+       3429,
+       3430,
+       3431,
+       3432,
+       3433,
+       3438,
+       3439,
+       3440,
+       3441,
+       3442,
+       3443,
+       3444,
+       3445,
+       3446,
+       3447,
+       3448,
+       3449,
+       3450,
+       3451,
+       3452,
+       3453,
+       3454,
+       3455,
+       3460,
+       3461,
+       3462,
+       3463,
+       3464,
+       3465,
+       3466,
+       3467,
+       3468,
+       3469,
+       3470,
+       3471,
+       3472,
+       3477,
+       3478,
+       3479,
+       3481,
+       3482,
+       3483,
+       3485,
+       3486,
+       3487,
+       3489,
+       3490,
+       3491,
+       3493,
+       3494,
+       3495,
+       3497,
+       3498,
+       3499,
+       4789,
+       4790,
+       4791,
+       4792,
+       4793,
+       4794,
+       4795,
+       4796,
+       4797,
+       4798,
+       4799,
+       4800,
+       4801,
+       4802,
+       4803,
+       4804,
+       4805,
+       4806,
+       4807
+      ]
+     },
+     "Bank": {
+      "Width": 4,
+      "Height": 3,
+      "MinTotal": 20,
+      "MaxTotal": 45,
+      "MinRespawnSeconds": 1200.0,
+      "MaxRespawnSeconds": 1800.0,
+      "RandomizeVeins": true
+     },
+     "MaxRange": 2,
+     "ConsumedPerHarvest": 10,
+     "ConsumedPerFeluccaHarvest": 20,
+     "PlaceAtFeetIfFull": false,
+     "HumanBonus": {
+      "Chance": 10.0,
+      "Multiplier": 1.1,
+      "Rounding": "Ceiling"
+     },
+     "Requires": {
+      "ToolInPackOrHand": true
+     },
+     "Effect": {
+      "Actions": [
+       7
+      ],
+      "Sounds": [
+       318
+      ],
+      "Counts": [
+       1
+      ],
+      "DelaySeconds": 1.6,
+      "SoundDelaySeconds": 0.9,
+      "DurationSeconds": [
+       0.9,
+       0.9
+      ]
+     },
+     "Resources": [
+      {
+       "Name": "Log",
+       "ReqSkill": 0.0,
+       "MinSkill": 0.0,
+       "MaxSkill": 100.0,
+       "Message": {
+        "Cliloc": 1072540
+       },
+       "Types": [
+        "Log"
+       ]
+      },
+      {
+       "Name": "Oak",
+       "ReqSkill": 65.0,
+       "MinSkill": 25.0,
+       "MaxSkill": 105.0,
+       "Message": {
+        "Cliloc": 1072541
+       },
+       "Types": [
+        "OakLog"
+       ]
+      },
+      {
+       "Name": "Ash",
+       "ReqSkill": 80.0,
+       "MinSkill": 40.0,
+       "MaxSkill": 120.0,
+       "Message": {
+        "Cliloc": 1072542
+       },
+       "Types": [
+        "AshLog"
+       ]
+      },
+      {
+       "Name": "Yew",
+       "ReqSkill": 95.0,
+       "MinSkill": 55.0,
+       "MaxSkill": 135.0,
+       "Message": {
+        "Cliloc": 1072543
+       },
+       "Types": [
+        "YewLog"
+       ]
+      },
+      {
+       "Name": "Heartwood",
+       "ReqSkill": 100.0,
+       "MinSkill": 60.0,
+       "MaxSkill": 140.0,
+       "Message": {
+        "Cliloc": 1072544
+       },
+       "Types": [
+        "HeartwoodLog"
+       ]
+      },
+      {
+       "Name": "Bloodwood",
+       "ReqSkill": 100.0,
+       "MinSkill": 60.0,
+       "MaxSkill": 140.0,
+       "Message": {
+        "Cliloc": 1072545
+       },
+       "Types": [
+        "BloodwoodLog"
+       ]
+      },
+      {
+       "Name": "Frostwood",
+       "ReqSkill": 100.0,
+       "MinSkill": 60.0,
+       "MaxSkill": 140.0,
+       "Message": {
+        "Cliloc": 1072546
+       },
+       "Types": [
+        "FrostwoodLog"
+       ]
+      }
+     ],
+     "Veins": [
+      {
+       "Chance": 49.0,
+       "Primary": "Log",
+       "Fallback": null,
+       "FallbackChance": 0.0
+      },
+      {
+       "Chance": 30.0,
+       "Primary": "Oak",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 10.0,
+       "Primary": "Ash",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 5.0,
+       "Primary": "Yew",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 3.0,
+       "Primary": "Heartwood",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 2.0,
+       "Primary": "Bloodwood",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      },
+      {
+       "Chance": 1.0,
+       "Primary": "Frostwood",
+       "Fallback": "Log",
+       "FallbackChance": 0.5
+      }
+     ],
+     "BonusResources": [
+      {
+       "ReqSkill": 0,
+       "Chance": 82.0,
+       "Type": null,
+       "Message": null
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 10.0,
+       "Type": "BarkFragment",
+       "Message": {
+        "Cliloc": 1072548
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 3.0,
+       "Type": "LuminescentFungi",
+       "Message": {
+        "Cliloc": 1072550
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 2.0,
+       "Type": "SwitchItem",
+       "Message": {
+        "Cliloc": 1072547
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 1.0,
+       "Type": "ParasiticPlant",
+       "Message": {
+        "Cliloc": 1072549
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 1.0,
+       "Type": "BrilliantAmber",
+       "Message": {
+        "Cliloc": 1072551
+       }
+      },
+      {
+       "ReqSkill": 100,
+       "Chance": 1.0,
+       "Type": "CrystalShards",
+       "Message": {
+        "Cliloc": 1113756
+       },
+       "Map": "TerMur"
+      }
+     ],
+     "Messages": {
+      "NoResources": {
+       "Cliloc": 500493,
+       "Text": "There's not enough wood here to harvest."
+      },
+      "OutOfRange": {
+       "Cliloc": 500446,
+       "Text": "That is too far away."
+      },
+      "Fail": {
+       "Cliloc": 500495,
+       "Text": "You hack at the tree for a while, but fail to produce any useable wood."
+      },
+      "PackFull": {
+       "Cliloc": 500497,
+       "Text": "You can't place any wood into your backpack!"
+      },
+      "ToolBroke": {
+       "Cliloc": 500499,
+       "Text": "You broke your axe."
+      }
+     },
+     "BladedKindling": {
+      "ToolBases": [
+       "BaseKnife",
+       "BaseSword"
+      ],
+      "BankCost": 5,
+      "MinBankRemaining": 5,
+      "Type": "Kindling",
+      "SkillCheck": false,
+      "Messages": {
+       "Success": {
+        "Cliloc": 500491
+       },
+       "Hint": {
+        "Cliloc": 500492
+       },
+       "PackFull": {
+        "Cliloc": 500490
+       },
+       "BadTarget": {
+        "Cliloc": 500494
+       }
+      }
+     },
+     "Boards": {
+      "Log": "Board",
+      "OakLog": "OakBoard",
+      "AshLog": "AshBoard",
+      "YewLog": "YewBoard",
+      "HeartwoodLog": "HeartwoodBoard",
+      "BloodwoodLog": "BloodwoodBoard",
+      "FrostwoodLog": "FrostwoodBoard"
+     },
+     "Notes": [
+      "BladedKindling: using any knife or sword on a tree tile of this definition takes 5 from the tree's bank (needs >= 5 left) and gives one Kindling, no skill check (Targets/BladedItemTarget.cs).",
+      "Bonus resources: CrystalShards only on Ter Mur (Map). Rolled after every successful harvest; needs Lumberjacking base >= ReqSkill; placed at the feet if the pack is full.",
+      "Void-pool HarvestMaps, the Woodsman's talisman (+logs), Caddellite and the region's resource swap can change the result - not exported.",
+      "Chopping reveals the lumberjack when it starts."
+     ]
+    }
+   ]
+  },
+  "Fishing": {
+   "Skill": "Fishing",
+   "Tools": {
+    "BegFishingPole": {
+     "UsesRemaining": 150,
+     "UsesPerHarvest": 0
+    },
+    "CaddelliteFishingPole": {
+     "UsesRemaining": 150,
+     "UsesPerHarvest": 0
+    },
+    "CaptainBlackheartsFishingPole": {
+     "UsesRemaining": 150,
+     "UsesPerHarvest": 0
+    },
+    "FishingPole": {
+     "UsesRemaining": 150,
+     "UsesPerHarvest": 0
+    },
+    "XenrrFishingPole": {
+     "UsesRemaining": 150,
+     "UsesPerHarvest": 0
+    }
+   },
+   "SystemMessages": {
+    "Prompt": {
+     "Cliloc": 500974,
+     "Text": "What water do you want to fish in?"
+    },
+    "AlreadyFishing": {
+     "Cliloc": 500972,
+     "Text": "You are already fishing."
+    },
+    "Mounted": {
+     "Cliloc": 500971,
+     "Text": "You can't fish while riding!"
+    },
+    "BigFish": {
+     "Cliloc": 1042635,
+     "Text": "Your fishing pole bends as you pull a big fish from the depths!"
+    },
+    "Chest": {
+     "Cliloc": 503175,
+     "Text": "You pull up a heavy chest from the depths of the ocean!"
+    },
+    "Serpent": {
+     "Cliloc": 503170,
+     "Text": "Uh oh! That doesn't look like a fish!"
+    }
+   },
+   "Notes": [],
+   "Definitions": [
+    {
+     "Name": "Fish",
+     "Skill": "Fishing",
+     "Tools": [
+      "BegFishingPole",
+      "CaddelliteFishingPole",
+      "CaptainBlackheartsFishingPole",
+      "FishingPole",
+      "XenrrFishingPole"
+     ],
+     "TileIds": "expanded",
+     "Tiles": {
+      "Land": [
+       168,
+       169,
+       170,
+       171,
+       310,
+       311
+      ],
+      "Static": [
+       6039,
+       6040,
+       6041,
+       6042,
+       6043,
+       6044,
+       13422,
+       13423,
+       13424,
+       13425,
+       13426,
+       13427,
+       13428,
+       13429,
+       13430,
+       13431,
+       13432,
+       13433,
+       13434,
+       13435,
+       13436,
+       13437,
+       13438,
+       13439,
+       13440,
+       13441,
+       13442,
+       13443,
+       13444,
+       13445,
+       13456,
+       13457,
+       13458,
+       13459,
+       13460,
+       13461,
+       13462,
+       13463,
+       13464,
+       13465,
+       13466,
+       13467,
+       13468,
+       13469,
+       13470,
+       13471,
+       13472,
+       13473,
+       13474,
+       13475,
+       13476,
+       13477,
+       13478,
+       13479,
+       13480,
+       13481,
+       13482,
+       13483,
+       13493,
+       13494,
+       13495,
+       13496,
+       13497,
+       13498,
+       13499,
+       13500,
+       13501,
+       13502,
+       13503,
+       13504,
+       13505,
+       13506,
+       13507,
+       13508,
+       13509,
+       13510,
+       13511,
+       13512,
+       13513,
+       13514,
+       13515,
+       13516,
+       13517,
+       13518,
+       13519,
+       13520,
+       13521,
+       13522,
+       13523,
+       13524,
+       13525,
+       13526,
+       13527,
+       13528,
+       13529,
+       13530,
+       13531,
+       13532,
+       13533,
+       13534,
+       13535,
+       13536,
+       13537,
+       13538,
+       13539,
+       13540,
+       13541,
+       13542,
+       13543,
+       13544,
+       13545,
+       13546,
+       13547,
+       13548,
+       13549,
+       13550,
+       13551,
+       13552,
+       13553,
+       13554,
+       13555,
+       13556,
+       13557,
+       13558,
+       13559,
+       13560,
+       13561,
+       13562,
+       13563,
+       13564,
+       13565,
+       13566,
+       13567,
+       13568,
+       13569,
+       13570,
+       13571,
+       13572,
+       13573,
+       13574,
+       13575,
+       13576,
+       13577,
+       13578,
+       13579,
+       13580,
+       13581,
+       13582,
+       13583,
+       13584,
+       13585,
+       13586,
+       13587,
+       13588,
+       13589,
+       13590,
+       13591,
+       13592,
+       13593,
+       13594,
+       13595,
+       13596,
+       13597,
+       13598,
+       13599,
+       13600,
+       13601,
+       13602,
+       13603,
+       13604,
+       13605,
+       13606,
+       13607,
+       13608,
+       13609,
+       13610,
+       13611,
+       13612,
+       13613,
+       13614,
+       13615,
+       13616,
+       13617,
+       13618,
+       13619,
+       13620,
+       13621,
+       13622,
+       13623,
+       13624,
+       13625,
+       13626,
+       13627,
+       13628,
+       13629,
+       13630,
+       13631,
+       13632,
+       13633,
+       13634,
+       13635,
+       13636,
+       13637,
+       13638,
+       13639,
+       13640,
+       13641,
+       13642,
+       13643,
+       13644,
+       13645,
+       13646,
+       13647,
+       13648,
+       13649,
+       13650,
+       13651,
+       13652,
+       13653,
+       13654,
+       13655,
+       13656,
+       13657,
+       13658,
+       13659,
+       13660,
+       13661,
+       13662,
+       13663,
+       13664,
+       13665,
+       13666,
+       13667,
+       13668,
+       13669,
+       13670,
+       13671,
+       13672,
+       13673,
+       13674,
+       13675,
+       13676,
+       13677,
+       13678,
+       13679,
+       13680,
+       13681,
+       13682,
+       13683,
+       13684,
+       13685,
+       13686,
+       13687,
+       13688,
+       13689,
+       13690,
+       13691,
+       13692,
+       13693,
+       13694,
+       13695,
+       13696,
+       13697,
+       13698,
+       13699,
+       13700,
+       13701,
+       13702,
+       13703,
+       13704,
+       13705,
+       13706,
+       13707,
+       13708,
+       13709,
+       13710,
+       13711,
+       13712,
+       13713,
+       13714,
+       13715,
+       13716,
+       13717,
+       13718,
+       13719,
+       13720,
+       13721,
+       13722,
+       13723,
+       13724,
+       13725,
+       13726,
+       13727,
+       13728,
+       13729,
+       13730,
+       13731,
+       13732,
+       13733,
+       13734,
+       13735,
+       13736,
+       13737,
+       13738,
+       13739,
+       13740,
+       13741,
+       13742,
+       13743,
+       13744,
+       13745,
+       13746,
+       13747,
+       13748,
+       13749,
+       13750,
+       13751,
+       13752,
+       13753,
+       13754,
+       13755,
+       13756,
+       13757,
+       13758,
+       13759,
+       13760,
+       13761,
+       13762,
+       13763,
+       13764,
+       13765,
+       13766,
+       13767,
+       13768,
+       13769,
+       13770,
+       13771,
+       13772,
+       13773,
+       13774,
+       13775,
+       13776,
+       13777,
+       13778,
+       13779,
+       13780,
+       13781
+      ]
+     },
+     "LavaTiles": {
+      "Land": [
+       500,
+       501,
+       502,
+       503
+      ],
+      "Static": [
+       4560,
+       4561,
+       4562,
+       4846,
+       4847,
+       4848,
+       4849,
+       4850,
+       4852,
+       4853,
+       4854,
+       4855,
+       4856,
+       4857,
+       4858,
+       4859,
+       4864,
+       4865,
+       4866,
+       4867,
+       4868,
+       4870,
+       4871,
+       4872,
+       4873,
+       4874,
+       4876,
+       4877,
+       4878,
+       4879,
+       4880,
+       4882,
+       4883,
+       4884,
+       4885,
+       4886,
+       4888,
+       4889,
+       4890,
+       4891,
+       4892
+      ]
+     },
+     "Bank": {
+      "Width": 8,
+      "Height": 8,
+      "MinTotal": 5,
+      "MaxTotal": 15,
+      "MinRespawnSeconds": 600.0,
+      "MaxRespawnSeconds": 1200.0,
+      "RandomizeVeins": false
+     },
+     "MaxRange": 4,
+     "ConsumedPerHarvest": 1,
+     "ConsumedPerFeluccaHarvest": 1,
+     "PlaceAtFeetIfFull": false,
+     "Requires": {
+      "NotMounted": true,
+      "NotFlying": true
+     },
+     "Effect": {
+      "Actions": [
+       6
+      ],
+      "Sounds": [
+       0
+      ],
+      "Counts": [
+       1
+      ],
+      "DelaySeconds": 0.0,
+      "SoundDelaySeconds": 8.0,
+      "DurationSeconds": [
+       8.0,
+       8.0
+      ],
+      "Splash": {
+       "AfterSeconds": 1.5,
+       "Sound": 868,
+       "Effect": 13613,
+       "LavaSound": 1546,
+       "LavaEffect": 6773
+      }
+     },
+     "Resources": [
+      {
+       "Name": "Fish",
+       "ReqSkill": 0.0,
+       "MinSkill": 0.0,
+       "MaxSkill": 120.0,
+       "Message": {
+        "Cliloc": 1043297
+       },
+       "Types": [
+        "Fish"
+       ]
+      }
+     ],
+     "Veins": [
+      {
+       "Chance": 100.0,
+       "Primary": "Fish",
+       "Fallback": null,
+       "FallbackChance": 0.0
+      }
+     ],
+     "BonusResources": [
+      {
+       "ReqSkill": 0,
+       "Chance": 97.0,
+       "Type": null,
+       "Message": null
+      },
+      {
+       "ReqSkill": 80.0,
+       "Chance": 2.0,
+       "Type": "DelicateScales",
+       "Message": {
+        "Cliloc": 1113764
+       }
+      },
+      {
+       "ReqSkill": 80.0,
+       "Chance": 1.0,
+       "Type": "WhitePearl",
+       "Message": {
+        "Cliloc": 1072597
+       }
+      }
+     ],
+     "Messages": {
+      "NoResources": {
+       "Cliloc": 503172,
+       "Text": "The fish don't seem to be biting here."
+      },
+      "OutOfRange": {
+       "Cliloc": 500976,
+       "Text": "You need to be closer to the water to fish!"
+      },
+      "TimedOutOfRange": {
+       "Cliloc": 500976,
+       "Text": "You need to be closer to the water to fish!"
+      },
+      "Fail": {
+       "Cliloc": 503171,
+       "Text": "You fish a while, but fail to catch anything."
+      },
+      "PackFull": {
+       "Cliloc": 503176,
+       "Text": "You do not have room in your backpack for a fish."
+      },
+      "ToolBroke": {
+       "Cliloc": 503174,
+       "Text": "You broke your fishing pole."
+      }
+     },
+     "Mutations": [
+      {
+       "ReqSkill": 80.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 1865.0,
+       "DeepWater": true,
+       "Types": [
+        "SpecialFishingNet"
+       ]
+      },
+      {
+       "ReqSkill": 90.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 1875.0,
+       "DeepWater": true,
+       "Types": [
+        "TreasureMap"
+       ]
+      },
+      {
+       "ReqSkill": 100.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 750.0,
+       "DeepWater": true,
+       "Types": [
+        "MessageInABottle"
+       ]
+      },
+      {
+       "ReqSkill": 80.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 4080.0,
+       "DeepWater": true,
+       "Types": [
+        "BigFish"
+       ]
+      },
+      {
+       "ReqSkill": 0.0,
+       "MinSkill": 125.0,
+       "MaxSkill": -2375.0,
+       "DeepWater": false,
+       "Types": [
+        "PrizedFish",
+        "WondrousFish",
+        "TrulyRareFish",
+        "PeculiarFish"
+       ]
+      },
+      {
+       "ReqSkill": 0.0,
+       "MinSkill": 125.0,
+       "MaxSkill": -420.0,
+       "DeepWater": false,
+       "Types": [
+        "Boots",
+        "Shoes",
+        "Sandals",
+        "ThighBoots"
+       ],
+       "JunkProofHookSkips": 80.0
+      },
+      {
+       "ReqSkill": 80.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 2500.0,
+       "DeepWater": false,
+       "Types": [
+        "MudPuppy",
+        "RedHerring"
+       ],
+       "Region": "Underworld"
+      },
+      {
+       "ReqSkill": 0.0,
+       "MinSkill": 200.0,
+       "MaxSkill": -200.0,
+       "DeepWater": false,
+       "Types": [],
+       "Nothing": true
+      }
+     ],
+     "LavaMutations": [
+      {
+       "ReqSkill": 0.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 333,
+       "DeepWater": false,
+       "Types": [
+        "StoneFootwear"
+       ]
+      },
+      {
+       "ReqSkill": 80.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 333,
+       "DeepWater": false,
+       "Types": [
+        "CrackedLavaRockEast",
+        "CrackedLavaRockSouth"
+       ]
+      },
+      {
+       "ReqSkill": 85.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 333,
+       "DeepWater": false,
+       "Types": [
+        "StonePaver"
+       ]
+      },
+      {
+       "ReqSkill": 80.0,
+       "MinSkill": 80.0,
+       "MaxSkill": 4080,
+       "DeepWater": false,
+       "Types": [],
+       "Special": "RandomWeaponWithSearingSocket"
+      }
+     ],
+     "SpecialFish": {
+      "Named": [
+       {
+        "Type": "AutumnDragonfish",
+        "Hue": 2506,
+        "Cliloc": 1116090,
+        "Where": "Ilshenar",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 105.4
+       },
+       {
+        "Type": "BlueLobster",
+        "Hue": 2591,
+        "Cliloc": 1116366,
+        "Where": "Ice",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 103.1
+       },
+       {
+        "Type": "BullFish",
+        "Hue": 1157,
+        "Cliloc": 1116095,
+        "Where": "Labyrinth",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 105.4
+       },
+       {
+        "Type": "CrystalFish",
+        "Hue": 1167,
+        "Cliloc": 1116092,
+        "Where": "Prism of Light",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 105.4
+       },
+       {
+        "Type": "FairySalmon",
+        "Hue": 2578,
+        "Cliloc": 1116089,
+        "Where": "TerMur",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 85.8
+       },
+       {
+        "Type": "FireFish",
+        "Hue": 1461,
+        "Cliloc": 1116093,
+        "Where": "Shame",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 95.8
+       },
+       {
+        "Type": "GiantKoi",
+        "Hue": 1257,
+        "Cliloc": 1116088,
+        "Where": "Tokuno",
+        "DeepWater": true,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 95.8
+       },
+       {
+        "Type": "GreatBarracuda",
+        "Hue": 2579,
+        "Cliloc": 1116100,
+        "Where": "Felucca",
+        "DeepWater": true,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 89.0
+       },
+       {
+        "Type": "HolyMackerel",
+        "Hue": 2959,
+        "Cliloc": 1116087,
+        "Where": "Gravewater Lake",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 102.9
+       },
+       {
+        "Type": "LavaFish",
+        "Hue": 2075,
+        "Cliloc": 1116096,
+        "Where": "Abyss",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 110.0
+       },
+       {
+        "Type": "ReaperFish",
+        "Hue": 2075,
+        "Cliloc": 1116094,
+        "Where": "Doom",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 98.1
+       },
+       {
+        "Type": "SpiderCrab",
+        "Hue": 2539,
+        "Cliloc": 1116367,
+        "Where": "Terathan Keep",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 103.1
+       },
+       {
+        "Type": "StoneCrab",
+        "Hue": 2558,
+        "Cliloc": 1116365,
+        "Where": "T2A",
+        "DeepWater": true,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 103.1
+       },
+       {
+        "Type": "SummerDragonfish",
+        "Hue": 43,
+        "Cliloc": 1116091,
+        "Where": "Destard",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 105.2
+       },
+       {
+        "Type": "UnicornFish",
+        "Hue": 1154,
+        "Cliloc": 1116086,
+        "Where": "Twisted Weald",
+        "DeepWater": false,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 110.0
+       },
+       {
+        "Type": "YellowtailBarracuda",
+        "Hue": 2515,
+        "Cliloc": 1116098,
+        "Where": "Trammel",
+        "DeepWater": true,
+        "BaseChance": 0.0075,
+        "Tier": "Rare",
+        "MinSkill": 81.9
+       },
+       {
+        "Type": "AbyssalDragonfish",
+        "Hue": 2406,
+        "Cliloc": 1116118,
+        "Where": "Destard",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 120.0
+       },
+       {
+        "Type": "BlackMarlin",
+        "Hue": 2500,
+        "Cliloc": 1116099,
+        "Where": "Felucca",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 110.1
+       },
+       {
+        "Type": "BloodLobster",
+        "Hue": 2117,
+        "Cliloc": 1116370,
+        "Where": "Shame",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 115.1
+       },
+       {
+        "Type": "BlueMarlin",
+        "Hue": 0,
+        "Cliloc": 1116097,
+        "Where": "Trammel",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.0
+       },
+       {
+        "Type": "DreadLobster",
+        "Hue": 1777,
+        "Cliloc": 1116371,
+        "Where": "Doom",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 115.1
+       },
+       {
+        "Type": "DungeonPike",
+        "Hue": 1158,
+        "Cliloc": 1116107,
+        "Where": "Terathan Keep",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.1
+       },
+       {
+        "Type": "GiantSamuraiFish",
+        "Hue": 2576,
+        "Cliloc": 1116103,
+        "Where": "Tokuno",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 110.1
+       },
+       {
+        "Type": "GoldenTuna",
+        "Hue": 1281,
+        "Cliloc": 1116102,
+        "Where": "Tokuno",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.0
+       },
+       {
+        "Type": "Kingfish",
+        "Hue": 2604,
+        "Cliloc": 1116085,
+        "Where": "TrammelAndFelucca",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 92.2
+       },
+       {
+        "Type": "LanternFish",
+        "Hue": 1463,
+        "Cliloc": 1116106,
+        "Where": "Prism of Light",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.1
+       },
+       {
+        "Type": "RainbowFish",
+        "Hue": 1283,
+        "Cliloc": 1116108,
+        "Where": "Twisted Weald",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.1
+       },
+       {
+        "Type": "SeekerFish",
+        "Hue": 2076,
+        "Cliloc": 1116109,
+        "Where": "Labyrinth",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 105.1
+       },
+       {
+        "Type": "SpringDragonfish",
+        "Hue": 0,
+        "Cliloc": 1116104,
+        "Where": "Ilshenar",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 120.0
+       },
+       {
+        "Type": "StoneFish",
+        "Hue": 1837,
+        "Cliloc": 1116110,
+        "Where": "T2A",
+        "DeepWater": true,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 115.1
+       },
+       {
+        "Type": "TunnelCrab",
+        "Hue": 2600,
+        "Cliloc": 1116372,
+        "Where": "Underworld",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 115.1
+       },
+       {
+        "Type": "VoidCrab",
+        "Hue": 2069,
+        "Cliloc": 1116368,
+        "Where": "TerMur",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 120.0
+       },
+       {
+        "Type": "VoidLobster",
+        "Hue": 2071,
+        "Cliloc": 1116369,
+        "Where": "Abyss",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 120.0
+       },
+       {
+        "Type": "WinterDragonfish",
+        "Hue": 2499,
+        "Cliloc": 1116105,
+        "Where": "Ice",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 120.0
+       },
+       {
+        "Type": "ZombieFish",
+        "Hue": 2551,
+        "Cliloc": 1116101,
+        "Where": "Gravewater Lake",
+        "DeepWater": false,
+        "BaseChance": 0.001,
+        "Tier": "Legendary",
+        "MinSkill": 115.1
+       }
+      ],
+      "Common": {
+       "Dungeon": {
+        "MinSkill": 106.0,
+        "Types": [
+         "DungeonChub",
+         "DemonTrout",
+         "SnaggletoothBass",
+         "CutThroatTrout",
+         "GrimCisco",
+         "DrakeFish",
+         "OrcBass",
+         "DarkFish",
+         "CragSnapper",
+         "InfernalTuna",
+         "TormentedPike",
+         "LurkerFish"
+        ]
+       },
+       "DeepWater": {
+        "MinSkill": 80.0,
+        "Types": [
+         "Haddock",
+         "CapeCod",
+         "BlackSeabass",
+         "Tarpon",
+         "RedSnook",
+         "GraySnapper",
+         "Cobia",
+         "MahiMahi",
+         "Amberjack",
+         "Shad",
+         "YellowfinTuna",
+         "Bonito",
+         "BlueFish",
+         "RedGrouper",
+         "CaptainSnook",
+         "Bonefish",
+         "RedDrum",
+         "BlueGrouper"
+        ]
+       },
+       "Shore": {
+        "MinSkill": 50.0,
+        "Types": [
+         "PumpkinSeedSunfish",
+         "YellowPerch",
+         "PikeFish",
+         "BrookTrout",
+         "RainbowTrout",
+         "BluegillSunfish",
+         "RedbellyBream",
+         "SmallmouthBass",
+         "UncommonShiner",
+         "GreenCatfish",
+         "Walleye",
+         "KokaneeSalmon"
+        ]
+       }
+      },
+      "Notes": [
+       "Rolled before the normal catch (FishInfo.GetSpecialItem), with a fishing pole only (crabs/lobsters are lobster-trap catches and are skipped). Named fish: in list order, the baited fish first; each needs Fishing >= MinSkill, deep water when DeepWater, and the place in Where (a map name, a region name, 'T2A' = the Lost Lands, 'TrammelAndFelucca' = those maps outside the Lost Lands, 'Fire Island', 'Gravewater Lake' (Malas; no roll, always matches)); it is caught when BaseChance x bait strength > random (bait strength 1, or 2 when the pole is baited for it, 3 with enhanced bait, plus fishing attire bonuses; BaseChance x10 when a magical fish finder shows a school). A later match overwrites an earlier one.",
+       "Common: if no named fish, chance Fishing/121.5 to catch one random type from the first group that applies: Dungeon (a dungeon region, skill >= 106), DeepWater (skill >= 80), Shore (not deep, not dungeon, skill >= 50).",
+       "Lava fishing (lava hook) only rolls the named list."
+      ]
+     },
+     "Notes": [
+      "Mutations: after a successful skill roll, entries are tried in order; an entry needs Fishing base >= ReqSkill and DeepWater entries need deep water (Trammel, Felucca or Tokuno deep sea); it hits when (Fishing - MinSkill) / (MaxSkill - MinSkill) > random, giving one of its Types at random (Nothing = the catch fails). SpecialFish Named catches are never mutated (Common ones can be).",
+      "Skill gain: in deep water below 75 Fishing the catch always succeeds with no gain; outside deep water at 75+ it always succeeds with no gain; otherwise the normal ReqSkill + skill check on MinSkill..MaxSkill.",
+      "TreasureMap / MessageInABottle / SpecialFishingNet catches arrive inside a sea serpent (25% deep sea serpent) spawned within 10 tiles on deep water, with message 503170. BigFish and SOS chests are placed at the feet when the pack is full.",
+      "Lava (LavaTiles, only with a lava hook on the pole; ServUO matches the raw graphic id of land or static against the whole list): no normal fish; LavaMutations are tried in order (skill capped at 120, chance x1.5 on Felucca-rules maps), then the named SpecialFish list. Bank consumption = item amount (halved, rounded up, on Felucca rules). On failure the hook loses a use with chance 0.5 / (Fishing / 50).",
+      "Fishing.m_LavaTiles contains 4560, 4561, 4562 between 4859 and 4864 (probably meant 4860-4862); kept as written.",
+      "SOS: with an SOS in the pack whose target is within 60 tiles (Trammel/Felucca), resources are always available and every catch is shipwreck loot or the SOS chest (16 or 17 outcomes) - not exported.",
+      "Quests (Collector's rainbow pearls, Underworld SomethingFishy/ScrapingtheBottom) and Charybdis (High Seas, Oracle of the Sea + Charybdis bait, 100 Fishing) take over the harvest - not exported.",
+      "Hooks: each catch attempt uses one hook charge; bait loses a use when something is caught. Fishing pole uses (UsesRemaining) only count on Siege.",
+      "The pole is moved into the hand (unequipping both hands) when fishing from the pack."
+     ]
+    }
+   ]
+  }
+ }
+}

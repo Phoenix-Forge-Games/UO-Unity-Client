@@ -31,6 +31,9 @@ namespace UOGame.UI
 
         /// <summary>Building on <see cref="House"/> now.</summary>
         public static bool Building { get; private set; }
+
+        /// <summary>The frame Esc was used to stop building or placing (nothing else should act on that press).</summary>
+        public static int BackHandledFrame { get; private set; } = -1;
         /// <summary>Choosing where a plot deed's land goes.</summary>
         public static bool Claiming => Instance != null && Instance._deed != 0;
         public static HousePlot House { get; private set; }
@@ -201,6 +204,7 @@ namespace UOGame.UI
 
             if (!GameInput.Typing && GameInput.Controls.Gameplay.Back.WasPressedThisFrame())
             {
+                BackHandledFrame = Time.frameCount;
                 Stop();
                 return;
             }

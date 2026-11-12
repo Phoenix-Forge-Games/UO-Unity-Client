@@ -42,6 +42,16 @@ namespace UOGame
                 gameObject.AddComponent<WorldLights>(); // lamps and torches in the world light up at night
             }
 
+            if (!Application.isBatchMode && GetComponent<RoomProbes>() == null)
+            {
+                gameObject.AddComponent<RoomProbes>(); // buildings' reflections, re-made each hour of the day
+            }
+
+            if (!Application.isBatchMode && GetComponent<GameAudio>() == null)
+            {
+                gameObject.AddComponent<GameAudio>(); // music, ambience and sound effects
+            }
+
             if (_view != null && string.IsNullOrEmpty(_view.Folder))
             {
                 _view.Folder = WorldFolder;

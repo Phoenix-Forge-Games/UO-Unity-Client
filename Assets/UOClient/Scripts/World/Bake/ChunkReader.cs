@@ -294,7 +294,8 @@ namespace UOClient.Bake
                                 effect.transform.localPosition = Vector3.zero;
                                 effect.transform.localRotation = Quaternion.identity;
                                 effect.transform.localScale = Vector3.one;
-                                components[i].Add(effect.GetComponent<ParticleSystem>());
+                                Component placed = effect.GetComponent<ParticleSystem>();
+                                components[i].Add(placed != null ? placed : effect.transform); // or a whole prefab (a light fixture)
                             }
 
                             break;

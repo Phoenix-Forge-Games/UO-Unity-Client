@@ -319,6 +319,13 @@ namespace UOGame.Server
             SkillService.Instance?.Enter(connection, character, combat);
             PetService.Instance?.Enter(connection, character, combat);
             _playing[connection] = (player, character);
+            AccountStore.Account account = GameAuthenticator.AccountOf(connection);
+            if (account != null && account.LastPlayed != character.Id)
+            {
+                account.LastPlayed = character.Id;
+                GameAuthenticator.Store?.Save();
+            }
+
             AdminService.Instance?.Entered(connection);
             Debug.Log($"[Game] {character.Name} entered the world at {position}");
         }

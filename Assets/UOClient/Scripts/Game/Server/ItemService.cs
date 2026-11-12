@@ -443,29 +443,36 @@ namespace UOGame.Server
             PlayerIdentity identity = body.GetComponent<PlayerIdentity>();
             if (identity != null)
             {
-                var gear = new List<Gear>();
-                foreach (AccountStore.Item item in character.Items)
-                {
-                    ItemDef def = item.Slot != 0 ? Catalog.Find(item.Type) : null;
-                    if (def != null)
-                    {
-                        gear.Add(new Gear { Item = def.Kind, Hue = (ushort)item.Hue });
-                    }
-                }
-
-                identity.Look.Value = new Look
-                {
-                    Seed = character.LookSeed,
-                    Female = character.Female,
-                    Gargoyle = character.Gargoyle,
-                    Skin = (ushort)character.Skin,
-                    Hair = (ushort)character.Hair,
-                    HairHue = (ushort)character.HairHue,
-                    Beard = (ushort)character.Beard,
-                    BeardHue = (ushort)character.BeardHue,
-                    Gear = gear.ToArray(),
-                };
+                identity.Look.Value = LookOf(character);
             }
+        }
+
+        /// <summary>How a character looks: body, skin, hair and beard, dressed in what they wear.</summary>
+        public static Look LookOf(AccountStore.Character character)
+        {
+            EnsureCatalog();
+            var gear = new List<Gear>();
+            foreach (AccountStore.Item item in character.Items)
+            {
+                ItemDef def = item.Slot != 0 ? Catalog?.Find(item.Type) : null;
+                if (def != null)
+                {
+                    gear.Add(new Gear { Item = def.Kind, Hue = (ushort)item.Hue });
+                }
+            }
+
+            return new Look
+            {
+                Seed = character.LookSeed,
+                Female = character.Female,
+                Gargoyle = character.Gargoyle,
+                Skin = (ushort)character.Skin,
+                Hair = (ushort)character.Hair,
+                HairHue = (ushort)character.HairHue,
+                Beard = (ushort)character.Beard,
+                BeardHue = (ushort)character.BeardHue,
+                Gear = gear.ToArray(),
+            };
         }
 
         // ------------------------------------------------------------------ wearing

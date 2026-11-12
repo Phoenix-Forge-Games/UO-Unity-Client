@@ -169,9 +169,9 @@ namespace UOClient.Bake
         {
             _nodeIndex[t] = _nodes.Count;
             _nodes.Add(t);
-            if (t.GetComponent<ParticleSystem>() != null)
+            if (t.GetComponent<ParticleSystem>() != null || t.GetComponent<PlacedWhole>() != null)
             {
-                return; // an effect: placed whole from its prefab (see Classify)
+                return; // an effect or a whole prefab (a light fixture): placed whole from its prefab (see Classify)
             }
 
             for (int i = 0; i < t.childCount; i++)
@@ -187,7 +187,12 @@ namespace UOClient.Bake
             _refTokens[ChunkFormat.Id(t.gameObject)] = $"n{index}g";
             _refTokens[ChunkFormat.Id(t)] = $"n{index}t";
             var list = new List<Component>();
-            ParticleSystem effect = t.GetComponent<ParticleSystem>();
+            Component effect = t.GetComponent<ParticleSystem>();
+            if (effect == null)
+            {
+                effect = t.GetComponent<PlacedWhole>();
+            }
+
             if (effect != null)
             {
                 if (_palette.EffectIndex(t.name) >= 0)
@@ -327,6 +332,7 @@ namespace UOClient.Bake
                 switch (c)
                 {
                     case ParticleSystem _:
+                    case PlacedWhole _:
                         int effect = _palette.EffectIndex(t.name);
                         _needEffects = Math.Max(_needEffects, effect + 1);
                         w.Write(ChunkFormat.Effect);

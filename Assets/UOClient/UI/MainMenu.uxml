@@ -1,0 +1,72 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LoginScreen.uss" />
+    <Style src="MainMenu.uss" />
+    <ui:VisualElement name="root" class="menu-screen">
+
+        <!-- The menu: on the left, over the town. -->
+        <ui:VisualElement name="menu-panel" class="menu-panel">
+            <ui:Label text="Britannia Reborn" class="title" />
+            <ui:Label text="The world you knew, in three dimensions" class="subtitle" />
+
+            <ui:VisualElement name="main-page" class="page">
+                <ui:Button name="solo-button" text="Play Solo" class="menu-item" />
+                <ui:Button name="multiplayer-button" text="Multiplayer" class="menu-item" />
+                <ui:Button name="options-button" text="Options" class="menu-item" />
+                <ui:Button name="exit-button" text="Exit to Desktop" class="menu-item" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="multiplayer-page" class="page hidden">
+                <ui:Label text="Multiplayer" class="page-heading" />
+                <ui:Button name="host-button" text="Host Game" class="menu-item" />
+                <ui:Button name="join-button" text="Join Game" class="menu-item" />
+                <ui:Button name="multiplayer-back" text="Back" class="secondary-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="join-page" class="page hidden">
+                <ui:Label text="Join Game" class="page-heading" />
+                <ui:TextField name="address" label="Server" class="field" />
+                <ui:IntegerField name="port" label="Port" value="7770" class="field" />
+                <ui:TextField name="account" label="Account" class="field" />
+                <ui:TextField name="password" label="Password" password="true" class="field" />
+                <ui:Toggle name="save-credentials" label="Save credentials" class="field menu-toggle" />
+                <ui:Button name="connect-button" text="Connect" class="primary-button" />
+                <ui:Button name="join-back" text="Back" class="secondary-button" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="options-page" class="page hidden">
+                <ui:Label text="Options" class="page-heading" />
+            </ui:VisualElement>
+
+            <ui:Label name="status" class="status" />
+        </ui:VisualElement>
+
+        <!-- Choosing or making your character, beside them at the door. -->
+        <ui:VisualElement name="character-panel" class="menu-panel character-panel hidden">
+            <ui:VisualElement name="select-page" class="page">
+                <ui:Label text="Your characters" class="page-heading" />
+                <ui:ScrollView name="character-list" class="choice-list" />
+                <ui:Button name="new-character" text="New character" class="secondary-button" />
+            </ui:VisualElement>
+            <ui:VisualElement name="create-page" class="page create-page hidden" />
+            <ui:Label name="character-status" class="status" />
+            <ui:Button name="start-button" text="Start Game" class="primary-button" />
+            <ui:Button name="character-back" text="Back" class="secondary-button" />
+        </ui:VisualElement>
+
+        <!-- Connecting... -->
+        <ui:Label name="busy" class="menu-busy hidden" />
+
+        <!-- Loading into the world. -->
+        <ui:VisualElement name="loading" class="loading hidden">
+            <ui:Label text="Britannia Reborn" class="loading-title" />
+            <ui:Label name="loading-what" text="Entering Britannia" class="loading-what" />
+            <ui:VisualElement class="loading-bar">
+                <ui:VisualElement name="loading-fill" class="loading-fill" />
+            </ui:VisualElement>
+            <ui:Label name="loading-percent" text="0%" class="loading-percent" />
+        </ui:VisualElement>
+
+        <!-- Black, for fades. -->
+        <ui:VisualElement name="fade" class="fade" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

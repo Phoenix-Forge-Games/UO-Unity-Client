@@ -252,6 +252,225 @@ MonoBehaviour:
   m_Name: VolumeComponentSupportedEverywhere
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:VolumeComponentEditorSupportedOnTests/VolumeComponentSupportedEverywhere
   active: 1
+--- !u!114 &-5149193262705809575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f53d442396c644b198ad641a34212ce, type: 3}
+  m_Name: RadiantGlobalIllumination
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::RadiantGI.Universal.RadiantGlobalIllumination
+  active: 1
+  indirectIntensity:
+    m_OverrideState: 1
+    m_Value: 1.2
+  indirectDistanceAttenuation:
+    m_OverrideState: 1
+    m_Value: 0.4
+  indirectMaxSourceBrightness:
+    m_OverrideState: 1
+    m_Value: 8
+  normalMapInfluence:
+    m_OverrideState: 1
+    m_Value: 0.2
+  rayBounce:
+    m_OverrideState: 1
+    m_Value: 0
+  nearFieldObscurance:
+    m_OverrideState: 1
+    m_Value: 0.4
+  nearFieldObscuranceSpread:
+    m_OverrideState: 1
+    m_Value: 0.2
+  nearFieldObscuranceMaxCameraDistance:
+    m_OverrideState: 1
+    m_Value: 125
+  nearFieldObscuranceOccluderDistance:
+    m_OverrideState: 1
+    m_Value: 0.825
+  nearFieldObscuranceTintColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  virtualEmitters:
+    m_OverrideState: 1
+    m_Value: 0
+  organicLight:
+    m_OverrideState: 1
+    m_Value: 0
+  organicLightThreshold:
+    m_OverrideState: 1
+    m_Value: 0.5
+  organicLightSpread:
+    m_OverrideState: 1
+    m_Value: 0.98
+  organicLightNormalsInfluence:
+    m_OverrideState: 1
+    m_Value: 0.95
+  organicLightTintColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  organicLightAnimationSpeed:
+    m_OverrideState: 1
+    m_Value: {x: 0, y: 0, z: 0}
+  organicLightDistanceScaling:
+    m_OverrideState: 1
+    m_Value: 0
+  unityAmbientLighting:
+    m_OverrideState: 1
+    m_Value: 1
+  ambientStripPrePass:
+    m_OverrideState: 1
+    m_Value: 0
+  rayCount:
+    m_OverrideState: 1
+    m_Value: 1
+  rayMaxLength:
+    m_OverrideState: 1
+    m_Value: 6
+  rayMaxSamples:
+    m_OverrideState: 1
+    m_Value: 24
+  rayJitter:
+    m_OverrideState: 1
+    m_Value: 0.3
+  thickness:
+    m_OverrideState: 1
+    m_Value: 0.25
+  fallbackReuseRays:
+    m_OverrideState: 1
+    m_Value: 0
+  rayReuse:
+    m_OverrideState: 1
+    m_Value: 0
+  fallbackReflectionProbes:
+    m_OverrideState: 1
+    m_Value: 1
+  probesIntensity:
+    m_OverrideState: 1
+    m_Value: 0.25
+  fallbackReflectiveShadowMap:
+    m_OverrideState: 1
+    m_Value: 0
+  reflectiveShadowMapIntensity:
+    m_OverrideState: 1
+    m_Value: 0.8
+  fallbackDefaultAmbient:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  blurSpread:
+    m_OverrideState: 1
+    m_Value: 1
+  blurQuality:
+    m_OverrideState: 1
+    m_Value: 1
+  downsampling:
+    m_OverrideState: 1
+    m_Value: 2
+  highQualityFiltering:
+    m_OverrideState: 1
+    m_Value: 0
+  raytracerAccuracy:
+    m_OverrideState: 1
+    m_Value: 8
+  depthPrecision:
+    m_OverrideState: 1
+    m_Value: 1
+  temporalFilter:
+    m_OverrideState: 1
+    m_Value: 1
+  temporalStabilization:
+    m_OverrideState: 1
+    m_Value: 8
+  temporalResponseSpeed:
+    m_OverrideState: 1
+    m_Value: 12
+  darkThreshold:
+    m_OverrideState: 1
+    m_Value: 0.2
+  darkThresholdMultiplier:
+    m_OverrideState: 1
+    m_Value: 10
+  showInEditMode:
+    m_OverrideState: 1
+    m_Value: 1
+  showInSceneView:
+    m_OverrideState: 1
+    m_Value: 0
+  brightnessThreshold:
+    m_OverrideState: 1
+    m_Value: 0
+  brightnessMax:
+    m_OverrideState: 1
+    m_Value: 8
+  sourceBrightness:
+    m_OverrideState: 1
+    m_Value: 1
+  giWeight:
+    m_OverrideState: 1
+    m_Value: 0
+  fallbackAmbient:
+    m_OverrideState: 1
+    m_Value: 0
+  nearCameraAttenuation:
+    m_OverrideState: 1
+    m_Value: 0
+  saturation:
+    m_OverrideState: 1
+    m_Value: 1
+  limitToVolumeBounds:
+    m_OverrideState: 1
+    m_Value: 0
+  stencilCheck:
+    m_OverrideState: 1
+    m_Value: 0
+  stencilValue:
+    m_OverrideState: 1
+    m_Value: 1
+  stencilCompareFunction:
+    m_OverrideState: 1
+    m_Value: 6
+  aoInfluence:
+    m_OverrideState: 1
+    m_Value: 0
+  occlusionIntensity:
+    m_OverrideState: 1
+    m_Value: 0.5
+  debugView:
+    m_OverrideState: 1
+    m_Value: 0
+  debugDepthMultiplier:
+    m_OverrideState: 1
+    m_Value: 10
+  debugMotionVectorMultiplier:
+    m_OverrideState: 1
+    m_Value: 1
+  compareMode:
+    m_OverrideState: 1
+    m_Value: 0
+  compareSameSide:
+    m_OverrideState: 1
+    m_Value: 0
+  comparePanning:
+    m_OverrideState: 1
+    m_Value: 0.25
+  compareLineAngle:
+    m_OverrideState: 1
+    m_Value: 1.4
+  compareLineWidth:
+    m_OverrideState: 1
+    m_Value: 0.002
+  transparencySupport:
+    m_OverrideState: 1
+    m_Value: 0
+  transparentLayerMask:
+    m_OverrideState: 1
+    m_Value:
+      serializedVersion: 2
+      m_Bits: 0
 --- !u!114 &-5139089513906902183
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -468,6 +687,7 @@ MonoBehaviour:
   - {fileID: -6288072647309666549}
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
+  - {fileID: -5149193262705809575}
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3

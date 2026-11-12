@@ -3,7 +3,43 @@
 Built, not yet confirmed working in play. Keep this up to date: add an entry when something is built but untested,
 remove it once it's been seen working (by the user or a test on the local server), and note how it was checked in
 TODO.md.
-Last updated 2026-11-11.
+Last updated 2026-11-12.
+
+## Ground under water, 2026-11-12 (scratch bake of chunks 22,24 and 23,24; raycasts)
+- Fixed: most UO water is water statics over "NoName" (void) land, and the terrain cut a hole at every void tile, so
+  there was nothing under rivers, canals and much of the sea (Trammel 815k tiles in 1535 chunks, Felucca 832k).
+  TerrainStreamer.BuildHoles now keeps the ground under any water tile. Seen on the scratch bake: every water tile in
+  the Britain river chunk has terrain under it (WorldData before: 280 of 409 river tiles had none), bed visible.
+- Not checked: walking/swimming across in Solo; the rest of the world, which needs the full re-bake.
+
+## Light fixtures, volumetric glow, Radiant GI, menu door shot on Cinemachine, 2026-11-12 (Solo, captures)
+- Seen: at 22:30 in clear weather the door shot with a lantern on an arm each side of the door and the Knights
+  lamppost behind the camera, lit orange, flames on the lanterns, the character lit from the front; no volumetric
+  glow in clear air; in forced Fog the lamps' halos swelling with the fog; the camera blending to the Door Cam
+  (Cinemachine, priority) and keeping the character centred as they walk to the Stand Spot and turn to it.
+- Not checked: room lights in houses at night (candles and lanterns on tables, the brass candelabra in corners,
+  flames on each wick), wall torches and street lamps across a town with their new flames, Radiant GI's look and
+  cost indoors, Back to the menu blending to the town camera, the brain going and the game camera taking over after
+  Start Game, frame cost with 32 lights and 6 glows.
+
+## HUD micro menu, game menu, chat fade, 2026-11-12 (Solo, script-pressed buttons)
+- Seen: the micro menu bottom left under the chat; Skills opening the Character window on its tab; the game menu
+  (Resume, Options, Log Out, Exit to Desktop); Options in the game styled like the menu; Log Out back to the main
+  menu; the chat showing a new line and faded out 15 s later.
+- Not checked: Esc (closing windows, opening the game menu, and not doing so while building), the micro-menu
+  tooltips with key names, pressing Enter bringing the faded chat back, Exit to Desktop in a build.
+
+## Main menu, 2026-11-12 (Solo, by script-pressed buttons and captures)
+- Seen: the Britain backdrop fading up once the town loads; six townsfolk on the cobbled streets; Play Solo moving
+  the camera to the door and the last-played character (Phoenix) out front with the list; New character dressing
+  them live and Start Game greyed until a name is given; Start Game fading to black, the loading bar (land, far
+  town, room reflections) and fading into the game with the HUD and controls back and the menu scene gone; the
+  Options tabs; the Join page filled from last time.
+- Not checked: Join to a real server (needs the protocol-27 server), wrong password and no-server errors coming back
+  to the menu, creating a character through to the world, the door actually swinging as they step out (the last
+  test caught them already outside), Exit to Desktop in a build, Controls rebinding from the menu, logging in to a
+  character far from Britain (a longer load).
+
 
 ## New server (first playtest)
 - Combat by hand: clicking and Tab to target, R to attack and stop, the unit frames, floating numbers, creatures
@@ -212,3 +248,26 @@ Last updated 2026-11-11.
   copes (CPU) with the navmesh rebuilding as players move about; spawns no longer on roofs.
 - Street lamps, wall torches and candles lit at night across towns, and the cost of 24 lights.
 
+## Shadows, rain leak, probes, Bank of Britain, 2026-11-11 (Solo, Britain)
+- Seen: no drops under the bank's roof in a storm (0 in three checks, was about 5); probes near you render, and
+  render again when the hour changes (13:00 then 20:00); the bank re-baked as one 4.9 m hall, no upper floor or
+  stairs, probes the full height.
+- Not checked: frame time with 150 m shadows and hourly probe renders; how far-LOD shadows look as blocks swap;
+  reflections looking right in rooms (only that they render).
+
+## Rain indoors, overcast skies, room lights, 2026-11-11 (Solo, Britain, forced Rain and Storm)
+- Seen: no rain inside the bank (drops near you under the roof went from 44 to about 5, the few left being squares
+  not yet measured); rain still visible through windows; a fully grey sky by day with weak sun and faint shadows,
+  no stars or moon at night; a candlestick on the bank's table and standing lanterns in its other rooms, lit day
+  and night (dimmer by day); 90 candlesticks and 175 lanterns across 110 houses round Britain.
+- Not checked: snow indoors, rain on ships and under bridges, frame time in a storm in a dense town, how the
+  lanterns look in every kind of house (a corner could still catch a bed or a shelf the checks missed).
+
+## Sound, 2026-11-11 (tested in Solo with a stand-in clip)
+- Seen working: the audio services start on the client only; footsteps of nearby walkers on the 3D channel; town
+  music fades in; night ambience loops; the Sound window (bottom-right button) with a slider per channel.
+- Not yet heard: swings, hits, misses, deaths, doors, your spells, thunder after lightning, button clicks, music
+  changing for combat, dungeons, the wilds and night, rain and wind ambience. Volumes kept between sessions.
+- Real music (IMAscore), checked by which clip plays: menu music on the login screen ("Leave For Battle"), switching
+  at once to "You Never Know" in Britain at night. Nobody has listened yet: check the fades, the loudness against
+  effects, and that a new track follows when one ends.

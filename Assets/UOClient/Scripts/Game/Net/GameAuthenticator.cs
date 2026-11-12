@@ -106,6 +106,7 @@ namespace UOGame.Net
             {
                 Accounts[connection] = account;
                 result.Characters = Summaries(account);
+                result.LastPlayed = account.LastPlayed;
                 Debug.Log($"[Game] {connection.ClientId} logged in as {account.Name}");
             }
             else
@@ -140,7 +141,8 @@ namespace UOGame.Net
             var list = new CharacterSummary[account.Characters.Count];
             for (int i = 0; i < list.Length; i++)
             {
-                list[i] = new CharacterSummary { Id = account.Characters[i].Id, Name = account.Characters[i].Name };
+                AccountStore.Character c = account.Characters[i];
+                list[i] = new CharacterSummary { Id = c.Id, Name = c.Name, Look = ItemService.LookOf(c) };
             }
 
             return list;

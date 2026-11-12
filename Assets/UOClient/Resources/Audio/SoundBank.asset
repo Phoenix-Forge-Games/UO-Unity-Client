@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3704b60e2cbe360488be28b6562e32c5, type: 3}
+  m_Name: SoundBank
+  m_EditorClassIdentifier: UOGame::UOGame.SoundBank
+  Entries:
+  - Key: step
+    Clips: []
+  - Key: swing
+    Clips: []
+  - Key: hit
+    Clips: []
+  - Key: miss
+    Clips: []
+  - Key: death
+    Clips: []
+  - Key: door.open
+    Clips: []
+  - Key: door.close
+    Clips: []
+  - Key: spell.begin
+    Clips: []
+  - Key: spell.cast
+    Clips: []
+  - Key: spell.fizzle
+    Clips: []
+  - Key: thunder
+    Clips: []
+  - Key: ui.click
+    Clips: []
+  - Key: music.menu
+    Clips:
+    - {fileID: 11400000, guid: 4913a73c16a13d24ba6ea14a7957873f, type: 2}
+    - {fileID: 11400000, guid: 14d3e5424a67ec94999e28d28db348ca, type: 2}
+  - Key: music.wild
+    Clips:
+    - {fileID: 11400000, guid: 678d71785a913e4498e9dcb4de6b4ce1, type: 2}
+    - {fileID: 11400000, guid: f1252418b1b0e8d4a9d9dc14ce3ca03c, type: 2}
+    - {fileID: 11400000, guid: c194bbf6c78e72c47acb1d8c5a8bc384, type: 2}
+    - {fileID: 11400000, guid: d43354a089ef0cc42b0d57542d2515f2, type: 2}
+    - {fileID: 11400000, guid: ab1da64e6f31d4643907191474f891a4, type: 2}
+  - Key: music.night
+    Clips:
+    - {fileID: 11400000, guid: 0d2635df7af663b439c03e00d7e60511, type: 2}
+    - {fileID: 11400000, guid: 3ac33b9fdf0bb194e97872771c60adbc, type: 2}
+    - {fileID: 11400000, guid: edc055941a27aee48b8e33acfd97ca1c, type: 2}
+  - Key: music.town
+    Clips:
+    - {fileID: 11400000, guid: 62575d3ca097e604a8dd4517b8442f9e, type: 2}
+    - {fileID: 11400000, guid: ac907d49dc8dfcc41845d75beb0f7fa5, type: 2}
+    - {fileID: 11400000, guid: 01e8fe8cc871d8d4d8d3a397a02365a5, type: 2}
+    - {fileID: 11400000, guid: 87e172d1b6869c8469155f1a9cee2cda, type: 2}
+    - {fileID: 11400000, guid: af8340178e2f8394fa0e6bbd30f29bfa, type: 2}
+  - Key: music.town.night
+    Clips:
+    - {fileID: 11400000, guid: 1489ab5672471ee488d96ce5e608c304, type: 2}
+  - Key: music.dungeon
+    Clips:
+    - {fileID: 11400000, guid: 8eefea466cf29824a8e1c08d3d724f5b, type: 2}
+    - {fileID: 11400000, guid: d3ce189435e999d43aa55d5517efeb80, type: 2}
+  - Key: music.combat
+    Clips:
+    - {fileID: 11400000, guid: c9759df44168e1a46bb1705f0b90bfa8, type: 2}
+  - Key: music.champion
+    Clips:
+    - {fileID: 11400000, guid: 94bc92295ad10ba43899e66eec830fa5, type: 2}
+    - {fileID: 11400000, guid: a60f8a7f4ae9be94fb6386eb0da7a46b, type: 2}
+  - Key: ambient.day
+    Clips: []
+  - Key: ambient.night
+    Clips: []
+  - Key: ambient.rain
+    Clips: []
+  - Key: ambient.wind
+    Clips: []
+  - Key: ambient.dungeon
+    Clips: []

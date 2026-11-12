@@ -23,6 +23,9 @@ namespace UOClient.Bake
         private readonly Queue<(LoadedChunk Chunk, Transform Block)> _queue = new Queue<(LoadedChunk, Transform)>();
 
         /// <summary>Queue every block of a freshly loaded chunk.</summary>
+        /// <summary>Blocks still waiting for their far version.</summary>
+        public int Pending => _queue.Count;
+
         public void Enqueue(LoadedChunk chunk)
         {
             if (chunk?.Root == null)
@@ -114,7 +117,10 @@ namespace UOClient.Bake
                 part.AddComponent<MeshFilter>().sharedMesh = mesh;
                 var meshRenderer = part.AddComponent<MeshRenderer>();
                 meshRenderer.sharedMaterial = pair.Key;
-                meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                // Casts a shadow when what it stands in for does (buildings and props; not the flowers and bushes), so
+                // a far building's shadow doesn't vanish as it swaps to this.
+                bool casts = pair.Value.Exists(p => p.Filter.TryGetComponent(out Renderer r) && r.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.Off);
+                meshRenderer.shadowCastingMode = casts ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
                 far.Add(meshRenderer);
             }
 

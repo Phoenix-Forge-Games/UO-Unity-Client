@@ -1,0 +1,158 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 491cef0a5130768439040511e6d35e9e, type: 3}
+  m_Name: RoomLights
+  m_EditorClassIdentifier: UOGame::UOGame.RoomLightKit
+  CandleFlame: {fileID: 1722020378972503864, guid: 12d19848e1548d64d94685f900921d13, type: 3}
+  TorchFlame: {fileID: 1648978194837340, guid: c3039019fa1c65840b1b35eed158363c, type: 3}
+  TableLights:
+  - {fileID: 6416043365138817367, guid: 815bee57292a31b4e896ca99be212386, type: 3}
+  - {fileID: 6764405960355555519, guid: c0d05ceada353cd4caf8910246e13c31, type: 3}
+  - {fileID: 903851899261369292, guid: 443bf1a87731ebd49a03d8613fed3607, type: 3}
+  - {fileID: 2543356250817498751, guid: 15d4e60ae1a61b94a9544295a566c84b, type: 3}
+  - {fileID: 4559520893098818685, guid: 6de786d3bcd83e149a0579bcd77310c0, type: 3}
+  CornerLight: {fileID: 8172493876969898947, guid: e91393ccc4c56f046801a2569f723831, type: 3}
+  DoorLantern: {fileID: 6751961611957249640, guid: ceab82cba98a4934492d079aab879bbb, type: 3}
+  StreetLamp: {fileID: 6328740914440788406, guid: 6e59ba65556868148aa09d6e8d8afa06, type: 3}
+  Housing: {fileID: 4900000, guid: 03d199e8ba1f1a149a5c3032415d2963, type: 3}
+  Regions: {fileID: 4900000, guid: 31c62f39278c78042af81447edc7f694, type: 3}
+  Cities:
+  - Britain
+  - Trinsic
+  - Vesper
+  - Minoc
+  - Jhelom
+  - Moonglow
+  - Nujel'm
+  - Magincia
+  - Serpent's Hold
+  CitySpacing: 8
+  VillageSpacing: 16
+  WildSpacing: 64
+  Anchors:
+  - Position: {x: 1859.66, y: 2.5, z: -2015.01}
+    Yaw: 270
+  DropProps:
+  - SM_Prop_Street_Lamp
+  - SM_Prop_Torch_01
+  Fixtures:
+  - Prefab: {fileID: 5769822014845734585, guid: 596492eca626c2540a7a059856cca442, type: 3}
+    Flames:
+    - {x: 0.02, y: 0.395, z: -0.01}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 1542832004461625174, guid: b67d289f6529f644b92960f5d29bfe6c, type: 3}
+    Flames:
+    - {x: 0, y: 0.545, z: 0.02}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 169758, guid: 60c6bc14bb0e58c4a99aa8e32d80f308, type: 3}
+    Flames:
+    - {x: -0.02, y: 0.385, z: -0.03}
+    - {x: 0.055, y: 0.305, z: 0.03}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 1008467881180038, guid: a8c705c57a34d7943ac6f8d99d393d57, type: 3}
+    Flames:
+    - {x: 0, y: 1.55, z: 0}
+    - {x: -0.19, y: 1.515, z: 0}
+    - {x: 0.19, y: 1.485, z: 0}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 3698448349016931728, guid: a8e73f08b349874429782acd5cc44af8, type: 3}
+    Flames:
+    - {x: 0, y: 0.965, z: 0.17}
+    - {x: -0.27, y: 0.675, z: 0.17}
+    - {x: 0.27, y: 0.655, z: 0.17}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 100744, guid: 63cb0e18155992f40a58f0495a9c839b, type: 3}
+    Flames:
+    - {x: 0.01, y: -1.68, z: 0.51}
+    - {x: 0.38, y: -1.7, z: 0.25}
+    - {x: 0.43, y: -1.81, z: -0.26}
+    - {x: 0.03, y: -1.68, z: -0.46}
+    - {x: -0.44, y: -1.77, z: -0.24}
+    - {x: -0.43, y: -1.8, z: 0.26}
+    Kind: 0
+    FlameScale: 1
+  - Prefab: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
+    Flames:
+    - {x: 0, y: 0.24, z: 0}
+    Kind: 1
+    FlameScale: 1
+  - Prefab: {fileID: 121142, guid: cefe5026a3c7c85498276c8ee6e59f13, type: 3}
+    Flames:
+    - {x: 0, y: 0.3, z: 0}
+    Kind: 1
+    FlameScale: 1
+  - Prefab: {fileID: 145908, guid: bb677ec00087db84e9c3dcc9bb02a479, type: 3}
+    Flames:
+    - {x: 0, y: -0.23, z: 0.55}
+    Kind: 1
+    FlameScale: 1.1
+  - Prefab: {fileID: 104616, guid: 5e1d462ffd80d7444837984e9e18388b, type: 3}
+    Flames:
+    - {x: 0, y: 2.47, z: 0.97}
+    Kind: 1
+    FlameScale: 1.1
+  - Prefab: {fileID: 7508625403262129973, guid: aab20c158f4dcec41b042ff7007dd34e, type: 3}
+    Flames:
+    - {x: 0, y: -0.88, z: 0}
+    Kind: 1
+    FlameScale: 1.1
+  - Prefab: {fileID: 1568525375095786, guid: bac41e063fe0fec4dae7fc7740141d27, type: 3}
+    Flames:
+    - {x: 0, y: 2.06, z: -0.54}
+    Kind: 1
+    FlameScale: 1
+  - Prefab: {fileID: 1346391149651154, guid: 08fbd81b18b8c4949b0f5b250596657a, type: 3}
+    Flames:
+    - {x: 0, y: 2.06, z: -0.53}
+    - {x: 0, y: 2.06, z: 0.53}
+    Kind: 1
+    FlameScale: 1
+  - Prefab: {fileID: 1979531206300384, guid: 4d8b9ace7ba126c47bd16c86db9c235c, type: 3}
+    Flames:
+    - {x: 0, y: 0.42, z: 0.18}
+    Kind: 1
+    FlameScale: 0.8
+  - Prefab: {fileID: 1470852809624960, guid: 51651d19206874a46aec23592e8985f0, type: 3}
+    Flames:
+    - {x: 0, y: 0.3, z: 0.24}
+    Kind: 2
+    FlameScale: 0.55
+  - Prefab: {fileID: 1070600896629514, guid: c135a56b1314f3b45814f29821c8bd4b, type: 3}
+    Flames:
+    - {x: 0, y: 0.33, z: 0.18}
+    Kind: 2
+    FlameScale: 0.55
+  - Prefab: {fileID: 1256706614363328, guid: 1d268c3d60d709e4c98adec1870aa36f, type: 3}
+    Flames:
+    - {x: 0, y: 0.31, z: 0.18}
+    Kind: 2
+    FlameScale: 0.55
+  - Prefab: {fileID: 4439482546042843684, guid: 379c27e951e42634b8d7cffaf7e31b19, type: 3}
+    Flames:
+    - {x: 0, y: 2.47, z: 0.97}
+    Kind: 1
+    FlameScale: 1.1
+  - Prefab: {fileID: 1336181972950877853, guid: ec066c6ed977f404984bacbd90a8e933, type: 3}
+    Flames:
+    - {x: 0, y: -0.88, z: 0}
+    Kind: 1
+    FlameScale: 1.1
+  - Prefab: {fileID: 1811431079098459721, guid: e1667e69861cc3344b49f8bf49aee1dd, type: 3}
+    Flames:
+    - {x: 0, y: 0.24, z: 0}
+    Kind: 1
+    FlameScale: 1

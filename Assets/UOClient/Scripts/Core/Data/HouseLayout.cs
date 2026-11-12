@@ -11,6 +11,41 @@ namespace UOClient.Data
         Masonry,
     }
 
+    /// <summary>What an outwork piece is.</summary>
+    public enum OutworkKind
+    {
+        /// <summary>A castle wall on the tile's south and/or east edge (see <see cref="OutworkPiece.Edges"/>).</summary>
+        Wall,
+        /// <summary>An arch on a tile edge: the opening under it is a passage.</summary>
+        Arch,
+        /// <summary>A whole-tile post or pillar.</summary>
+        Pillar,
+        /// <summary>A buttress against a wall.</summary>
+        Buttress,
+        /// <summary>A walkable deck tile above the ground (a wall-walk, the top of an arcade).</summary>
+        Deck,
+        /// <summary>A tile of a pool beside the outworks; the pool is rimmed along the water's edge.</summary>
+        Water,
+    }
+
+    /// <summary>One piece of a castle's outworks, in UO terms.</summary>
+    public readonly struct OutworkPiece
+    {
+        public readonly int X, Y, Z, Top;
+        public readonly OutworkKind Kind;
+        public readonly WallEdges Edges;
+
+        public OutworkPiece(int x, int y, int z, int top, OutworkKind kind, WallEdges edges)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            Top = top;
+            Kind = kind;
+            Edges = edges;
+        }
+    }
+
     /// <summary>Which side of a footprint tile an opening is on.</summary>
     public enum TileSide
     {
@@ -68,6 +103,27 @@ namespace UOClient.Data
         public bool ThatchRoof;
         /// <summary>No roof tiles over it: a flat, walkable roof (banks, guild halls, keeps) with parapets.</summary>
         public bool FlatRoof;
+
+        /// <summary>
+        /// Built from UO's castle masonry (thick keep walls, arrow loops, arches, battlements; see
+        /// <see cref="IsCastleWall"/>) rather than ordinary brick or stone: guild keeps, gatehouses, towers.
+        /// </summary>
+        public bool Castle;
+
+        /// <summary>
+        /// UO's castle wall sets: the keep set (stone wall, arrow loop, stone arch, buttress, post, battlement
+        /// and merlon pieces, 0x00C5-0x00E3) and Castle British's own thick stone walls (0x0080-0x0090).
+        /// </summary>
+        /// <summary>
+        /// A castle house's outworks: the tiles of castle masonry joined to it outside its footprint (a gateway
+        /// arcade, a wall-walk with passages through it, corner posts), and every castle piece and raised walkway
+        /// deck on them. Built with the castle and claimed from the map so they aren't drawn tile by tile too.
+        /// </summary>
+        public readonly HashSet<(int X, int Y)> Outworks = new HashSet<(int X, int Y)>();
+        public readonly List<OutworkPiece> OutworkPieces = new List<OutworkPiece>();
+
+        public static bool IsCastleWall(ushort graphic) =>
+            (graphic >= 0x00C5 && graphic <= 0x00E3) || (graphic >= 0x0080 && graphic <= 0x0090);
 
         public int MinX = int.MaxValue, MinY = int.MaxValue, MaxX = int.MinValue, MaxY = int.MinValue;
 

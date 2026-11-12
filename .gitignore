@@ -96,3 +96,8 @@ Thumbs.db
 /Assets/FishNet/Demos.meta
 # Working screenshots (they show the paid art).
 /Docs/**/*.png
+
+# Unity's crash recovery copies, and probe output from Tools/NetTest runs
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+/Tools/NetTest/*.txt

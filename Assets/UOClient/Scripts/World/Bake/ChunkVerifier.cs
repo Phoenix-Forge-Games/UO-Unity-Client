@@ -77,6 +77,17 @@ namespace UOClient.Bake
                 return;
             }
 
+            if (a.GetComponent<PlacedWhole>() != null)
+            {
+                // A whole prefab (a light fixture): likewise, a fresh copy of the prefab under the loaded object.
+                if (b.childCount == 0 || b.GetChild(0).GetComponent<PlacedWhole>() == null)
+                {
+                    Differ("whole prefab missing", where);
+                }
+
+                return;
+            }
+
             bool merged = a.GetComponent<MergedParts>() != null;
             MeshFilter fa = a.GetComponent<MeshFilter>(), fb = b.GetComponent<MeshFilter>();
             if ((fa != null) != (fb != null))

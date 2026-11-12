@@ -1,0 +1,30 @@
+{
+  "_about": "The game's sounds by name. Each lists audio clips by asset name; * matches anything, and a pattern with a / also matches the folder path. Tools/Game/MakeAudio.eval.cs turns this into Resources/Audio/SoundBank. music.* plays as music, ambient.* as looping ambience, ui.* as flat interface sound, everything else as 3D world sound. Min and Max are the distances (metres) a world sound is full volume within and fades out by.",
+  "Sounds": {
+    "step":              { "Clips": [], "Min": 1, "Max": 18 },
+    "swing":             { "Clips": [], "Min": 2, "Max": 25 },
+    "hit":               { "Clips": [], "Min": 2, "Max": 25 },
+    "miss":              { "Clips": [], "Min": 2, "Max": 25 },
+    "death":             { "Clips": [], "Min": 3, "Max": 30 },
+    "door.open":         { "Clips": [], "Min": 2, "Max": 20 },
+    "door.close":        { "Clips": [], "Min": 2, "Max": 20 },
+    "spell.begin":       { "Clips": [], "Min": 2, "Max": 25 },
+    "spell.cast":        { "Clips": [], "Min": 2, "Max": 30 },
+    "spell.fizzle":      { "Clips": [], "Min": 2, "Max": 20 },
+    "thunder":           { "Clips": [] },
+    "ui.click":          { "Clips": [] },
+    "music.menu":        { "Clips": ["*IMAscore_HopeAndGlory_LOOP", "*IMAscore_LeaveForBattle_LOOP"] },
+    "music.wild":        { "Clips": ["*IMAscore_FlyToTheHills_LOOP", "*IMAscore_Immortal_LOOP", "*IMAscore_HiddenValley_LOOP", "*IMAscore_TheMorningAfter_LOOP", "*IMAscore_MorningMagic_LOOP"] },
+    "music.night":       { "Clips": ["*IMAscore_FrozenFields_LOOP", "*IMAscore_Enchanted_LOOP", "*IMAscore_NightFalls_LOOP"] },
+    "music.town":        { "Clips": ["*IMAscore_PeacefulKingdom_LOOP", "*IMAscore_Stonehill Village_LOOP", "*IMAscore_DustyTavern_LOOP", "*IMAscore_OnTheMarket_LOOP", "*IMAscore_WithinTheCastle_LOOP"] },
+    "music.town.night":  { "Clips": ["*IMAscore_YouNeverKnow_LOOP"] },
+    "music.dungeon":     { "Clips": ["*IMAscore_DimmedLights_LOOP", "*IMAscore_Legions_LOOP"] },
+    "music.combat":      { "Clips": ["*IMAscore_Paradigma_LOOP"] },
+    "music.champion":    { "Clips": ["*IMAscore_EpicGuardians_LOOP", "*IMAscore_Skyscraper_LOOP"] },
+    "ambient.day":       { "Clips": [] },
+    "ambient.night":     { "Clips": [] },
+    "ambient.rain":      { "Clips": [] },
+    "ambient.wind":      { "Clips": [] },
+    "ambient.dungeon":   { "Clips": [] }
+  }
+}

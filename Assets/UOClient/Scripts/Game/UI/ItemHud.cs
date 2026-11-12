@@ -101,6 +101,7 @@ namespace UOGame.UI
         private void OnUIReload(PanelRenderer panelRenderer, VisualElement root, int version)
         {
             _root = root;
+            Window.All.Clear(); // a reload builds them all again
             if (_hudStyles != null && !root.styleSheets.Contains(_hudStyles))
             {
                 root.styleSheets.Add(_hudStyles);
@@ -140,6 +141,7 @@ namespace UOGame.UI
             BuildCraftWindow();
             BuildHousingWindows();
             BuildPetWindows();
+            BuildMicroMenu();
 
             _dragGhost = new Label { pickingMode = PickingMode.Ignore };
             _dragGhost.AddToClassList("drag-ghost");
@@ -193,6 +195,7 @@ namespace UOGame.UI
             }
 
             UpdatePets();
+            UpdateMicroMenu();
             if (!GameInput.Typing)
             {
                 if (GameInput.Controls.Gameplay.Backpack.WasPressedThisFrame())
@@ -1002,12 +1005,18 @@ namespace UOGame.UI
             public bool IsOpen => Root.style.display == DisplayStyle.Flex;
             public event Action Closed;
 
+            /// <summary>Every window the HUD has (Esc closes those open).</summary>
+            public static readonly List<Window> All = new List<Window>();
+
             public Window(VisualElement layer, string title, float width, float height, Vector2 at)
             {
                 Root = new VisualElement();
                 Root.AddToClassList("window");
                 Root.style.width = width;
-                Root.style.height = height;
+                if (height > 0f)
+                {
+                    Root.style.height = height; // otherwise it fits its contents
+                }
                 Root.style.left = at.x;
                 Root.style.top = at.y;
                 var header = new VisualElement();
@@ -1046,6 +1055,7 @@ namespace UOGame.UI
                 Root.RegisterCallback<PointerDownEvent>(_ => Root.BringToFront(), TrickleDown.TrickleDown);
                 Root.style.display = DisplayStyle.None;
                 layer.Add(Root);
+                All.Add(this);
             }
 
             public void SetTitle(string title) => _title.text = title;

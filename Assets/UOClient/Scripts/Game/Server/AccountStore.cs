@@ -149,6 +149,8 @@ namespace UOGame.Server
             public string Hash;
             public int Iterations;
             public string Created;
+            /// <summary>The character last entered the world as (0: none yet); the menu offers it first.</summary>
+            public int LastPlayed;
             /// <summary>An admin account: its characters play normally and can switch to admin mode (the Admin tools).
             /// Granted only through the admin API (Docs/AdminTools.md).</summary>
             public bool Admin;

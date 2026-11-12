@@ -838,3 +838,126 @@
     color: rgb(236, 226, 206);
     margin: 2px 0 4px 8px;
 }
+
+/* The micro menu: a button per window, bottom left under the chat (ItemHud.MicroMenu). */
+.micro-menu {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    flex-direction: row;
+}
+
+.micro-button {
+    height: 36px;
+    min-width: 70px;
+    margin-right: 4px;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+.micro-menu-game {
+    margin-left: 8px;
+}
+
+.game-menu {
+    flex-grow: 0;
+    padding: 10px 6px 14px 6px;
+}
+
+.game-menu-button {
+    width: auto; /* fill the window (.menu-button is a fixed 300 px) */
+    height: 44px;
+    margin: 4px 16px;
+    font-size: 16px;
+}
+
+/* The Options panel inside the HUD (OptionsPanel; the main menu styles it in MainMenu.uss). */
+.options {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.options-tabs {
+    flex-direction: row;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+.options-tab {
+    flex-grow: 1;
+    height: 30px;
+    margin: 0 4px 0 0;
+    color: rgb(214, 200, 176);
+    background-color: rgb(48, 40, 32);
+    border-color: rgb(100, 80, 50);
+}
+
+.options-tab-active {
+    background-color: rgb(150, 116, 58);
+    color: rgb(20, 16, 10);
+}
+
+.options-page {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-bottom: 8px;
+}
+
+.options .setting {
+    margin: 4px 0;
+}
+
+.options .setting Label {
+    min-width: 170px;
+    color: rgb(214, 200, 176);
+}
+
+.options .page-heading {
+    font-size: 15px;
+    color: rgb(226, 190, 116);
+    margin: 10px 0 4px 0;
+}
+
+.options-key {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0;
+}
+
+.options-key-name {
+    flex-grow: 1;
+    color: rgb(214, 200, 176);
+}
+
+.options-key-value {
+    min-width: 110px;
+    color: rgb(236, 226, 206);
+}
+
+.options-note {
+    white-space: normal;
+    font-size: 12px;
+    color: rgb(170, 152, 120);
+    margin-top: 6px;
+}
+
+.options .menu-row {
+    flex-direction: row;
+    flex-shrink: 0;
+    justify-content: flex-end;
+}
+
+.options .primary-button, .options .secondary-button {
+    height: 32px;
+    min-width: 96px;
+    margin-left: 6px;
+    color: rgb(236, 224, 200);
+    background-color: rgb(58, 46, 34);
+    border-color: rgb(120, 94, 52);
+}
+
+.options .primary-button {
+    background-color: rgb(200, 158, 82);
+    color: rgb(24, 18, 12);
+    -unity-font-style: bold;
+}

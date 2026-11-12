@@ -47,6 +47,16 @@ namespace UOClient.Bake
         public bool IsLoadedAt(Vector3 position) => _loaded.ContainsKey(ChunkAt(position));
 
         private readonly List<Vector2Int> _centres = new List<Vector2Int>();
+        private readonly HashSet<Vector2Int> _counted = new HashSet<Vector2Int>();
+
+        /// <summary>
+        /// How much of the world within reach of the centres is in (0..1): chunks loaded of those that exist, and the
+        /// far versions of their buildings made. 1 with nothing to load. A loading screen waits on it.
+        /// </summary>
+        public float Progress { get; private set; } = 1f;
+
+        /// <summary>Is everything within reach of the centres loaded (and its far versions made)?</summary>
+        public bool Settled => Progress >= 1f;
 
         private void Start()
         {
@@ -109,6 +119,8 @@ namespace UOClient.Bake
             string folder = Path.Combine(Folder, Facet.ToString());
             Vector2Int? nearest = null;
             int nearestDistance = int.MaxValue;
+            int wanted = 0, have = 0;
+            _counted.Clear();
             foreach (Vector2Int centre in _centres)
             {
                 for (int dy = -RadiusChunks; dy <= RadiusChunks; dy++)
@@ -116,7 +128,14 @@ namespace UOClient.Bake
                     for (int dx = -RadiusChunks; dx <= RadiusChunks; dx++)
                     {
                         var key = new Vector2Int(centre.x + dx, centre.y + dy);
-                        if (_loaded.ContainsKey(key) || _missing.Contains(key))
+                        bool loaded = _loaded.ContainsKey(key);
+                        if (_counted.Add(key) && !_missing.Contains(key))
+                        {
+                            wanted++;
+                            have += loaded ? 1 : 0;
+                        }
+
+                        if (loaded || _missing.Contains(key))
                         {
                             continue;
                         }
@@ -141,6 +160,15 @@ namespace UOClient.Bake
                         }
                     }
                 }
+            }
+
+            // Chunks count 90%, the far versions of their buildings the rest.
+            float chunks = wanted == 0 ? 1f : (float)have / wanted;
+            int farLeft = _farLod != null ? _farLod.Pending : 0;
+            Progress = chunks * 0.9f + (farLeft == 0 ? 0.1f : 0.1f / (1f + farLeft * 0.25f));
+            if (chunks >= 1f && farLeft == 0)
+            {
+                Progress = 1f;
             }
 
             if (nearest.HasValue)

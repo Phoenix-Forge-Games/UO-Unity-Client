@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c51575fba4a4a438c34a8bbe6fc9a2, type: 3}
+  m_Name: AudioManager
+  m_EditorClassIdentifier: PhoenixForgeGames.Audio.Runtime::PhoenixForgeGames.Audio.Service.ForgeAudioManagerService
+  masterVolume: 0
+  audioServices:
+  - {fileID: 11400000, guid: 84448ef9a3baa7f4287e325e2b08b1c8, type: 2}
+  - {fileID: 11400000, guid: d2ca089004f14b347b6b254e92f3e9fa, type: 2}
+  - {fileID: 11400000, guid: eea4ce4390f7ca047860710428c5d23f, type: 2}
+  - {fileID: 11400000, guid: 670d0cacfa6326449b12401e12e4fc2a, type: 2}
+  forgeAudioConstants: {fileID: 11400000, guid: 43e0b69f5a5cae24c80d93a0f1309620, type: 2}
+  forgeAudioEventChannel: {fileID: 11400000, guid: 97794374dbacc944d9a11c9ec3903e49, type: 2}

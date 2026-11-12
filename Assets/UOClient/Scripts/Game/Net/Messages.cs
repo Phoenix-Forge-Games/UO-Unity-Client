@@ -7,7 +7,7 @@ namespace UOGame.Net
     public static class Protocol
     {
         /// <summary>Bump when any message changes shape.</summary>
-        public const int Version = 26;
+        public const int Version = 27;
 
         /// <summary>
         /// What this build's world content is: the chunk format and the palette it was baked against. A client whose
@@ -54,12 +54,16 @@ namespace UOGame.Net
         public bool Ok;
         public string Reason;
         public CharacterSummary[] Characters;
+        /// <summary>The character this account last entered the world as (0: none yet).</summary>
+        public int LastPlayed;
     }
 
     public struct CharacterSummary
     {
         public int Id;
         public string Name;
+        /// <summary>How they look, dressed in what they wear (the menu shows them).</summary>
+        public Look Look;
     }
 
     /// <summary>Client → server: make a new character (and play it).</summary>

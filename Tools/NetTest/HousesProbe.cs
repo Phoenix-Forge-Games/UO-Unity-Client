@@ -39,7 +39,7 @@ internal static class HousesProbe
                 if (misses) continue;
                 string storeys = string.Join("/", h.Storeys.Select(s => s.Count));
                 string doors = string.Join(" ", h.Doors.Select(d => $"{d.X},{d.Y}{d.Side.ToString()[0]}"));
-                Console.WriteLine($"house #{count} at {h.MinX},{h.MinY}-{h.MaxX},{h.MaxY} ({h.MaxX - h.MinX + 1}x{h.MaxY - h.MinY + 1}) floorZ={h.FloorZ} tiles/storey={storeys} walls={h.Walls} thatch={h.ThatchRoof} flat={h.FlatRoof} doors[{h.Doors.Count}]: {doors} windows={h.Windows.Count}");
+                Console.WriteLine($"house #{count} at {h.MinX},{h.MinY}-{h.MaxX},{h.MaxY} ({h.MaxX - h.MinX + 1}x{h.MaxY - h.MinY + 1}) floorZ={h.FloorZ} tiles/storey={storeys} walls={h.Walls} thatch={h.ThatchRoof} flat={h.FlatRoof} castle={h.Castle} outworks={h.Outworks.Count}/{h.OutworkPieces.Count} doors[{h.Doors.Count}]: {doors} windows={h.Windows.Count}");
                 if (!plan) continue;
                 for (int ty = h.MinY; ty <= h.MaxY; ty++)
                 {

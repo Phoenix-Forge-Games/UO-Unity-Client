@@ -223,7 +223,11 @@ namespace UOClient.Buildings
             _target = open;
             _open = open;
             _t = 0f;
+            Swung?.Invoke(this, open);
         }
+
+        /// <summary>A door started to open (true) or shut (false): the client plays its sound.</summary>
+        public static event System.Action<BuildingDoor, bool> Swung;
 
         /// <summary>
         /// Opens the door and shuts it again after <paramref name="seconds"/>: the door's own logic for a door no

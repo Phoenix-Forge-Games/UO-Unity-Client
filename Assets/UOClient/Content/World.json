@@ -129,9 +129,37 @@
   }
  },
  "Lights": {
-  "MaxLit": 24,
+  "MaxLit": 32,
   "Note": "Lights in the baked world (the client's look): each prop whose name starts with Match gets a warm point light near its top at night (Range metres, Intensity, Flicker for flames); only the MaxLit nearest the camera are on at once, and they fade out by day.",
   "Props": [
+   {
+    "Match": "SM_Prop_Lampost",
+    "Range": 12,
+    "Intensity": 3.0,
+    "Flicker": 0.15,
+    "Top": 1.3
+   },
+   {
+    "Match": "SM_Prop_Lantern_Attachment",
+    "Range": 9,
+    "Intensity": 2.6,
+    "Flicker": 0.15,
+    "Top": 0.6
+   },
+   {
+    "Match": "SM_Prop_Lamp_Hanging",
+    "Range": 8,
+    "Intensity": 2.4,
+    "Flicker": 0.15,
+    "Top": 0.9
+   },
+   {
+    "Match": "SM_Prop_Candle_Wall",
+    "Range": 5,
+    "Intensity": 1.6,
+    "Flicker": 0.8,
+    "Top": 0.05
+   },
    {
     "Match": "SM_Prop_Street_Lamp",
     "Range": 11,
@@ -174,6 +202,14 @@
     "Flicker": 1.0,
     "Top": 0.6
    }
-  ]
+  ],
+  "Indoor": {
+   "Note": "Every room of every building gets a warm candle-like light (unless a lit prop is already in it): Height metres above its floor, reaching most of the room up to MaxRange; DayShare of its brightness by day, since interiors are dim then too. Room lights share MaxLit with the props, nearest first.",
+   "Height": 1.9,
+   "MaxRange": 9,
+   "Intensity": 1.8,
+   "Flicker": 0.6,
+   "DayShare": 0.4
+  }
  }
 }

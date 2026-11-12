@@ -81,6 +81,17 @@ namespace UOGame.Content
                 });
             }
 
+            JToken indoor = lights?["Indoor"];
+            IndoorLight = new PropLight
+            {
+                Match = "",
+                Range = (float?)indoor?["MaxRange"] ?? 9f,
+                Intensity = (float?)indoor?["Intensity"] ?? 1.8f,
+                Flicker = (float?)indoor?["Flicker"] ?? 0.6f,
+                Top = (float?)indoor?["Height"] ?? 1.9f,
+            };
+            IndoorDayShare = (float?)indoor?["DayShare"] ?? IndoorDayShare;
+
             JToken w = root["Weather"];
             WeatherPeriodMinutes = Math.Max(1, (int?)w?["PeriodMinutes"] ?? WeatherPeriodMinutes);
             WeatherBlendSeconds = Mathf.Max(0.1f, (float?)w?["BlendSeconds"] ?? WeatherBlendSeconds);
@@ -117,6 +128,10 @@ namespace UOGame.Content
 
         public static readonly List<PropLight> PropLights = new List<PropLight>();
         public static int MaxLitProps = 24;
+        /// <summary>The light in every room of every building (Range: the most it reaches; Top: height above the floor).</summary>
+        public static PropLight IndoorLight = new PropLight { Match = "", Range = 9f, Intensity = 1.8f, Flicker = 0.6f, Top = 1.9f };
+        /// <summary>How bright room lights are by day, as a share of their night brightness (interiors are dim then too).</summary>
+        public static float IndoorDayShare = 0.4f;
 
         // ------------------------------------------------------------------ weather (World.json Weather)
 

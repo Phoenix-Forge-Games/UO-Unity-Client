@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 366a5dd0de724f57924921dbb04f6e46, type: 3}
+  m_Name: AudioServices
+  m_EditorClassIdentifier: PhoenixForgeGames.Core.Runtime::PhoenixForgeGames.Core.Shared.ForgeServiceLoader
+  services:
+  - {fileID: 11400000, guid: be7ffad10af628c47b565db3da9628af, type: 2}

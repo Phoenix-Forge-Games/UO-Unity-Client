@@ -140,6 +140,7 @@ namespace UOClient.Data
             FillHoles(layout, ground, floorZ);
             visited.UnionWith(ground);
             layout.Storeys.Add(ground);
+            DecideStyle(layout); // before the storeys: a castle's storeys are counted by its walls
             AddUpperStoreys(layout);
             int edges = FindOpenings(layout);
 
@@ -149,8 +150,6 @@ namespace UOClient.Data
                 Trace?.Invoke($"{x},{y}: outline too open ({layout.Doors.Count} gaps of {edges} edges) at {layout.MinX},{layout.MinY}-{layout.MaxX},{layout.MaxY}");
                 return null;
             }
-
-            DecideStyle(layout);
 
             // A flat "roof" with no door and no window under it is a passage under the city wall's walkway, a
             // tunnel or a vault, not a building: real flat-roofed buildings (banks, guard posts, keeps) have a way in.
@@ -163,6 +162,10 @@ namespace UOClient.Data
             FindPorch(layout);
             layout.GroundZ = LowestGroundAround(layout);
             FindHangings(layout);
+            if (layout.Castle)
+            {
+                FindOutworks(layout);
+            }
             visited.UnionWith(layout.Porch);
             return layout;
         }
@@ -401,7 +404,42 @@ namespace UOClient.Data
                 after = alongX ? Blocked(x + k, y, side, floorZ) : Blocked(x, y + k, side, floorZ);
             }
 
-            return before && after;
+            return (before && after) || CastleOver(x, y, side, floorZ);
+        }
+
+        /// <summary>
+        /// A gap in a wall line with castle masonry over it (the arch and the storeys above a keep's gateway) is a
+        /// gateway, however wide: keep gates are three or four tiles across, wider than any house door.
+        /// </summary>
+        private bool CastleOver(int x, int y, TileSide side, int floorZ)
+        {
+            int ox = x, oy = y;
+            WallEdges need;
+            switch (side)
+            {
+                case TileSide.South: need = WallEdges.South; break;
+                case TileSide.East: need = WallEdges.East; break;
+                case TileSide.North: oy = y - 1; need = WallEdges.South; break;
+                default: ox = x - 1; need = WallEdges.East; break;
+            }
+
+            MapBlock block = _map.GetBlock(ox >> 3, oy >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X == (ox & 7) && tile.Y == (oy & 7) && HouseLayout.IsCastleWall(tile.Graphic) &&
+                    tile.Z >= floorZ + StoreyZ - 2 && tile.Z <= floorZ + StoreyZ * 3 &&
+                    (_walls.Get(tile.Graphic) & (need | WallEdges.Full)) != 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void IncludeAll(HouseLayout layout, HashSet<(int X, int Y)> tiles)
@@ -570,6 +608,14 @@ namespace UOClient.Data
                     {
                         tiles.Add((x, y));
                     }
+                }
+
+                // A keep's floors are galleries and half levels (a dais a storey and a half up, a deck two
+                // storeys up), not one floor every storey; its castle walls rising another storey make one.
+                if (layout.Castle && TallWallsAt(layout.Ground, want) >= MinStoreyWalls)
+                {
+                    layout.Storeys.Add(new HashSet<(int X, int Y)>(layout.Storeys[storey - 1]));
+                    continue;
                 }
 
                 // A handful of high floor tiles is a balcony or a loft, not a storey; a floor with no walls
@@ -900,7 +946,7 @@ namespace UOClient.Data
         private void DecideStyle(HouseLayout layout)
         {
             var votes = new int[4];
-            int thatch = 0, tiled = 0;
+            int thatch = 0, tiled = 0, castle = 0;
             foreach ((int x, int y) in layout.Ground)
             {
                 foreach (StaticTile tile in BlockStaticsAt(x, y))
@@ -939,6 +985,11 @@ namespace UOClient.Data
                     {
                         votes[(int)HouseWalls.Masonry]++;
                     }
+
+                    if (HouseLayout.IsCastleWall(tile.Graphic))
+                    {
+                        castle++;
+                    }
                 }
             }
 
@@ -954,6 +1005,231 @@ namespace UOClient.Data
             layout.Walls = (HouseWalls)best;
             layout.ThatchRoof = thatch > tiled;
             layout.FlatRoof = thatch + tiled == 0;
+            layout.Castle = layout.Walls == HouseWalls.Masonry && castle * 2 >= votes[(int)HouseWalls.Masonry];
+        }
+
+        /// <summary>How far past its footprint a castle's outworks (an arcade, a wall-walk) are followed.</summary>
+        private const int OutworkReach = 64;
+
+        /// <summary>The keep set only: Castle British's own walls (0x0080-0x0090) are a town wall, not outworks.</summary>
+        private static bool IsKeepPiece(ushort graphic) => graphic >= 0x00C5 && graphic <= 0x00E3;
+
+        /// <summary>
+        /// The castle masonry joined to a castle house outside its footprint: from the ring round the footprint
+        /// outward through every tile (diagonals too) carrying keep pieces, within <see cref="OutworkReach"/>.
+        /// Its pieces are read as walls, arches, pillars, buttresses and raised decks (<see cref="OutworkPiece"/>).
+        /// </summary>
+        private void FindOutworks(HouseLayout layout)
+        {
+            HashSet<(int X, int Y)> ground = layout.Ground;
+            var queue = new Queue<(int X, int Y)>();
+            var seen = new HashSet<(int X, int Y)>(ground);
+            foreach ((int x, int y) in ground)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (seen.Add((x + dx, y + dy)))
+                    {
+                        queue.Enqueue((x + dx, y + dy));
+                    }
+                }
+            }
+
+            while (queue.Count > 0)
+            {
+                (int x, int y) = queue.Dequeue();
+                if (x < 0 || y < 0 || !HasKeepPiece(x, y))
+                {
+                    continue;
+                }
+
+                layout.Outworks.Add((x, y));
+                for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    int nx = x + dx, ny = y + dy;
+                    if (nx >= layout.MinX - OutworkReach && nx <= layout.MaxX + OutworkReach &&
+                        ny >= layout.MinY - OutworkReach && ny <= layout.MaxY + OutworkReach && seen.Add((nx, ny)))
+                    {
+                        queue.Enqueue((nx, ny));
+                    }
+                }
+            }
+
+            // The middle of a wall-walk carries no castle piece, only its paving: follow raised decks from the outworks.
+            var decks = new Queue<(int X, int Y)>(layout.Outworks);
+            while (decks.Count > 0)
+            {
+                (int x, int y) = decks.Dequeue();
+                foreach (TileSide side in Sides)
+                {
+                    (int nx, int ny) = Step(x, y, side);
+                    if (!ground.Contains((nx, ny)) && !layout.Outworks.Contains((nx, ny)) &&
+                        nx >= layout.MinX - OutworkReach && nx <= layout.MaxX + OutworkReach &&
+                        ny >= layout.MinY - OutworkReach && ny <= layout.MaxY + OutworkReach && HasRaisedDeck(nx, ny, layout.FloorZ))
+                    {
+                        layout.Outworks.Add((nx, ny));
+                        decks.Enqueue((nx, ny));
+                    }
+                }
+            }
+
+            foreach ((int x, int y) in layout.Outworks)
+            {
+                MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+                int land = block.GetLand(x & 7, y & 7).Z;
+                foreach (StaticTile tile in block.Statics)
+                {
+                    if (tile.X != (x & 7) || tile.Y != (y & 7))
+                    {
+                        continue;
+                    }
+
+                    StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
+                    int top = tile.Z + Math.Max((int)info.Height, 1);
+                    if (IsKeepPiece(tile.Graphic))
+                    {
+                        string name = info.Name ?? string.Empty;
+                        WallEdges edges = _walls.Get(tile.Graphic);
+                        OutworkKind kind = Contains(name, "arch") ? OutworkKind.Arch
+                            : Contains(name, "buttress") ? OutworkKind.Buttress
+                            : (edges & (WallEdges.South | WallEdges.East)) == 0 ? OutworkKind.Pillar
+                            : OutworkKind.Wall;
+
+                        layout.OutworkPieces.Add(new OutworkPiece(x, y, tile.Z, top, kind, edges));
+                    }
+                    else if (info.Is(TileFlag.Surface) && info.Height <= 2 && tile.Z >= Math.Max(land, layout.FloorZ) + 10)
+                    {
+                        layout.OutworkPieces.Add(new OutworkPiece(x, y, tile.Z, tile.Z, OutworkKind.Deck, WallEdges.None));
+                    }
+                }
+            }
+
+            FindPools(layout);
+        }
+
+        /// <summary>Largest pool rimmed as a castle's water feature; more is a moat or a river, left as it is.</summary>
+        private const int MaxPool = 400;
+
+        /// <summary>
+        /// Pools beside a castle's outworks (the basins either side of the Mage Guild's approach): every water tile
+        /// joined to one next to the outworks, kept when the body is small enough to be a basin. They are rimmed by
+        /// the builder along the water's own edge.
+        /// </summary>
+        private void FindPools(HouseLayout layout)
+        {
+            var seen = new HashSet<(int X, int Y)>();
+            var near = new List<(int X, int Y)>();
+            foreach ((int x, int y) in layout.Outworks)
+            for (int dy = -1; dy <= 1; dy++)
+            for (int dx = -1; dx <= 1; dx++)
+                if (IsWater(x + dx, y + dy)) near.Add((x + dx, y + dy));
+
+            foreach ((int X, int Y) start in near)
+            {
+                if (seen.Contains(start))
+                {
+                    continue;
+                }
+
+                var pool = new List<(int X, int Y)>();
+                var queue = new Queue<(int X, int Y)>();
+                queue.Enqueue(start);
+                seen.Add(start);
+                while (queue.Count > 0 && pool.Count <= MaxPool)
+                {
+                    (int x, int y) = queue.Dequeue();
+                    pool.Add((x, y));
+                    foreach (TileSide side in Sides)
+                    {
+                        (int nx, int ny) = Step(x, y, side);
+                        if (!seen.Contains((nx, ny)) && IsWater(nx, ny))
+                        {
+                            seen.Add((nx, ny));
+                            queue.Enqueue((nx, ny));
+                        }
+                    }
+                }
+
+                if (pool.Count > MaxPool)
+                {
+                    continue;
+                }
+
+                foreach ((int x, int y) in pool)
+                {
+                    layout.OutworkPieces.Add(new OutworkPiece(x, y, 0, 0, OutworkKind.Water, WallEdges.None));
+                }
+            }
+        }
+
+        /// <summary>A walkable surface well above the ground and the castle floor: a wall-walk's paving.</summary>
+        private bool HasRaisedDeck(int x, int y, int floorZ)
+        {
+            if (x < 0 || y < 0)
+            {
+                return false;
+            }
+
+            MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            int land = block.GetLand(x & 7, y & 7).Z;
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X == (x & 7) && tile.Y == (y & 7))
+                {
+                    StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
+                    if (info.Is(TileFlag.Surface) && info.Height <= 2 && tile.Z >= Math.Max(land, floorZ) + 10)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsWater(int x, int y)
+        {
+            MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X == (x & 7) && tile.Y == (y & 7) && Contains(_tiles.GetStatic(tile.Graphic).Name ?? string.Empty, "water"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasKeepPiece(int x, int y)
+        {
+            MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X == (x & 7) && tile.Y == (y & 7) && IsKeepPiece(tile.Graphic))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private IEnumerable<StaticTile> BlockStaticsAt(int x, int y)

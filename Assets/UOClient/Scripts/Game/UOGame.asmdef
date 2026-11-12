@@ -7,7 +7,10 @@
         "UOClient.Buildings",
         "FishNet.Runtime",
         "GameKit.Dependencies",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.Cinemachine",
+        "PhoenixForgeGames.Audio.Runtime",
+        "PhoenixForgeGames.Core.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

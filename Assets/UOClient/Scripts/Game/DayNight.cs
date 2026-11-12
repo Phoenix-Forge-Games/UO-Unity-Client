@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UOGame.Content;
@@ -23,7 +24,7 @@ namespace UOGame
         private Light _sun;
         private Material _sky;
         private bool _ourSky;
-        private float _sunIntensity = 1f, _exposure = 1.3f;
+        private float _sunIntensity = 1f, _exposure = 1.3f, _shadowStrength = 1f;
         private Color _sunColor = new Color(1f, 0.957f, 0.839f);
         private static readonly Color MoonColor = new Color(0.55f, 0.65f, 0.95f);
 
@@ -46,6 +47,16 @@ namespace UOGame
         /// <summary>0..1: how amber the light is (the sun near the horizon).</summary>
         public static float Golden { get; private set; }
         public static WorldRules.Weather Weather { get; private set; }
+        /// <summary>0..1: how fully the sky is clouded over (rain or snow closes it from horizon to horizon).</summary>
+        public static float Overcast { get; private set; }
+        /// <summary>0..1: how foggy the weather is (lamps glow wider in it).</summary>
+        public static float Fog { get; private set; }
+        /// <summary>In a dungeon (always dark, no sky or weather).</summary>
+        public static bool Underground { get; private set; }
+        /// <summary>The town or place you're in (its named region), or null out in the wilds.</summary>
+        public static string PlaceName { get; private set; }
+        /// <summary>A lightning flash lit the sky (the thunder follows it).</summary>
+        public static event Action Lightning;
 
         private void Start()
         {
@@ -65,6 +76,7 @@ namespace UOGame
             if (_sun != null)
             {
                 _sunIntensity = _sun.intensity;
+                _shadowStrength = _sun.shadowStrength;
                 _sunColor = _sun.color;
             }
 
@@ -90,14 +102,23 @@ namespace UOGame
         private void Update()
         {
             PlayerMotor me = PlayerMotor.Local;
-            Vector2Int tile = me != null ? UOClient.WorldSpace.ToTile(me.transform.position) : new Vector2Int(1600, 1600);
+            // Where you stand; before you're in the world (the menu), where the camera is.
+            Camera view = Camera.main;
+            Vector2Int tile = me != null ? UOClient.WorldSpace.ToTile(me.transform.position)
+                : view != null ? UOClient.WorldSpace.ToTile(view.transform.position) : new Vector2Int(1600, 1600);
             const int facet = 1; // Trammel: the world that's baked
             DateTime now = DateTime.UtcNow;
             Hour = WorldRules.HourAt(now, facet, tile.x);
             bool dungeon = HousingRules.InDungeon(facet, tile.x, tile.y);
+            Underground = dungeon;
+            if (Time.frameCount % 15 == 0)
+            {
+                PlaceName = HousingRules.PlaceName(facet, tile.x, tile.y);
+            }
             bool nightSight = me != null && me.GetComponent<PlayerIdentity>() is PlayerIdentity id && id.NightSight.Value;
             WorldRules.Weather weather = dungeon ? new WorldRules.Weather { Name = "Underground", Light = 1f } : WorldRules.WeatherAt(now);
             Weather = weather;
+            Overcast = dungeon ? 0f : Mathf.Clamp01(Mathf.Max(weather.Rain, weather.Snow) * 2.5f);
             float dark = dungeon && !nightSight ? 1f : 0f;
 
             // The sun on its path (World.json Sun): up in the east, across the south, down in the west, then under the
@@ -122,6 +143,7 @@ namespace UOGame
                 if (_nextFlash > 0f)
                 {
                     _flash = 1f;
+                    Lightning?.Invoke();
                 }
 
                 _nextFlash = Time.time + Mathf.Lerp(25f, 4f, weather.Lightning) * (0.4f + (float)_random.NextDouble() * 1.2f);
@@ -141,7 +163,9 @@ namespace UOGame
 
                 _sun.transform.rotation = sunUp || nightSight && sunElevation > -20f ? sunRot : moonRot;
                 _sun.color = sunUp ? Color.Lerp(_sunColor, Amber, golden) : nightSight ? _sunColor : MoonColor;
-                _sun.intensity = _sunIntensity * (sunUp ? sunI : moonI) * (dark > 0 ? 0.15f : 1f) + _flash * 1.5f;
+                // Under a closed sky the light is diffuse: the sun much weaker, its shadows faint.
+                _sun.intensity = _sunIntensity * (sunUp ? sunI : moonI) * (dark > 0 ? 0.15f : 1f) * Mathf.Lerp(1f, 0.4f, Overcast) + _flash * 1.5f;
+                _sun.shadowStrength = _shadowStrength * Mathf.Lerp(1f, 0.3f, Overcast);
             }
 
             // Ambient light from the sky's own colours: dark at night, darker in dungeons, greyer under heavy cloud, warm
@@ -190,7 +214,9 @@ namespace UOGame
             _sky.SetFloat("_CloudDark", weather.CloudDark);
             _sky.SetVector("_CloudOffset", _cloudOffset);
             _sky.SetFloat("_Flash", _flash);
-            _sky.SetFloat("_Stars", Mathf.Lerp(1.6f, 0f, weather.Clouds * 0.5f));
+            // Rain or snow means a fully overcast sky: cloud from horizon to horizon, no sun, moon or stars.
+            _sky.SetFloat("_Overcast", Overcast);
+            _sky.SetFloat("_Stars", Mathf.Lerp(1.6f, 0f, weather.Clouds * 0.5f) * (1f - Overcast));
         }
 
         private float _reflectDay = -1f, _reflectClouds = -1f, _nextReflect;
@@ -219,6 +245,7 @@ namespace UOGame
 
         private void UpdateFog(WorldRules.Weather weather, float day, float dark)
         {
+            Fog = weather.Fog;
             float fog = Mathf.Max(weather.Fog, dark * 0.5f);
             RenderSettings.fog = fog > 0.01f;
             if (!RenderSettings.fog)
@@ -292,6 +319,161 @@ namespace UOGame
             Vector3 above = cam != null ? cam.transform.position + Vector3.up * 18f : transform.position;
             Place(_rain, dungeon ? 0f : weather.Rain * 5000f, above, weather.Wind);
             Place(_snow, dungeon ? 0f : weather.Snow * 900f, above, weather.Wind);
+            UpdateCover(cam);
+            KeepOut(_rain);
+            KeepOut(_snow);
+        }
+
+        // ------------------------------------------------------------------ roofs keep the weather out
+
+        // What's overhead round the camera, half a metre square at a time: the height of the first solid thing a drop
+        // would land on (a roof, a floor, the ground). A drop goes as it reaches the highest cover of its square and the
+        // squares beside it, so none slip in where a roof's edge crosses a square, and a frame early, so none show for a
+        // frame under the roof. Plants and creatures don't count. Unmeasured squares come first, a few hundred a frame;
+        // the rest are measured again in turn (keeping what they had meanwhile), so doors, ships and houses are noticed.
+        private const float CoverCell = 0.5f;
+        private const int CoverSpan = 160;          // squares across the map: 80 m, past the rain's 44 m and its drift
+        private const int CoverPerFrame = 500;
+        private readonly float[] _coverHeight = new float[CoverSpan * CoverSpan];
+        private readonly int[] _coverKey = new int[CoverSpan * CoverSpan];   // which square each slot holds (0: none)
+        private readonly Queue<Vector2Int> _coverWanted = new Queue<Vector2Int>();
+        private readonly HashSet<Vector2Int> _coverQueued = new HashSet<Vector2Int>();
+        private readonly RaycastHit[] _coverHits = new RaycastHit[16];
+        private ParticleSystem.Particle[] _drops = new ParticleSystem.Particle[0];
+        private int _coverSweep;
+        private int _coverMask = -1;
+        private float _coverTop;
+        private Vector2Int _coverCentre;
+
+        private static int Key(int x, int z) => (x & 0xFFFF) << 16 | z & 0xFFFF | 1 << 31; // never 0
+
+        private static int Slot(int x, int z) => ((x % CoverSpan + CoverSpan) % CoverSpan) * CoverSpan + (z % CoverSpan + CoverSpan) % CoverSpan;
+
+        private void UpdateCover(Camera cam)
+        {
+            if (cam == null || (_rain == null || _rain.particleCount == 0) && (_snow == null || _snow.particleCount == 0))
+            {
+                return;
+            }
+
+            if (_coverMask == -1)
+            {
+                int plants = LayerMask.NameToLayer(UOClient.MapRenderer.VegetationLayerName);
+                _coverMask = plants >= 0 ? ~(1 << plants) : ~0;
+            }
+
+            Vector3 at = cam.transform.position;
+            _coverTop = at.y + 40f;
+            _coverCentre = new Vector2Int(Mathf.FloorToInt(at.x / CoverCell), Mathf.FloorToInt(at.z / CoverCell));
+            int budget = CoverPerFrame;
+            for (; budget > 0 && _coverWanted.Count > 0; budget--)
+            {
+                Vector2Int cell = _coverWanted.Dequeue();
+                _coverQueued.Remove(cell);
+                Measure(cell.x, cell.y);
+            }
+
+            // Then the known squares again, in turn, round the camera.
+            const int Half = 48; // 24 m each way: where the rain falls
+            for (; budget > 0; budget--)
+            {
+                _coverSweep = (_coverSweep + 1) % (Half * 2 * Half * 2);
+                int x = _coverCentre.x - Half + _coverSweep / (Half * 2), z = _coverCentre.y - Half + _coverSweep % (Half * 2);
+                if (_coverKey[Slot(x, z)] == Key(x, z))
+                {
+                    Measure(x, z);
+                }
+            }
+        }
+
+        /// <summary>The top of the highest solid thing over a square (not plants or creatures), or far below.</summary>
+        private void Measure(int x, int z)
+        {
+            var from = new Vector3((x + 0.5f) * CoverCell, _coverTop, (z + 0.5f) * CoverCell);
+            int n = Physics.RaycastNonAlloc(from, Vector3.down, _coverHits, 120f, _coverMask, QueryTriggerInteraction.Ignore);
+            float best = float.NegativeInfinity;
+            for (int i = 0; i < n; i++)
+            {
+                RaycastHit h = _coverHits[i];
+                if (h.point.y > best && h.collider.GetComponentInParent<Combat.Combatant>() == null)
+                {
+                    best = h.point.y;
+                }
+            }
+
+            int slot = Slot(x, z);
+            _coverKey[slot] = Key(x, z);
+            _coverHeight[slot] = best;
+        }
+
+        /// <summary>The cover over a square, or false (and it's asked for) when it hasn't been measured.</summary>
+        private bool Cover(int x, int z, out float top)
+        {
+            int slot = Slot(x, z);
+            if (_coverKey[slot] == Key(x, z))
+            {
+                top = _coverHeight[slot];
+                return true;
+            }
+
+            var cell = new Vector2Int(x, z);
+            if (_coverQueued.Add(cell))
+            {
+                _coverWanted.Enqueue(cell);
+            }
+
+            top = float.NegativeInfinity;
+            return false;
+        }
+
+        /// <summary>Drops that have reached what's overhead (or will this frame) go.</summary>
+        private void KeepOut(ParticleSystem ps)
+        {
+            if (ps == null || ps.particleCount == 0)
+            {
+                return;
+            }
+
+            if (_drops.Length < ps.main.maxParticles)
+            {
+                _drops = new ParticleSystem.Particle[ps.main.maxParticles];
+            }
+
+            int count = ps.GetParticles(_drops);
+            float ahead = 30f * Time.deltaTime * 1.5f + 0.05f; // how far the fastest drop falls before it's next drawn
+            bool changed = false;
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 p = _drops[i].position;
+                int x = Mathf.FloorToInt(p.x / CoverCell), z = Mathf.FloorToInt(p.z / CoverCell);
+                if (!Cover(x, z, out float top))
+                {
+                    continue;
+                }
+
+                // The highest cover here and beside it.
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    for (int dz = -1; dz <= 1; dz++)
+                    {
+                        if ((dx != 0 || dz != 0) && Cover(x + dx, z + dz, out float side) && side > top)
+                        {
+                            top = side;
+                        }
+                    }
+                }
+
+                if (p.y <= top + ahead)
+                {
+                    _drops[i].remainingLifetime = 0f;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                ps.SetParticles(_drops, count);
+            }
         }
 
         private static void Place(ParticleSystem ps, float rate, Vector3 at, float wind)

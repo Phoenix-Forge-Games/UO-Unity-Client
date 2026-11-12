@@ -42,6 +42,15 @@ namespace UOClient.World
                 new Vector2((uoX - West) * SyntyKit.Unit, (South - uoY) * SyntyKit.Unit);
         }
 
+        /// <summary>
+        /// Buildings that are one tall hall: every storey above the ground floor is left open to it (no floor, no
+        /// stairs), up to the roof. By the house's anchor tile.
+        /// </summary>
+        private static readonly HashSet<(int X, int Y)> TallHalls = new HashSet<(int X, int Y)>
+        {
+            (1424, 1675), // the Bank of Britain
+        };
+
         public static Vector3 RootPosition(HouseLayout layout)
         {
             Grid grid = GridFor(layout);
@@ -102,6 +111,14 @@ namespace UOClient.World
                 {
                     int built = storey * repeat + k;
                     List<SyntyRoom> rooms = Rooms(cells, built);
+                    if (built > 0 && TallHalls.Contains((layout.Anchor.X, layout.Anchor.Y)))
+                    {
+                        foreach (SyntyRoom room in rooms)
+                        {
+                            room.NoFloor = true; // open to the hall below: no deck, so no stair up either
+                        }
+                    }
+
                     if (built == 0)
                     {
                         spec.Rooms = rooms;
@@ -141,6 +158,161 @@ namespace UOClient.World
             }
 
             return spec;
+        }
+
+        /// <summary>
+        /// A castle-masonry building (<see cref="HouseLayout.Castle"/>) as a <see cref="SyntyCastle"/> for the castle
+        /// kit: the same footprint, one unit per tile, but tall. Each UO storey is a 5 m castle level and one more
+        /// level crowns it, so the smallest gatehouse stands 10 m to its battlements. Built at
+        /// <see cref="RootPosition"/> like a house.
+        /// </summary>
+        public static SyntyCastle CastlePlan(HouseLayout layout)
+        {
+            Grid grid = GridFor(layout);
+            var castle = new SyntyCastle { Name = $"Castle_{layout.Anchor.X}_{layout.Anchor.Y}" };
+            HashSet<Vector2Int> previous = null;
+            foreach (HashSet<(int X, int Y)> storey in layout.Storeys)
+            {
+                HashSet<Vector2Int> cells = Cells(grid, storey);
+                if (previous != null)
+                {
+                    cells.IntersectWith(previous); // nothing hangs in the air
+                }
+
+                if (cells.Count == 0)
+                {
+                    break;
+                }
+
+                castle.Levels.Add(cells);
+                previous = cells;
+            }
+
+            if (castle.Levels.Count == 0)
+            {
+                return null;
+            }
+
+            castle.Levels.Add(new HashSet<Vector2Int>(previous));
+            foreach ((Vector2 point, int width) in DoorPoints(grid, layout.Doors))
+            {
+                castle.Doors.Add((point, width));
+            }
+
+            int drop = layout.FloorZ - layout.GroundZ;
+            castle.FoundationDepth = drop > 2 ? drop * WorldSpace.ZScale + 0.25f : 0f;
+            AddOutworks(layout, grid, castle);
+            return castle;
+        }
+
+        /// <summary>
+        /// The castle's outworks in the builder's terms. UO heights are stretched by the same factor as the castle
+        /// (its UO storeys against its built levels), so a wall-walk meets the castle's battlements and an arcade
+        /// rises with the keep. Pieces of the castle's own outline (its north and west walls, its corner posts, the
+        /// paving along the top of its walls) are the castle's, not outworks, and are left out.
+        /// </summary>
+        private static void AddOutworks(HouseLayout layout, Grid grid, SyntyCastle castle)
+        {
+            if (layout.OutworkPieces.Count == 0)
+            {
+                return;
+            }
+
+            HashSet<(int X, int Y)> ground = layout.Ground;
+            // A castle level (5 m) per UO storey (20): the outworks keep UO's own proportions rather than the keep's
+            // extra crowning level, so an arcade stays an arcade beside the tower.
+            const float scale = SyntyCastleBuilder.LevelHeight / 20f;
+            float M(int z) => Mathf.Max(0f, (z - layout.FloorZ) * scale);
+
+            bool Ring(int x, int y)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++)
+                    if (ground.Contains((x + dx, y + dy))) return true;
+                return false;
+            }
+
+            var pillars = new Dictionary<(int X, int Y), (float Top, bool Buttress)>();
+            var eastWalls = new HashSet<(int X, int Y)>();
+            var southWalls = new HashSet<(int X, int Y)>();
+            foreach (OutworkPiece p in layout.OutworkPieces)
+            {
+                if (p.Kind == OutworkKind.Wall || p.Kind == OutworkKind.Arch)
+                {
+                    if ((p.Edges & WallEdges.East) != 0) eastWalls.Add((p.X, p.Y));
+                    if ((p.Edges & WallEdges.South) != 0) southWalls.Add((p.X, p.Y));
+                }
+            }
+
+            foreach (OutworkPiece p in layout.OutworkPieces)
+            {
+                switch (p.Kind)
+                {
+                    case OutworkKind.Wall:
+                    case OutworkKind.Arch:
+                    {
+                        bool arch = p.Kind == OutworkKind.Arch;
+                        bool full = (p.Edges & WallEdges.Full) != 0;
+                        if ((p.Edges & WallEdges.South) != 0 || full)
+                        {
+                            // The tile's south edge: between (x, y) and (x, y + 1).
+                            if (ground.Contains((p.X, p.Y)) == ground.Contains((p.X, p.Y + 1)))
+                            {
+                                castle.OutworkWalls.Add((true, grid.South - p.Y - 1, p.X - grid.West, M(p.Z), M(p.Top), arch));
+                            }
+                        }
+
+                        if ((p.Edges & WallEdges.East) != 0 || full)
+                        {
+                            if (ground.Contains((p.X, p.Y)) == ground.Contains((p.X + 1, p.Y)))
+                            {
+                                castle.OutworkWalls.Add((false, p.X + 1 - grid.West, grid.South - p.Y - 1, M(p.Z), M(p.Top), arch));
+                            }
+                        }
+
+                        break;
+                    }
+                    case OutworkKind.Pillar:
+                    case OutworkKind.Buttress:
+                    {
+                        if (Ring(p.X, p.Y))
+                        {
+                            break;
+                        }
+
+                        pillars.TryGetValue((p.X, p.Y), out var known);
+                        pillars[(p.X, p.Y)] = (Mathf.Max(known.Top, M(p.Top)), known.Buttress || p.Kind == OutworkKind.Buttress);
+                        break;
+                    }
+                    case OutworkKind.Water:
+                        castle.Pools.Add(new Vector2Int(p.X - grid.West, grid.South - 1 - p.Y));
+                        break;
+                    case OutworkKind.Deck:
+                    {
+                        if (Ring(p.X, p.Y))
+                        {
+                            break;
+                        }
+
+                        var cell = new Vector2Int(p.X - grid.West, grid.South - 1 - p.Y);
+                        castle.Decks.TryGetValue(cell, out float y);
+                        castle.Decks[cell] = Mathf.Max(y, M(p.Z));
+                        break;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<(int X, int Y), (float Top, bool Buttress)> pillar in pillars)
+            {
+                // A pillar standing in a wall line (UO puts it on the tile beside the edge) goes onto that line.
+                (int px, int py) = pillar.Key;
+                float ux = px + 0.5f, uy = py + 0.5f;
+                if (eastWalls.Contains((px, py - 1)) || eastWalls.Contains((px, py + 1))) ux = px + 1;
+                else if (eastWalls.Contains((px - 1, py - 1)) || eastWalls.Contains((px - 1, py + 1))) ux = px;
+                if (southWalls.Contains((px - 1, py)) || southWalls.Contains((px + 1, py))) uy = py + 1;
+                else if (southWalls.Contains((px - 1, py - 1)) || southWalls.Contains((px + 1, py - 1))) uy = py;
+                castle.Pillars.Add((grid.Local(ux, uy), pillar.Value.Top, pillar.Value.Buttress));
+            }
         }
 
         /// <summary>The porch (open veranda, lean-to) as open-sided rooms beside the house's own.</summary>

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abe10fa2cc288824fb8379d942ffcaf2, type: 3}
+  m_Name: AudioSettings
+  m_EditorClassIdentifier: PhoenixForgeGames.Audio.Runtime::PhoenixForgeGames.Audio.Constants.ForgeAudioConstants
+  audioContainerName: Game Audio
+  masterVolumeKey: uo.volume.master
+  defaultMasterVolume: 0.8
+  ambientVolumeKey: uo.volume.ambient
+  defaultAmbientVolume: 0.5
+  musicVolumeKey: uo.volume.music
+  defaultMusicVolume: 0.45
+  voiceVolumeKey: uo.volume.voice
+  defaultVoiceVolume: 0.75
+  sfxVolumeKey: uo.volume.sfx
+  defaultSfxVolume: 0.8
+  uiSfxVolumeKey: uo.volume.ui
+  defaultUiSfxVolume: 0.6

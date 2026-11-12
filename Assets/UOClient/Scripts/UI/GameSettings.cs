@@ -28,6 +28,10 @@ namespace UOClient
         public int ViewDistance = 1;
         /// <summary>0 off, 1 near (one terrain chunk around you), 2 far.</summary>
         public int GrassRange = 1;
+        /// <summary>How many lamps may light the world at once: 0 fewer (24), 1 normal (48), 2 many (96).</summary>
+        public int LampLights = 1;
+        /// <summary>How many of the nearest lamps cast shadows: 0 none, 1 two, 2 four, 3 eight.</summary>
+        public int LampShadows = 2;
 
         // ---- Controls ----
         /// <summary>The player's rebound keys (Input System binding overrides as JSON).</summary>

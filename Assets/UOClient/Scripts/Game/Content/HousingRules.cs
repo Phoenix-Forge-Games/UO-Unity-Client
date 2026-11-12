@@ -331,7 +331,6 @@ namespace UOGame.Content
 
         // ------------------------------------------------------------------ claiming land
 
-        /// <summary>The name of the town or place a tile is in (its named region), or null out in the wilds.</summary>
         /// <summary>Dungeon areas (Regions.json DungeonRegion): always dark (World.json Light.Dungeon).</summary>
         private static readonly List<(int Facet, RectInt Rect)> Dungeons = new List<(int, RectInt)>();
 
@@ -348,6 +347,7 @@ namespace UOGame.Content
             return false;
         }
 
+        /// <summary>The name of the town or place a tile is in (its named region), or null out in the wilds.</summary>
         public static string PlaceName(int facet, int x, int y)
         {
             foreach (Region r in Regions)

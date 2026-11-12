@@ -25,6 +25,19 @@ namespace UOClient
         private readonly Dictionary<(int X, int Y), HouseLayout> _roofZone = new Dictionary<(int X, int Y), HouseLayout>();
         private readonly HashSet<(int X, int Y)> _scanned = new HashSet<(int X, int Y)>();
 
+        /// <summary>
+        /// Tiles whose castle masonry belongs to a castle house: its corner posts and towers, its battlements and
+        /// merlons, and the gateway arches and parapets that run out from it. The generated keep stands in for all
+        /// of it; drawn tile by tile at UO's heights it is the jumble of stone blocks round a building twice as tall.
+        /// </summary>
+        private readonly Dictionary<(int X, int Y), HouseLayout> _castleWork = new Dictionary<(int X, int Y), HouseLayout>();
+
+        /// <summary>How far from a castle house its connected masonry (a gatehouse, a walled walk) is claimed.</summary>
+        private const int CastleReach = 64;
+
+        /// <summary>Blocks whose neighbourhood (<see cref="CastleReach"/>) has been scanned for castle houses.</summary>
+        private readonly HashSet<(int X, int Y)> _castleReady = new HashSet<(int X, int Y)>();
+
         public HouseIndex(MapFacet map, TileData tiles, StaticArt art, WallShapes walls)
         {
             _map = map;
@@ -121,6 +134,9 @@ namespace UOClient
             // Clear everything known about the whole area, then mark its blocks unscanned and to be rebuilt.
             RemoveWhere(_footprint, minX, minY, maxX, maxY);
             RemoveWhere(_roofZone, minX, minY, maxX, maxY);
+            RemoveWhere(_castleWork, minX - CastleReach, minY - CastleReach, maxX + CastleReach, maxY + CastleReach);
+            _castleReady.Clear();
+            _outworkTiles.RemoveWhere(t => t.X >= minX - CastleReach && t.X <= maxX + CastleReach && t.Y >= minY - CastleReach && t.Y <= maxY + CastleReach);
             _visited.RemoveWhere(t => t.X >= minX && t.X <= maxX && t.Y >= minY && t.Y <= maxY);
             _detector.Forget(minX, minY, maxX, maxY);
             for (int by = minY >> 3; by <= maxY >> 3; by++)
@@ -185,6 +201,219 @@ namespace UOClient
                     }
                 }
             }
+
+            if (house.Castle)
+            {
+                _castles.Add(house);
+                _outworkTiles.UnionWith(house.Outworks);
+                _foundOutworks[house] = new HashSet<(int X, int Y)>(house.Outworks);
+                ClaimCastleWork(house, tiles);
+            }
+        }
+
+        private readonly HashSet<HouseLayout> _castles = new HashSet<HouseLayout>();
+
+        /// <summary>Every castle's outwork tiles as found (before <see cref="ResolveOutworks"/> shares them out).</summary>
+        private readonly HashSet<(int X, int Y)> _outworkTiles = new HashSet<(int X, int Y)>();
+
+        /// <summary>
+        /// Before a castle is built: keeps only the outworks it owns. Castles joined by one structure (towers on a
+        /// wall-walk) all reach it, and each tile is built once, by the castle whose footprint is nearest (ties to
+        /// the north-west-most anchor). Every castle that could reach is scanned first, so the answer does not
+        /// depend on which blocks happened to load before.
+        /// </summary>
+        public void ResolveOutworks(HouseLayout house)
+        {
+            if (!house.Castle || house.Outworks.Count == 0)
+            {
+                return;
+            }
+
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            foreach ((int x, int y) in house.Outworks)
+            {
+                minX = Math.Min(minX, x); minY = Math.Min(minY, y); maxX = Math.Max(maxX, x); maxY = Math.Max(maxY, y);
+            }
+
+            int reach = CastleReach + 1;
+            for (int by = (minY - reach) >> 3; by <= (maxY + reach) >> 3; by++)
+            for (int bx = (minX - reach) >> 3; bx <= (maxX + reach) >> 3; bx++)
+                EnsureScanned(bx, by);
+
+            var rivals = new List<HouseLayout>();
+            foreach (HouseLayout other in _castles)
+            {
+                if (other != house && _footprint.TryGetValue(other.Anchor, out HouseLayout live) && live == other &&
+                    other.MaxX >= minX - reach && other.MinX <= maxX + reach && other.MaxY >= minY - reach && other.MinY <= maxY + reach)
+                {
+                    rivals.Add(other);
+                }
+            }
+
+            if (rivals.Count == 0)
+            {
+                return;
+            }
+
+            // A whole structure (a connected run of outworks) goes to one castle, so a wall-walk is never split
+            // between the towers along it: the castle nearest to any part of it, ties to the north-west-most anchor.
+            HashSet<(int X, int Y)> mineAll = _foundOutworks[house];
+            foreach (HashSet<(int X, int Y)> part in Components(mineAll))
+            {
+                int mine = MinDistance(house, part);
+                foreach (HouseLayout other in rivals)
+                {
+                    if (!_foundOutworks.TryGetValue(other, out HashSet<(int X, int Y)> theirsAll) || !theirsAll.Overlaps(part))
+                    {
+                        continue;
+                    }
+
+                    int theirs = MinDistance(other, part);
+                    if (theirs < mine || (theirs == mine && (other.Anchor.Y < house.Anchor.Y ||
+                        (other.Anchor.Y == house.Anchor.Y && other.Anchor.X < house.Anchor.X))))
+                    {
+                        house.Outworks.ExceptWith(part);
+                        break;
+                    }
+                }
+            }
+
+            house.OutworkPieces.RemoveAll(p => p.Kind != OutworkKind.Water && !house.Outworks.Contains((p.X, p.Y)));
+        }
+
+        /// <summary>
+        /// Statics a hand-finished castle prefab took over (its "Absorbed" group: a signpost by the gate, say), named
+        /// <c>UOStatic_&lt;graphic hex&gt;_&lt;x&gt;_&lt;y&gt;_&lt;z&gt;</c>. The prefab draws them now, so the map must not.
+        /// </summary>
+        private readonly HashSet<(ushort Graphic, int X, int Y, int Z)> _absorbed = new HashSet<(ushort, int, int, int)>();
+
+        private void AbsorbOverrideStatics(HouseLayout house)
+        {
+#if UNITY_EDITOR
+            string path = $"{HouseBuilder.CastleOverrideFolder}/Castle_{house.Anchor.X}_{house.Anchor.Y}.prefab";
+            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(path);
+            UnityEngine.Transform group = prefab != null ? prefab.transform.Find("Absorbed") : null;
+            if (group == null)
+            {
+                return;
+            }
+
+            foreach (UnityEngine.Transform child in group)
+            {
+                string[] parts = child.name.Split('_');
+                if (parts.Length == 5 && parts[0] == "UOStatic" &&
+                    ushort.TryParse(parts[1], System.Globalization.NumberStyles.HexNumber, null, out ushort graphic) &&
+                    int.TryParse(parts[2], out int x) && int.TryParse(parts[3], out int y) && int.TryParse(parts[4], out int z))
+                {
+                    _absorbed.Add((graphic, x, y, z));
+                }
+            }
+#endif
+        }
+
+        /// <summary>Every castle's outworks as its detector found them, before any were given to another castle.</summary>
+        private readonly Dictionary<HouseLayout, HashSet<(int X, int Y)>> _foundOutworks = new Dictionary<HouseLayout, HashSet<(int X, int Y)>>();
+
+        private static int MinDistance(HouseLayout house, HashSet<(int X, int Y)> tiles)
+        {
+            int best = int.MaxValue;
+            foreach ((int X, int Y) t in tiles)
+            {
+                best = Math.Min(best, Distance(house, t));
+            }
+
+            return best;
+        }
+
+        /// <summary>The tiles split into groups joined side by side or corner to corner.</summary>
+        private static List<HashSet<(int X, int Y)>> Components(HashSet<(int X, int Y)> tiles)
+        {
+            var parts = new List<HashSet<(int X, int Y)>>();
+            var left = new HashSet<(int X, int Y)>(tiles);
+            var order = new List<(int X, int Y)>(tiles);
+            order.Sort((a, b) => a.Y != b.Y ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
+            foreach ((int X, int Y) start in order)
+            {
+                if (!left.Remove(start))
+                {
+                    continue;
+                }
+
+                var part = new HashSet<(int X, int Y)> { start };
+                var queue = new Queue<(int X, int Y)>();
+                queue.Enqueue(start);
+                while (queue.Count > 0)
+                {
+                    (int x, int y) = queue.Dequeue();
+                    for (int dy = -1; dy <= 1; dy++)
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        if (left.Remove((x + dx, y + dy)))
+                        {
+                            part.Add((x + dx, y + dy));
+                            queue.Enqueue((x + dx, y + dy));
+                        }
+                    }
+                }
+
+                parts.Add(part);
+            }
+
+            return parts;
+        }
+
+        /// <summary>Chebyshev distance from a tile to a house's footprint rectangle.</summary>
+        private static int Distance(HouseLayout house, (int X, int Y) t) =>
+            Math.Max(Math.Max(house.MinX - t.X, t.X - house.MaxX), Math.Max(Math.Max(house.MinY - t.Y, t.Y - house.MaxY), 0));
+
+        /// <summary>
+        /// A castle house's own masonry (its footprint and the ring round it: the north and west walls, corner
+        /// posts, battlements) and its outworks (<see cref="HouseLayout.Outworks"/>), all built with the castle.
+        /// A tile in another house's footprint stays that house's.
+        /// </summary>
+        private void ClaimCastleWork(HouseLayout house, HashSet<(int X, int Y)> tiles)
+        {
+            AbsorbOverrideStatics(house);
+            var claim = new HashSet<(int X, int Y)>(house.Outworks);
+            foreach ((int x, int y) in tiles)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++)
+                    claim.Add((x + dx, y + dy));
+            }
+
+            foreach ((int X, int Y) t in claim)
+            {
+                if (_footprint.TryGetValue(t, out HouseLayout other) && other != house)
+                {
+                    continue;
+                }
+
+                if (!_castleWork.ContainsKey(t))
+                {
+                    _castleWork[t] = house;
+                }
+            }
+        }
+
+        /// <summary>The castle house owning the masonry on this tile, with every block it could be anchored in scanned.</summary>
+        private bool CastleWorkAt(int x, int y, out HouseLayout house)
+        {
+            if (!_castleReady.Add((x >> 3, y >> 3)))
+            {
+                return _castleWork.TryGetValue((x, y), out house);
+            }
+
+            int reach = CastleReach + 1;
+            for (int by = (y - reach) >> 3; by <= (y + reach) >> 3; by++)
+            {
+                for (int bx = (x - reach) >> 3; bx <= (x + reach) >> 3; bx++)
+                {
+                    EnsureScanned(bx, by);
+                }
+            }
+
+            return _castleWork.TryGetValue((x, y), out house);
         }
 
         /// <summary>
@@ -239,6 +468,26 @@ namespace UOClient
         /// <summary>Does a generated house replace this static?</summary>
         public bool Claims(StaticTileInfo info, ushort graphic, int x, int y, int z)
         {
+            // Castles that could own it are registered first (and their prefabs read). Cached per block.
+            CastleWorkAt(x, y, out _);
+            if (_absorbed.Contains((graphic, x, y, z)))
+            {
+                return true;
+            }
+
+            if (HouseLayout.IsCastleWall(graphic) && CastleWorkAt(x, y, out HouseLayout keep) &&
+                z >= keep.FloorZ - FoundationDepth && z < Top(keep) + StoreyZ * 3)
+            {
+                return true;
+            }
+
+            // The walkway decks of a castle's outworks (wall-walks, the top of an arcade) are built with it.
+            if (info.Is(TileFlag.Surface) && info.Height <= 2 && !_footprint.ContainsKey((x, y)) &&
+                CastleWorkAt(x, y, out HouseLayout walled) && _outworkTiles.Contains((x, y)) && z >= walled.FloorZ + 10)
+            {
+                return true;
+            }
+
             if (info.Is(TileFlag.Roof))
             {
                 return _roofZone.TryGetValue((x, y), out HouseLayout roofed) && z >= roofed.FloorZ + 10;

@@ -28,7 +28,7 @@ internal static class StaticsProbe
                         continue;
                     }
 
-                    if (info.Is(TileFlag.Roof)) continue;
+                    if (info.Is(TileFlag.Roof) && Environment.GetEnvironmentVariable("ALL") != "1") continue;
                     Console.WriteLine($"{x},{y},{s.Z}\t0x{s.Graphic:X4}\t{info.Name}\th{info.Height}\t{shapes.Get(s.Graphic)}\t{info.Flags}");
                 }
             }

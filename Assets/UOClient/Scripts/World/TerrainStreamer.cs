@@ -550,7 +550,11 @@ namespace UOClient
             return splat;
         }
 
-        /// <summary>One entry per tile; false makes a hole. Unity indexes holes [row, col] like heights.</summary>
+        /// <summary>
+        /// One entry per tile; false makes a hole. Unity indexes holes [row, col] like heights.
+        /// Water always keeps its ground: UO lays rivers, canals and ponds of water statics over "NoName" (void)
+        /// land, and a hole there leaves nothing under the water (it has no collider) to stand on or wade through.
+        /// </summary>
         private bool[,] BuildHoles(int originX, int originY)
         {
             var solid = new bool[ChunkTiles, ChunkTiles];
@@ -559,7 +563,8 @@ namespace UOClient
                 int y = originY + ChunkTiles - 1 - row;
                 for (int col = 0; col < ChunkTiles; col++)
                 {
-                    solid[row, col] = LandClassifier.Get(_map.GetLand(originX + col, y).TileId) != LandKind.Void;
+                    int x = originX + col;
+                    solid[row, col] = LandClassifier.Get(_map.GetLand(x, y).TileId) != LandKind.Void || WaterZAt(x, y).HasValue;
                 }
             }
 

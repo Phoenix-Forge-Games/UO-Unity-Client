@@ -40,6 +40,28 @@ namespace UOClient.Bake
         public bool Done => _next >= _queue.Count;
         public ChunkWriter Writer => _writer;
 
+        /// <summary>A finished chunk about to be written, for the game to seed its own props into.</summary>
+        public sealed class ChunkSeed
+        {
+            public int Facet;
+            /// <summary>The chunk, in chunk coordinates.</summary>
+            public Vector2Int Chunk;
+            /// <summary>Its map blocks: what's under them is written.</summary>
+            public List<GameObject> Blocks;
+            /// <summary>Its terrain (with a terrain collider).</summary>
+            public GameObject Terrain;
+            /// <summary>Everything built round it (neighbouring blocks too), for looking about.</summary>
+            public Transform World;
+            public MapFacet Map;
+        }
+
+        /// <summary>
+        /// Called on every chunk just before it is written: the game seeds its own props here (lanterns at doors, street
+        /// lamps) and drops map statics it draws its own way. Set by the game (the bake knows nothing of its rules).
+        /// </summary>
+        public static Action<ChunkSeed> SeedChunk;
+        private GameObject _terrainObject;
+
         /// <summary>What every static became; written as census-{facet}.md / .csv when the bake finishes.</summary>
         public StaticCensus Census { get; }
 
@@ -151,6 +173,7 @@ namespace UOClient.Bake
         {
             if (Current == chunk)
             {
+                _terrainObject = terrain;
                 _capture = TerrainCapture.From(terrain, data, used, bare, water);
             }
         }
@@ -197,6 +220,7 @@ namespace UOClient.Bake
                 }
             }
 
+            SeedChunk?.Invoke(new ChunkSeed { Facet = _facet, Chunk = chunk, Blocks = _roots, Terrain = _terrainObject, World = _root, Map = _map });
             byte[] bytes = _writer.Write(_facet, chunk.x, chunk.y, _roots, _capture);
             string path = Path.Combine(_folder, ChunkFormat.FileName(chunk.x, chunk.y));
             File.WriteAllBytes(path + ".tmp", bytes);

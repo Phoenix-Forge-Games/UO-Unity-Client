@@ -27,6 +27,7 @@ Shader "UOGame/Sky"
         _StarDensity ("Star density", Range(50, 600)) = 260
         _Clouds ("Cloud cover", Range(0, 1)) = 0.3
         _CloudDark ("Cloud darkness", Range(0, 1)) = 0
+        _Overcast ("Overcast (rain or snow: cloud from horizon to horizon)", Range(0, 1)) = 0
         _CloudOffset ("Cloud drift (xy)", Vector) = (0, 0, 0, 0)
         _CloudScale ("Cloud scale", Range(0.1, 4)) = 1.2
         _Flash ("Lightning flash", Range(0, 1)) = 0
@@ -50,7 +51,7 @@ Shader "UOGame/Sky"
                 float4 _SunDir, _MoonDir;
                 float4 _DayZenith, _DayHorizon, _NightZenith, _NightHorizon, _Sunset, _Ground, _SunColor, _MoonColor;
                 float _SunSize, _MoonSize, _MoonPhase, _Stars, _StarDensity;
-                float _Clouds, _CloudDark, _CloudScale, _Flash;
+                float _Clouds, _CloudDark, _Overcast, _CloudScale, _Flash;
                 float4 _CloudOffset;
             CBUFFER_END
 
@@ -186,13 +187,14 @@ Shader "UOGame/Sky"
                     col += _MoonColor.rgb * pow(saturate(md), 3000) * 0.3 * night;
                 }
 
-                // Clouds: a flat layer overhead seen in perspective, thinning toward the horizon.
-                if (up > 0.0 && _Clouds > 0.001)
+                // Clouds: a flat layer overhead seen in perspective, thinning toward the horizon. Overcast (rain or snow)
+                // closes every gap, down to the horizon, hiding the sun, moon and stars.
+                if (up > -0.05 && (_Clouds > 0.001 || _Overcast > 0.001))
                 {
                     float2 uv = dir.xz / (up + 0.12) * _CloudScale * 0.35 + _CloudOffset.xy;
                     float n = Fbm(uv) * 0.75 + Fbm(uv * 3.1 + 5.3) * 0.25;
-                    float cover = smoothstep(1.05 - _Clouds * 1.1, 1.3 - _Clouds * 1.1, n);
-                    float horizonFade = saturate(up * 6);
+                    float cover = lerp(smoothstep(1.05 - _Clouds * 1.1, 1.3 - _Clouds * 1.1, n), 1, _Overcast);
+                    float horizonFade = lerp(saturate(up * 6), 1, _Overcast);
                     float shade = saturate(n * 1.4 - 0.2); // thicker parts darker underneath
                     float3 dayCloud = lerp(float3(1, 1, 1), float3(0.42, 0.44, 0.48), saturate(_CloudDark * 0.8 + shade * 0.35));
                     dayCloud *= lerp(1, 0.55, _CloudDark);
@@ -201,9 +203,9 @@ Shader "UOGame/Sky"
                     nightCloud += _MoonColor.rgb * pow(saturate(dot(dir, moon)), 8) * 0.06 * (1 - _CloudDark);
                     float3 cloudCol = lerp(nightCloud, dayCloud, _Day);
                     cloudCol += float3(0.8, 0.85, 1.0) * _Flash * (0.6 + shade);
-                    col = lerp(col, cloudCol, cover * horizonFade * 0.95);
+                    col = lerp(col, cloudCol, cover * horizonFade * lerp(0.95, 1, _Overcast));
                     // Grey skies between the clouds too, as they close in.
-                    col = lerp(col, cloudCol * 0.9, saturate(_Clouds - 0.6) * 1.5 * horizonFade * _CloudDark);
+                    col = lerp(col, cloudCol * 0.9, saturate(saturate(_Clouds - 0.6) * 1.5 * _CloudDark + _Overcast * 0.35) * horizonFade);
                 }
 
                 col += float3(0.5, 0.55, 0.7) * _Flash * 0.35;

@@ -99,7 +99,7 @@ Before Addressables is installed, the editor already finds icons under `Assets/S
 | File | Assembly | Notes |
 |---|---|---|
 | `Scripts/Content/SecureArt.cs`, `SecureArtAddresses.cs` | UOClient | always compiled; no Addressables dependency |
-| `Scripts/Content/Addressables/*.cs` (`AddressablesArtBackend`, `EncryptedAssetBundleProvider`, `PatchPaths`) | UOClient.SecureArt.Addressables | compiled only when `com.unity.addressables` is installed (`versionDefines` → `UO_ADDRESSABLES` + `defineConstraints`) |
+| `Scripts/Content/Addressables/*.cs` (`AddressablesArtBackend`, `EncryptedAssetBundleProvider`, `PatchPaths`) | UOClient.SecureArt.Addressables | compiled only when `com.unity.addressables` is installed (`versionDefines` → `UO_ADDRESSABLES`) **and** the `UO_SECURE_ART` scripting define is set (Player settings). Addressables alone isn't enough: the Phoenix Forge Core package needs it too, and the backend must stay off until the encrypted content is built |
 | `Scripts/Content/Addressables/Editor/SecureArtBundles.cs` | UOClient.SecureArt.Editor | same gate; menu **UO Client > Secure Art > Build Content (encrypted)** and **Verify Built Content**; `EncryptProtectedBundles(folder)` for the updater's PatchBuild |
 | `Tools/SecureArt/SetupSecureArt.eval.cs` | eval | settings, profile, groups, entries, labels (idempotent) |
 | `Tools/SecureArt/ClearDirectArtRefs.eval.cs` | eval | last step: removes direct paid-art references from prefabs and the open scene (dry run by default) |

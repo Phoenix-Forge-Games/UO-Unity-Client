@@ -5,7 +5,7 @@
 .nameplate-name { color: rgb(235, 225, 200); font-size: 14px; -unity-font-style: bold; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9); }
 .nameplate-bubble { color: rgb(255, 255, 255); font-size: 14px; max-width: 320px; white-space: normal; -unity-text-align: middle-center;
     background-color: rgba(10, 10, 14, 0.75); border-radius: 6px; padding: 4px 8px; margin-bottom: 2px; }
-.chat { position: absolute; left: 16px; bottom: 16px; width: 440px; }
+.chat { position: absolute; left: 16px; bottom: 62px; width: 440px; }
 .chat-log { max-height: 220px; background-color: rgba(10, 10, 14, 0.35); border-radius: 4px; padding: 4px 6px; }
 .chat-line { color: rgb(230, 230, 230); font-size: 13px; white-space: normal; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); }
 .chat-input { margin-top: 4px; }

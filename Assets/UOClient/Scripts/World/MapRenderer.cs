@@ -277,6 +277,7 @@ namespace UOClient
                     continue;
                 }
 
+                _houses?.ResolveOutworks(house);
                 GameObject built = HouseBuilder.Build(house);
                 if (built == null)
                 {

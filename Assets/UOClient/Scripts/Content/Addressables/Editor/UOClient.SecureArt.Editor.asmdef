@@ -17,7 +17,8 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [
-        "UO_ADDRESSABLES"
+        "UO_ADDRESSABLES",
+        "UO_SECURE_ART"
     ],
     "versionDefines": [
         {

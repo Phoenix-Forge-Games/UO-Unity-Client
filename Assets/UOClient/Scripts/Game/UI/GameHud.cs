@@ -47,8 +47,43 @@ namespace UOGame.UI
             WorldServices.Said -= OnSaid;
         }
 
+        private VisualElement _hudRoot, _chat;
+        private float _chatActive;
+
+        /// <summary>Seconds with no chat in or out before the chat window fades away.</summary>
+        private const float ChatIdleSeconds = 12f;
+
+        /// <summary>
+        /// The chat window shows while lines come in or you're typing (Enter), and fades out after a quiet spell; it
+        /// comes back with the next line.
+        /// </summary>
+        private void UpdateChatFade()
+        {
+            if (_chat == null)
+            {
+                return;
+            }
+
+            bool typing = _input != null && !_input.ClassListContains("hidden");
+            if (typing)
+            {
+                _chatActive = Time.unscaledTime;
+            }
+
+            float target = Time.unscaledTime - _chatActive < ChatIdleSeconds ? 1f : 0f;
+            float now = _chat.resolvedStyle.opacity;
+            if (!Mathf.Approximately(now, target))
+            {
+                // Quick to appear, slow to go.
+                _chat.style.opacity = Mathf.MoveTowards(now, target, Time.unscaledDeltaTime * (target > now ? 6f : 0.7f));
+            }
+        }
+
         private void OnUIReload(PanelRenderer panelRenderer, VisualElement root, int version)
         {
+            _hudRoot = root;
+            _chat = root.Q("chat");
+            _chatActive = Time.unscaledTime;
             _plates = root.Q("nameplates");
             _doorPrompt = ControlPrompts.Create("{Use} Open");
             _doorPrompt.AddToClassList("door-prompt");
@@ -63,6 +98,17 @@ namespace UOGame.UI
 
         private void Update()
         {
+            // The HUD (and everything in its panel) only once you're in the world: not over the main menu.
+            if (_hudRoot != null)
+            {
+                DisplayStyle shown = PlayerMotor.Local != null ? DisplayStyle.Flex : DisplayStyle.None;
+                if (_hudRoot.style.display != shown)
+                {
+                    _hudRoot.style.display = shown;
+                }
+            }
+
+            UpdateChatFade();
             if (_input == null || PlayerMotor.Local == null)
             {
                 return;
@@ -125,6 +171,7 @@ namespace UOGame.UI
             var line = new Label($"{message.Speaker}: {message.Text}");
             line.AddToClassList("chat-line");
             _log.Add(line);
+            _chatActive = Time.unscaledTime; // a new line brings the chat back
             while (_log.contentContainer.childCount > MaxLines)
             {
                 _log.contentContainer.RemoveAt(0);

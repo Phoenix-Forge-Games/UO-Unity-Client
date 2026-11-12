@@ -14,13 +14,17 @@ namespace UOGame.UI
     /// (styles and colours from our content's rules), and a profession (ready-made stats, skills and kit) or your own
     /// stats and starting skills. It checks the same rules the server does, so Create is only offered when they hold;
     /// the server checks again and says why if it refuses.
+    /// Embedded (the main menu): it fills a panel the menu gives it, with no preview or buttons of its own; the menu
+    /// shows the look on a character in the scene (<see cref="LookChanged"/>) and submits (<see cref="Submit"/>) once
+    /// <see cref="Valid"/>.
     /// </summary>
     public sealed class CharacterCreator
     {
         private readonly VisualElement _overlay, _menu;
         private readonly Action<CreateCharacter> _send;
-        private readonly PaperdollStage _stage = new PaperdollStage();
+        private readonly PaperdollStage _stage;
         private readonly GameObject _holder;
+        private readonly bool _embedded;
         private readonly TextField _name;
         private readonly Label _problem, _statTotal, _skillTotal;
         private readonly VisualElement _custom, _beardRows, _professions;
@@ -42,33 +46,46 @@ namespace UOGame.UI
 
         public bool IsOpen => _overlay.style.display == DisplayStyle.Flex;
 
-        public CharacterCreator(VisualElement screen, Action<CreateCharacter> send)
+        /// <summary>Do the choices hold (a name, and stats and skills within the rules)?</summary>
+        public bool Valid { get; private set; }
+
+        /// <summary>Embedded: the look changed (dressed as the character would start).</summary>
+        public event Action<Look> LookChanged;
+
+        /// <summary>Embedded: <see cref="Valid"/> changed.</summary>
+        public event Action<bool> ValidityChanged;
+
+        public CharacterCreator(VisualElement screen, Action<CreateCharacter> send, bool embedded = false)
         {
             _send = send;
-            _holder = new GameObject("Creation Preview");
-            _holder.transform.position = new Vector3(0f, -2100f, 0f);
-            UnityEngine.Object.DontDestroyOnLoad(_holder);
-
-            _menu = screen.Q(className: "panel");
+            _embedded = embedded;
             _overlay = new VisualElement();
-            _overlay.AddToClassList("creator");
+            _overlay.AddToClassList(embedded ? "creator-embedded" : "creator");
             _overlay.style.display = DisplayStyle.None;
             screen.Add(_overlay);
 
-            var doll = new VisualElement();
-            doll.AddToClassList("creator-doll");
-            doll.style.backgroundImage = Background.FromRenderTexture(_stage.Texture);
-            doll.RegisterCallback<PointerMoveEvent>(e =>
+            if (!embedded)
             {
-                if ((e.pressedButtons & 1) != 0)
+                _stage = new PaperdollStage();
+                _holder = new GameObject("Creation Preview");
+                _holder.transform.position = new Vector3(0f, -2100f, 0f);
+                UnityEngine.Object.DontDestroyOnLoad(_holder);
+                _menu = screen.Q(className: "panel");
+                var doll = new VisualElement();
+                doll.AddToClassList("creator-doll");
+                doll.style.backgroundImage = Background.FromRenderTexture(_stage.Texture);
+                doll.RegisterCallback<PointerMoveEvent>(e =>
                 {
-                    _stage.Turn(-e.deltaPosition.x * 0.8f);
-                }
-            });
-            _overlay.Add(doll);
+                    if ((e.pressedButtons & 1) != 0)
+                    {
+                        _stage.Turn(-e.deltaPosition.x * 0.8f);
+                    }
+                });
+                _overlay.Add(doll);
+            }
 
             var side = new ScrollView();
-            side.AddToClassList("creator-side");
+            side.AddToClassList(embedded ? "creator-side-embedded" : "creator-side");
             _overlay.Add(side);
 
             side.Add(Heading("New character"));
@@ -178,7 +195,10 @@ namespace UOGame.UI
             cancel.AddToClassList("secondary-button");
             buttons.Add(_create);
             buttons.Add(cancel);
-            side.Add(buttons);
+            if (!embedded)
+            {
+                side.Add(buttons); // embedded: the menu has its own Start Game and Back
+            }
 
             foreach (SliderInt slider in new[] { _skin, _hairHue, _beardHue })
             {
@@ -214,7 +234,10 @@ namespace UOGame.UI
                 _menu.style.display = DisplayStyle.None;
             }
 
-            _stage.Showing = true;
+            if (_stage != null)
+            {
+                _stage.Showing = true;
+            }
         }
 
         public void Close()
@@ -225,7 +248,11 @@ namespace UOGame.UI
                 _menu.style.display = DisplayStyle.Flex;
             }
 
-            _stage.Showing = false;
+            if (_stage != null)
+            {
+                _stage.Showing = false;
+            }
+
             GameInput.SetTyping(false);
         }
 
@@ -234,8 +261,20 @@ namespace UOGame.UI
 
         public void Dispose()
         {
-            _stage.Dispose();
-            UnityEngine.Object.Destroy(_holder);
+            _stage?.Dispose();
+            if (_holder != null)
+            {
+                UnityEngine.Object.Destroy(_holder);
+            }
+        }
+
+        /// <summary>Embedded: make the character (when the choices hold).</summary>
+        public void Submit()
+        {
+            if (Valid)
+            {
+                Create();
+            }
         }
 
         // ------------------------------------------------------------------ choices
@@ -431,6 +470,12 @@ namespace UOGame.UI
 
             _problem.text = problem ?? string.Empty;
             _create.SetEnabled(problem == null);
+            if (Valid != (problem == null))
+            {
+                Valid = problem == null;
+                ValidityChanged?.Invoke(Valid);
+            }
+
             Preview();
         }
 
@@ -484,6 +529,17 @@ namespace UOGame.UI
 
             look.Gear = bySlot.Values.ToArray();
             string signature = $"{look.Female}|{look.Gargoyle}|{look.Skin}|{look.Hair}|{look.HairHue}|{look.Beard}|{look.BeardHue}|{_profession}|{string.Join(",", ChosenSkills())}";
+            if (_embedded)
+            {
+                if (signature != _built)
+                {
+                    _built = signature;
+                    LookChanged?.Invoke(look);
+                }
+
+                return;
+            }
+
             if (signature != _built && GameLook.Dresser != null)
             {
                 _built = signature;
@@ -501,7 +557,7 @@ namespace UOGame.UI
         /// <summary>Called every frame while open (the preview catches up after a rebuild).</summary>
         public void Tick()
         {
-            if (IsOpen)
+            if (IsOpen && _stage != null)
             {
                 _stage.Update(_built, _holder.transform);
             }

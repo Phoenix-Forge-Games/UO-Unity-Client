@@ -50,6 +50,11 @@ internal static class Program
             return StaticCensus.Run(args);
         }
 
+        if (args.Length > 0 && args[0] == "waterholes")
+        {
+            return WaterHoles.Run(args);
+        }
+
         if (args.Length > 0 && args[0] == "walk")
         {
             return WalkProbe.Run(args);

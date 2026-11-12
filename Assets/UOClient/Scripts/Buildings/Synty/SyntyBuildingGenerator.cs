@@ -651,14 +651,21 @@ namespace UOClient.Buildings.Synty
 
             for (int st = 0; st < spec.Storeys; st++)
             {
+                // A storey with no deck is the top of the hall below: no room of its own, and the hall's probe
+                // reaches up through it.
+                if (st > 0 && !HasFloor(spec, st)) continue;
+                int open = 0;
+                while (st + open + 1 < spec.Storeys && !HasFloor(spec, st + open + 1)) open++;
+
                 float floorY = SyntyKit.FloorY(st, spec.Plinth);
+                float height = SyntyKit.Headroom + (SyntyKit.FloorY(st + open, spec.Plinth) - floorY);
 
                 foreach (var r in spec.Floor(st))
                 {
                     var centre = new Vector3((r.X + r.X2) * 0.5f * U,
-                                             floorY + SyntyKit.Headroom * 0.5f,
+                                             floorY + height * 0.5f,
                                              (r.Z + r.Z2) * 0.5f * U);
-                    var size = new Vector3(r.W * U, SyntyKit.Headroom, r.D * U);
+                    var size = new Vector3(r.W * U, height, r.D * U);
 
                     BuildingRoomProbes.Add(functional, $"{r.Name}_{st}", centre, size);
                 }

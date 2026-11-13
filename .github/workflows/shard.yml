@@ -28,7 +28,10 @@ jobs:
       run:
         shell: powershell
     env:
-      PAID_ART_ROOT: ${{ vars.PAID_ART_ROOT || 'G:\Ultima Online\UnityClient' }}
+      # The private art repo (Phoenix-Forge-Games/britannia-reborn-art), filled before each push by its pre-push hook,
+      # and the persistent checkout this job uses. Docs/Shard.md.
+      ART_REPO_DIR: ${{ vars.ART_REPO_DIR || 'G:\Ultima Online\BritanniaRebornArt' }}
+      ART_CHECKOUT: ${{ vars.ART_CHECKOUT || 'G:\actions-runner-art' }}
       UNITY_EXE: ${{ vars.UNITY_EXE || 'G:\UnityInstalls\6000.6.8f1\Editor\Unity.exe' }}
       AZCOPY_EXE: ${{ vars.AZCOPY_EXE || 'azcopy' }}
       AZURE_RG: ${{ vars.AZURE_RG || 'phoenixforge-britannia' }}
@@ -70,10 +73,28 @@ jobs:
           lfs: true
           clean: false
 
-      - name: Link paid art from the owner's working copy
+      - name: Check out this commit's art
         run: |
-          $src = $env:PAID_ART_ROOT
-          if (-not (Test-Path (Join-Path $src 'Assets'))) { throw "PAID_ART_ROOT '$src' has no Assets folder." }
+          # The pre-push hook tagged the art for this exact commit as pub/<sha>.
+          $tag = "pub/$env:GITHUB_SHA"
+          git -C "$env:ART_REPO_DIR" rev-parse -q --verify "refs/tags/$tag" | Out-Null
+          if ($LASTEXITCODE -ne 0) {
+            git -C "$env:ART_REPO_DIR" fetch -q origin "refs/tags/${tag}:refs/tags/$tag"
+            if ($LASTEXITCODE -ne 0) { throw "No art tagged $tag: push from a machine with the art pre-push hook (Docs/Shard.md)." }
+          }
+          # A worktree of the art repo shares its LFS store, so a checkout copies nothing over the network.
+          if (-not (Test-Path (Join-Path $env:ART_CHECKOUT '.git'))) {
+            git -C "$env:ART_REPO_DIR" worktree add --detach "$env:ART_CHECKOUT" $tag
+          } else {
+            git -C "$env:ART_CHECKOUT" checkout -q --detach $tag
+          }
+          if ($LASTEXITCODE -ne 0) { throw "Couldn't check out $tag." }
+          "ART_ROOT=$env:ART_CHECKOUT" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Link the art into the project
+        run: |
+          $src = $env:ART_ROOT
+          if (-not (Test-Path (Join-Path $src 'Assets'))) { throw "The art checkout '$src' has no Assets folder." }
           # Whole git-ignored folders (Docs/SecureArt.md, .gitignore): junctions, plus their .meta files.
           foreach ($p in 'Assets\Synty', 'Assets\Secure', 'Assets\BK', 'Assets\AddressableAssetsData') {
             $from = Join-Path $src $p
@@ -84,10 +105,9 @@ jobs:
           }
           # Art files git-ignored inside tracked folders (Assets/UOClient images, models, audio; the SyntyWalls textures):
           # copied, only when newer. Robocopy exit codes below 8 are success.
-          robocopy "$src\Assets\UOClient" "$env:GITHUB_WORKSPACE\Assets\UOClient" *.png *.jpg *.jpeg *.tga *.psd *.exr *.fbx *.obj *.blend *.wav *.ogg *.mp3 /S /XO /NP /NFL /NDL /R:1 /W:1 | Out-Host
+          # The art repo's Assets/UOClient holds only those files (and their .meta), so copy all of it.
+          robocopy "$src\Assets\UOClient" "$env:GITHUB_WORKSPACE\Assets\UOClient" * /S /XO /NP /NFL /NDL /R:1 /W:1 | Out-Host
           if ($LASTEXITCODE -ge 8) { throw "Copying art failed ($LASTEXITCODE)." }
-          robocopy "$src\Assets\UOClient\Materials\SyntyWalls" "$env:GITHUB_WORKSPACE\Assets\UOClient\Materials\SyntyWalls" *.png.meta /XO /NP /NFL /NDL /R:1 /W:1 | Out-Host
-          if ($LASTEXITCODE -ge 8) { throw "Copying SyntyWalls metas failed ($LASTEXITCODE)." }
           $global:LASTEXITCODE = 0
 
       - name: Build the Linux server
@@ -121,7 +141,7 @@ jobs:
 
       - name: Sync WorldData to the world share
         run: |
-          $world = Join-Path $env:PAID_ART_ROOT 'WorldData'
+          $world = Join-Path $env:ART_ROOT 'WorldData'
           if (-not (Test-Path $world)) { throw "No WorldData at $world (bake it first)." }
           $expiry = (Get-Date).ToUniversalTime().AddHours(4).ToString('yyyy-MM-ddTHH:mmZ')
           $sas = az storage share generate-sas --name $env:WORLD_SHARE --account-name $env:STORAGE_ACCOUNT --account-key $env:STORAGE_KEY `

@@ -7,11 +7,12 @@ model is in `Docs/Shard.md`.
 ## What the workflow does
 
 1. **Build** on the self-hosted Windows runner (`self-hosted, windows, unity-build`: the owner's PC). Paid art isn't in
-   the repo, so it's linked in from the owner's working copy (`PAID_ART_ROOT`) with directory junctions, removed again
-   at the end. Unity then runs
+   the repo: it comes from the private art repo (Phoenix-Forge-Games/britannia-reborn-art) at tag `pub/<commit>`,
+   which the pre-push hook made when this commit was pushed (Docs/Shard.md). The job checks that tag out in a worktree
+   of the local art repo (`ART_CHECKOUT`) and links it in with directory junctions, removed again at the end. Unity then runs
    `-executeMethod UOClient.EditorTools.ServerBuilder.BuildLinuxFromCommandLine -buildOutput <context>\server`
    (StandaloneLinux64, Server subtarget, Mono).
-2. **World:** `azcopy sync` of `PAID_ART_ROOT\WorldData` to the file share `shard-world-<env>` (incremental: only
+2. **World:** `azcopy sync` of the art checkout's `WorldData` to the file share `shard-world-<env>` (incremental: only
    changed files move). Each environment has its own world share, so a develop sync never touches live.
 3. **Image:** `az acr build` with this folder's `Dockerfile` and the build in `server/` as the context; tagged
    `shard:<commit sha>` and `shard:<env>`.
@@ -42,7 +43,7 @@ model is in `Docs/Shard.md`.
   resource group: Contributor (deploy, ACR build, storage keys) plus Managed Identity Operator on the shard identity.
 - Repository variables: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RG`, `ACR_NAME`,
   `ACR_LOGIN_SERVER`, `STORAGE_ACCOUNT`, `SHARD_IDENTITY_ID`, `ACCOUNT_API` (e.g. `https://britanniareborn.com/api`),
-  optional `PAID_ART_ROOT`, `UNITY_EXE`, `AZCOPY_EXE`. Secret: `SHARD_KEY` (the website's shard key).
+  optional `ART_REPO_DIR`, `ART_CHECKOUT`, `UNITY_EXE`, `AZCOPY_EXE`. Secret: `SHARD_KEY` (the website's shard key).
 - The runner needs Unity 6000.6.8f1 with Linux Build Support (Mono), the Azure CLI, azcopy and Git LFS.
 
 ## By hand

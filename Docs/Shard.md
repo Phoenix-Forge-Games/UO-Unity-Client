@@ -25,6 +25,24 @@ The workflow runs on a self-hosted runner on the owner's PC, and this repository
   never starts any workflow without the owner's approval.
 - Merging a PR into `develop` is a push, so review a PR's workflow and build-script changes before merging.
 
+## Paid art: the private art repo
+
+The paid packs (`Assets/Synty`, `Assets/Secure`, the Addressables setup), the git-ignored art inside `Assets/UOClient`
+and the baked `WorldData` live in the private repo **Phoenix-Forge-Games/britannia-reborn-art**, cloned at
+`G:\Ultima Online\BritanniaRebornArt`. It holds only what the game uses: everything reachable by GUID from the files this
+repo tracks at the pushed commit, plus that repo's `keep.txt` (code, shaders, Resources, Sidekick). About 10.6 GB of
+the packs' 39.8 GB.
+
+- **Before every push** of this repo, `.git/hooks/pre-push` runs Git LFS, then `tools/pre-push.mjs` in the art repo.
+  For each pushed branch it trims the art from the working copy, commits what changed, tags it `pub/<commit sha>` and
+  pushes the art repo. If that fails the push stops; `SKIP_ART_SYNC=1 git push` skips it (that commit then can't be
+  built by the shard workflow).
+- **The shard workflow** checks out tag `pub/<sha>` of the art repo in a worktree (`ART_CHECKOUT`, default
+  `G:\actions-runner-art`; it shares the local repo's LFS store, so nothing is downloaded) and links it into the project.
+- **Art used only by name** (code that loads a prefab by a computed name, not a fixed string) can be missed by the trim.
+  Add it to the art repo's `keep.txt`. `node tools/sync-art.mjs --dry-run --verbose` there shows what's kept and why.
+- The hook is per clone (`.git/hooks` isn't versioned). On a new machine, copy the hook from the art repo's README.
+
 ## Accounts are website accounts
 
 On the hosted shard, `BR_ACCOUNT_API` and `BR_SHARD_KEY` are set, and the server checks every login with the

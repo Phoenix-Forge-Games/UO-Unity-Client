@@ -39,6 +39,11 @@ namespace UOGame.Net
         private static readonly Dictionary<NetworkConnection, AccountStore.Account> Accounts =
             new Dictionary<NetworkConnection, AccountStore.Account>();
 
+        /// <summary>Connections whose login the website is checking, each with its attempt's number (a dropped
+        /// connection's late answer then matches nothing).</summary>
+        private static readonly Dictionary<NetworkConnection, int> Pending = new Dictionary<NetworkConnection, int>();
+        private static int _attempts;
+
         /// <summary>The account a connection logged in as (server side), or null.</summary>
         public static AccountStore.Account AccountOf(NetworkConnection connection) =>
             connection != null && Accounts.TryGetValue(connection, out AccountStore.Account account) ? account : null;
@@ -73,13 +78,15 @@ namespace UOGame.Net
             if (args.ConnectionState == RemoteConnectionState.Stopped)
             {
                 Accounts.Remove(connection);
+                Pending.Remove(connection);
             }
         }
 
         private void OnLogin(NetworkConnection connection, LoginRequest request, Channel channel)
         {
-            if (connection.IsAuthenticated)
+            if (connection.IsAuthenticated || Pending.ContainsKey(connection))
             {
+                Pending.Remove(connection);
                 connection.Disconnect(true); // a second login on one connection
                 return;
             }
@@ -95,11 +102,69 @@ namespace UOGame.Net
             {
                 reason = "This game's world content doesn't match the server's: update the game.";
             }
+            else if (WebsiteAccounts.Enabled)
+            {
+                // A hosted shard: the website checks the password, without holding up the server meanwhile.
+                int attempt = ++_attempts;
+                Pending[connection] = attempt;
+                StartCoroutine(WebsiteAccounts.Check(request.Account?.Trim(), request.Password,
+                    (answer, failure) => OnWebsiteAnswer(connection, attempt, request.Account, answer, failure)));
+                return;
+            }
             else
             {
                 account = Store.Login(request.Account, request.Password, out reason);
             }
 
+            Finish(connection, request.Account, account, reason);
+        }
+
+        private void OnWebsiteAnswer(NetworkConnection connection, int attempt, string requested, WebsiteAccounts.Answer answer, string failure)
+        {
+            if (!Pending.TryGetValue(connection, out int pending) || pending != attempt)
+            {
+                return; // dropped (or disconnected for a second login) while the website answered
+            }
+
+            Pending.Remove(connection);
+            if (!connection.IsActive || connection.IsAuthenticated)
+            {
+                return;
+            }
+
+            AccountStore.Account account = null;
+            string reason = failure;
+            if (answer != null && answer.ok)
+            {
+                string name = string.IsNullOrWhiteSpace(answer.username) ? requested?.Trim() : answer.username.Trim();
+                if (string.IsNullOrEmpty(name))
+                {
+                    reason = WebsiteAccounts.Unreachable;
+                }
+                else
+                {
+                    try
+                    {
+                        account = Store.WebsiteLogin(name, answer.admin);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"[Game] Website login for {name}: couldn't save the account: {e.Message}");
+                        reason = "The server couldn't open your account; try again shortly.";
+                    }
+                }
+            }
+            else if (answer != null)
+            {
+                reason = string.IsNullOrWhiteSpace(answer.reason) ? "Wrong account name or password." : answer.reason;
+            }
+
+            Finish(connection, requested, account, reason);
+        }
+
+        /// <summary>Answers a login: in with the account's characters, or turned away with the reason.</summary>
+        private void Finish(NetworkConnection connection, string requested, AccountStore.Account account, string reason)
+        {
             bool ok = account != null;
             var result = new LoginResult { Ok = ok, Reason = reason, Characters = Array.Empty<CharacterSummary>() };
             if (ok)
@@ -110,7 +175,7 @@ namespace UOGame.Net
             }
             else
             {
-                Debug.Log($"[Game] {connection.ClientId} ({connection.GetAddress()}) refused as '{request.Account}': {reason}");
+                Debug.Log($"[Game] {connection.ClientId} ({connection.GetAddress()}) refused as '{requested}': {reason}");
             }
 
             NetworkManager.ServerManager.Broadcast(connection, result, false);

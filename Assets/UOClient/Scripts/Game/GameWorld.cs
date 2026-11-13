@@ -56,9 +56,12 @@ namespace UOGame
             }
         }
 
-        /// <summary>Where the baked chunks are: next to the project in the editor, next to the game in a build.</summary>
-        public static string WorldFolder =>
-            System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "WorldData"));
+        private static string _worldFolder;
+
+        /// <summary>Where the baked chunks are: <c>BR_WORLD_DIR</c> when set (a hosted shard's mounted, read-only share),
+        /// else next to the project in the editor and next to the game in a build. Read once.</summary>
+        public static string WorldFolder => _worldFolder ??= Server.AccountStore.FolderFromEnvironment("BR_WORLD_DIR")
+            ?? System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "WorldData"));
 
         /// <summary>Keep the world loaded around this character.</summary>
         public static void Follow(Transform character)

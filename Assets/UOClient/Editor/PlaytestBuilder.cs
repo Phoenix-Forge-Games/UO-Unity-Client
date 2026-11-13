@@ -17,6 +17,8 @@ namespace UOClient.EditorTools
         public const string Output = "Builds/Playtest/UOGame";
         public const string ExeName = "UOGame.exe";
         private const string GameScene = "Assets/UOClient/Scenes/Game.unity";
+        /// <summary>The main menu, loaded over the game scene at start (GameBoot.MenuScene): it must be in the build.</summary>
+        private const string MenuScene = "Assets/UOClient/Scenes/MainMenu.unity";
         private const int Facet = 1; // Trammel: the world that's baked and served
 
         public static bool Active { get; private set; }
@@ -44,7 +46,7 @@ namespace UOClient.EditorTools
             {
                 report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
                 {
-                    scenes = new[] { GameScene },
+                    scenes = new[] { GameScene, MenuScene },
                     locationPathName = Path.Combine(output, ExeName),
                     target = BuildTarget.StandaloneWindows64,
                     targetGroup = BuildTargetGroup.Standalone,

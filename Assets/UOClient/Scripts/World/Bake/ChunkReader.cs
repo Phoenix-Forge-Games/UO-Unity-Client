@@ -51,6 +51,13 @@ namespace UOClient.Bake
     /// <summary>Reads a chunk written by <see cref="ChunkWriter"/> back into objects (format in <see cref="ChunkFormat"/>).</summary>
     public sealed class ChunkReader
     {
+        /// <summary>
+        /// Draw terrains with GPU instancing? Off: in player builds the instanced terrain draws nothing (the editor is
+        /// fine), seen 2026-11-12 with BuildDiagnostics' -noTerrainInstancing (ground back with it off). The URP
+        /// instanced terrain variants are likely stripped; until that's found, terrains draw the ordinary way.
+        /// </summary>
+        public static bool DrawInstanced = false;
+
         private readonly WorldPalette _palette;
         private readonly WorldContent _content;
 
@@ -445,7 +452,7 @@ namespace UOClient.Bake
             Terrain terrain = go.AddComponent<Terrain>();
             terrain.terrainData = data;
             terrain.materialTemplate = _content.TerrainMaterial;
-            terrain.drawInstanced = true;
+            terrain.drawInstanced = DrawInstanced;
             terrain.heightmapPixelError = 3f;
             terrain.basemapDistance = 250f;
             terrain.allowAutoConnect = true;

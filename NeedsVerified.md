@@ -9,6 +9,15 @@ Last updated 2026-11-12.
 - Picked by measurement, not by ear: listen in a town by day that the village and crowd loops (Crowd Loop 04, 05)
   have no traffic, engines, modern voices or phones.
 
+## Playtest client 0.2.1-0.2.3, 2026-11-12 (user: blank sky, then no terrain)
+- 0.2.1: the playtest build now includes MainMenu.unity (PlaytestBuilder built only Game.unity, so the menu never
+  loaded: sky and music only).
+- 0.2.2: black from the first frame until the menu's own fade takes over (StartupCurtain; "[Boot]" lines in the
+  log); recorded shader variants (Rendering/GameShaderVariants, preloaded) so runtime-only variants survive builds.
+- 0.2.3: terrains draw without GPU instancing (ChunkReader.DrawInstanced): in builds the instanced terrain drew
+  nothing. Seen in the build's own screenshots (BuildDiagnostics -shot): no ground with instancing, ground without.
+- Not checked: in game (past the menu) in the build; terrain frame time without instancing.
+
 ## The mix and the menu walk, 2026-11-12 (user: no footsteps, no ambience, the walk-out slides)
 - The sounds were playing but buried: the ambience loops are 20-28 dB quieter than the music and footsteps 19-30 dB
   under full scale, all at the same channel volume. Now Resources/Audio/GameMix.mixer (made by MakeAudio): Music

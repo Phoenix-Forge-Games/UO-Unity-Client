@@ -189,6 +189,7 @@ namespace UOGame.Menu
             // Black until the town behind the menu is in, then it fades up.
             SetOpacity(_fade, 1f);
             _openedOnTown = false;
+            StartupCurtain.Lift(); // the menu's own black takes over from the one over the game's first frames
         }
 
         // ------------------------------------------------------------------ the menu

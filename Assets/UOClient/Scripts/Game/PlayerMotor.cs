@@ -251,7 +251,7 @@ namespace UOGame
             bool flying = _identity != null && _identity.Flying.Value;
             Boat deck = flying ? null : Boat.Under(transform.position);
             byte pose = _identity != null ? _identity.Pose.Value : PlayerIdentity.Standing;
-            if (IsServerStarted && pose != PlayerIdentity.Standing &&
+            if (IsServerStarted && (pose == PlayerIdentity.Sitting || pose == PlayerIdentity.Steering) &&
                 (deck == null || pose == PlayerIdentity.Steering && deck.Helm.Value != _identity.CharacterId + 1))
             {
                 _identity.Pose.Value = pose = PlayerIdentity.Standing; // off the ship, or no longer at the helm

@@ -32,6 +32,11 @@ namespace UOGame
         /// <summary>A held pose (the server sets it): standing, sitting on a deck, or steering at a ship's helm.</summary>
         public readonly SyncVar<byte> Pose = new SyncVar<byte>();
         public const byte Standing = 0, Sitting = 1, Steering = 2;
+        /// <summary>At work (everyone sees it): gathering and crafting set these while they last.</summary>
+        public const byte Mining = 3, Chopping = 4, Fishing = 5, Smithing = 6, Crafting = 7, Brewing = 8;
+
+        /// <summary>Is this pose one of the working ones?</summary>
+        public static bool IsWork(byte pose) => pose >= Mining && pose <= Brewing;
 
         /// <summary>Client side: every player this client can see.</summary>
         public static readonly System.Collections.Generic.List<PlayerIdentity> Seen = new System.Collections.Generic.List<PlayerIdentity>();

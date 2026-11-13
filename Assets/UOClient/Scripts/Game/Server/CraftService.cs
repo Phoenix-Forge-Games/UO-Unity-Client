@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Managing;
@@ -287,6 +288,60 @@ namespace UOGame.Server
 
         // ------------------------------------------------------------------ making things (server)
 
+        /// <summary>
+        /// Crafting shows (PlayerIdentity.Pose, everyone sees it) for a couple of seconds: hammering at the anvil
+        /// (Blacksmithy), stirring a pot (Alchemy, Cooking), or working at a bench (the rest).
+        /// </summary>
+        private void ShowWork(Combatant body, string system)
+        {
+            PlayerIdentity id = body.GetComponent<PlayerIdentity>();
+            if (id == null || id.Pose.Value != PlayerIdentity.Standing && !PlayerIdentity.IsWork(id.Pose.Value))
+            {
+                return; // sitting or at the helm: no
+            }
+
+            byte pose = system == "Blacksmithy" ? PlayerIdentity.Smithing
+                : system == "Alchemy" || system == "Cooking" ? PlayerIdentity.Brewing : PlayerIdentity.Crafting;
+            id.Pose.Value = pose;
+            _workUntil[id] = Time.time + 2.4f;
+            if (!_workWatch)
+            {
+                _workWatch = true;
+                StartCoroutine(EndWork());
+            }
+        }
+
+        private readonly Dictionary<PlayerIdentity, float> _workUntil = new Dictionary<PlayerIdentity, float>();
+        private bool _workWatch;
+
+        private IEnumerator EndWork()
+        {
+            var done = new List<PlayerIdentity>();
+            while (_workUntil.Count > 0)
+            {
+                yield return new WaitForSeconds(0.25f);
+                done.Clear();
+                foreach (KeyValuePair<PlayerIdentity, float> pair in _workUntil)
+                {
+                    if (pair.Key == null || Time.time >= pair.Value)
+                    {
+                        done.Add(pair.Key);
+                    }
+                }
+
+                foreach (PlayerIdentity id in done)
+                {
+                    _workUntil.Remove(id);
+                    if (id != null && PlayerIdentity.IsWork(id.Pose.Value))
+                    {
+                        id.Pose.Value = PlayerIdentity.Standing;
+                    }
+                }
+            }
+
+            _workWatch = false;
+        }
+
         private void OnCraft(NetworkConnection connection, CraftRequest request, Channel channel)
         {
             if (!ItemService.Instance.TryCarrier(connection, out AccountStore.Character character, out Combatant body) || body.Dead.Value)
@@ -321,6 +376,9 @@ namespace UOGame.Server
                 ItemService.Instance.Tell(connection, missing);
                 return;
             }
+
+            ItemService.Instance.HoldTool(connection, character, body, type => system.Tools.Contains(type), 20f); // the craft's own tool in hand
+            ShowWork(body, system.Name);
 
             double Skill(string name) => CharacterService.SkillOf(character, name);
             if (material != null && recipe.Resources.Exists(r => r.Material) && Skill(system.Skill) < material.ReqSkill)

@@ -84,6 +84,11 @@ namespace UOGame.Server
             {
                 if (a.ConnectionState == RemoteConnectionState.Stopped)
                 {
+                    if (_stowed.TryGetValue(c, out Stowed stowed))
+                    {
+                        PutToolAway(c, stowed); // log out with your own weapon in hand
+                    }
+
                     _carriers.Remove(c);
                     _banking.Remove(c);
                 }
@@ -102,6 +107,7 @@ namespace UOGame.Server
             if (_network.IsServerStarted)
             {
                 CheckBanks();
+                CheckTools();
             }
         }
 
@@ -492,6 +498,8 @@ namespace UOGame.Server
                 return;
             }
 
+            _stowed.Remove(connection); // they're choosing what to hold: don't swap it back on them
+
             if (!request.Wear)
             {
                 if (item.Slot != 0 && character.Items.FindAll(i => i.Slot == 0).Count < BackpackSize)
@@ -528,6 +536,154 @@ namespace UOGame.Server
         }
 
         private static bool IsHeld(ItemDef def) => def.Slot == WearSlot.OneHanded || def.Slot == WearSlot.TwoHanded;
+
+        // ------------------------------------------------------------------ the tool for the job
+
+        /// <summary>What working put away: the tool now in hand and what the hands held before (to give back).</summary>
+        private sealed class Stowed
+        {
+            public AccountStore.Character Character;
+            public Combatant Body;
+            public uint Tool;
+            public readonly List<(uint Id, byte Slot)> Held = new List<(uint, byte)>();
+            public float Until;
+            public Vector3 At;
+        }
+
+        private readonly Dictionary<NetworkConnection, Stowed> _stowed = new Dictionary<NetworkConnection, Stowed>();
+        /// <summary>How far from where the work was you can walk before the weapon comes back out (metres).</summary>
+        private const float ToolWander = 4f;
+
+        /// <summary>
+        /// Server: before the work starts, the job's tool goes in hand (one already held, else one from the backpack)
+        /// and whatever the hands held goes into the backpack, so nobody chops a tree with a sword or smiths with an
+        /// axe. Everyone sees it (it's in their look). The weapon comes back by itself `keepFor` seconds after the
+        /// last work, when a fight starts, or when they walk away; choosing what to hold themselves cancels that.
+        /// Tools with no hand slot of their own (a smith's hammer, a sewing kit...) are held in the main hand.
+        /// </summary>
+        public void HoldTool(NetworkConnection connection, AccountStore.Character character, Combatant body, Func<string, bool> fits, float keepFor)
+        {
+            if (character == null || body == null || fits == null)
+            {
+                return;
+            }
+
+            if (!_stowed.TryGetValue(connection, out Stowed stowed) || stowed.Character != character)
+            {
+                stowed = new Stowed { Character = character, Body = body };
+            }
+
+            stowed.Until = Time.time + keepFor;
+            stowed.At = body.transform.position;
+            AccountStore.Item tool = character.Items.Find(i => (i.Slot == (byte)WearSlot.OneHanded || i.Slot == (byte)WearSlot.TwoHanded) && fits(i.Type))
+                                     ?? character.Items.Find(i => i.Slot == 0 && fits(i.Type));
+            if (tool == null)
+            {
+                return;
+            }
+
+            if (tool.Slot != 0)
+            {
+                if (tool.Id == stowed.Tool)
+                {
+                    _stowed[connection] = stowed; // still at it
+                }
+
+                return; // already in hand (theirs, or ours from before)
+            }
+
+            var hands = character.Items.FindAll(i => i.Slot == (byte)WearSlot.OneHanded || i.Slot == (byte)WearSlot.TwoHanded);
+            if (character.Items.FindAll(i => i.Slot == 0).Count - 1 + hands.Count > BackpackSize)
+            {
+                Tell(connection, "Your backpack is too full to put away what you're holding.");
+                return;
+            }
+
+            foreach (AccountStore.Item held in hands)
+            {
+                if (held.Id != stowed.Tool)
+                {
+                    stowed.Held.Add((held.Id, held.Slot)); // the last job's tool just goes back in the pack
+                }
+
+                held.Slot = 0;
+            }
+
+            ItemDef def = Catalog.Find(tool.Type);
+            tool.Slot = def != null && IsHeld(def) ? (byte)def.Slot : (byte)WearSlot.OneHanded;
+            stowed.Tool = tool.Id;
+            _stowed[connection] = stowed;
+            Apply(character, body);
+            Send(connection, character);
+        }
+
+        /// <summary>Server: the work stopped; keep the tool out a little longer (more work may follow), then the weapon.</summary>
+        public void KeepTool(NetworkConnection connection, float seconds)
+        {
+            if (_stowed.TryGetValue(connection, out Stowed stowed))
+            {
+                stowed.Until = Mathf.Min(stowed.Until, Time.time + seconds);
+            }
+        }
+
+        private readonly List<NetworkConnection> _toolsDone = new List<NetworkConnection>();
+
+        private void CheckTools()
+        {
+            if (_stowed.Count == 0)
+            {
+                return;
+            }
+
+            _toolsDone.Clear();
+            foreach (KeyValuePair<NetworkConnection, Stowed> pair in _stowed)
+            {
+                Combatant body = pair.Value.Body;
+                if (body == null || body.Dead.Value || body.InCombat.Value || Time.time >= pair.Value.Until ||
+                    (body.transform.position - pair.Value.At).magnitude > ToolWander)
+                {
+                    _toolsDone.Add(pair.Key);
+                }
+            }
+
+            foreach (NetworkConnection connection in _toolsDone)
+            {
+                PutToolAway(connection, _stowed[connection]);
+            }
+        }
+
+        /// <summary>The tool back in the pack and the hands' own things back in them (those still in the pack).</summary>
+        private void PutToolAway(NetworkConnection connection, Stowed stowed)
+        {
+            _stowed.Remove(connection);
+            AccountStore.Character character = stowed.Character;
+            AccountStore.Item tool = character.Items.Find(i => i.Id == stowed.Tool);
+            if (tool == null || tool.Slot == 0)
+            {
+                return; // used up or put away already: leave their hands alone
+            }
+
+            tool.Slot = 0;
+            foreach ((uint id, byte slot) in stowed.Held)
+            {
+                AccountStore.Item item = character.Items.Find(i => i.Id == id);
+                bool free = !character.Items.Exists(i => i.Slot == slot || i.Slot == (byte)WearSlot.TwoHanded && slot == (byte)WearSlot.OneHanded);
+                if (item != null && item.Slot == 0 && free)
+                {
+                    item.Slot = slot;
+                }
+            }
+
+            if (stowed.Body != null)
+            {
+                Apply(character, stowed.Body);
+            }
+
+            if (connection != null && connection.IsActive)
+            {
+                Send(connection, character);
+            }
+        }
 
         // ------------------------------------------------------------------ moving: backpack, bank, ground
 

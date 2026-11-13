@@ -62,48 +62,6 @@ MonoBehaviour:
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Animator: {fileID: 9100000, guid: 910f9a32f07003e4c9ab674742632fd0, type: 2}
     Hide: []
-  - Name: orcs
-    Bodies: 1100t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
-    Height: 1.95
-    Tint: {r: 1, g: 1, b: 1, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
-  - Name: orc captains
-    Bodies: 0700t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
-    Height: 2.05
-    Tint: {r: 0.85, g: 0.8, b: 0.8, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
-  - Name: orcish lords
-    Bodies: 8a00t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
-    Height: 2.15
-    Tint: {r: 0.75, g: 0.7, b: 0.7, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
-  - Name: orc brutes
-    Bodies: bd00t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
-    Height: 2.6
-    Tint: {r: 0.7, g: 0.6, b: 0.55, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
-  - Name: orcish mages
-    Bodies: 8c00t
-    Prefab: {fileID: 1042931328060984, guid: 7161ed0803b6af44eba14325b62837de, type: 3}
-    Height: 1.8
-    Tint: {r: 1, g: 1, b: 1, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
-  - Name: orc scouts and bombers
-    Bodies: b500b600t
-    Prefab: {fileID: 1475337874035606, guid: c4e3b5d3572bced46ab0fdb482897812, type: 3}
-    Height: 1.7
-    Tint: {r: 1, g: 1, b: 1, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
-    Hide: []
   - Name: goblins
     Bodies: d302t
     Prefab: {fileID: 1387492477484550, guid: 7ee713c854e6be5469a1372d66b7bc40, type: 3}
@@ -111,31 +69,94 @@ MonoBehaviour:
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
     Hide: []
+  - Name: orcs
+    Bodies: 1100t
+    Prefab: {fileID: 2362086220571647882, guid: 146207895c594ce4ab482acd8b7a7cb5, type: 3}
+    Height: 1.95
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: dfee21d8d6fd4d649b3447e446e5ec2b, type: 2}
+    Hide: []
+  - Name: orc scouts
+    Bodies: b500t
+    Prefab: {fileID: 2370360417158177863, guid: e60784ad2e6bc4543b54ca3d4271261f, type: 3}
+    Height: 1.8
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: dfee21d8d6fd4d649b3447e446e5ec2b, type: 2}
+    Hide: []
+  - Name: orc bombers
+    Bodies: b600t
+    Prefab: {fileID: 9142526592530596188, guid: 038ac5597f0b9554f82d868916da5e04, type: 3}
+    Height: 1.85
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: dfee21d8d6fd4d649b3447e446e5ec2b, type: 2}
+    Hide: []
+  - Name: orc brutes
+    Bodies: bd00t
+    Prefab: {fileID: 9142526592530596188, guid: 038ac5597f0b9554f82d868916da5e04, type: 3}
+    Height: 2.6
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: dfee21d8d6fd4d649b3447e446e5ec2b, type: 2}
+    Hide: []
+  - Name: orc captains
+    Bodies: 0700t
+    Prefab: {fileID: 5447793852973799004, guid: 96f7f7816af637d4ebdcebb6f5918f70, type: 3}
+    Height: 2.05
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 017f7ee90caea0a42996600c0a2882be, type: 2}
+    Hide: []
+  - Name: orcish lords
+    Bodies: 8a00t
+    Prefab: {fileID: 6557861365482010861, guid: 159ca979bb01466418e54f383be97e8f, type: 3}
+    Height: 2.15
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 017f7ee90caea0a42996600c0a2882be, type: 2}
+    Hide: []
+  - Name: orcish mages
+    Bodies: 8c00t
+    Prefab: {fileID: 923351880399278244, guid: c290650c75a135649a6602bc40d6a023, type: 3}
+    Height: 1.85
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: bcf7eb985ff4d49478ed4891ce90f106, type: 2}
+    Hide: []
   - Name: ogres
     Bodies: 0100t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Prefab: {fileID: 6528487982060302720, guid: b4d8a7f74ffbe1a49b53a1efe7e45677, type: 3}
     Height: 2.9
-    Tint: {r: 0.8, g: 0.75, b: 0.6, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 3ca940c55c0036c4c8fb2dcc10e974af, type: 2}
     Hide: []
   - Name: ogre lords
     Bodies: 5300t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Prefab: {fileID: 8493191723754282027, guid: 23dd8d665bdc7ec4e980f43f2cc5546a, type: 3}
     Height: 3.2
-    Tint: {r: 0.7, g: 0.6, b: 0.5, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 3ca940c55c0036c4c8fb2dcc10e974af, type: 2}
     Hide: []
   - Name: arctic ogre lords
     Bodies: 8700t
-    Prefab: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+    Prefab: {fileID: 1696229108443720700, guid: 9b852abf37a79a543ae9c84f538f5c4f, type: 3}
     Height: 3.2
-    Tint: {r: 0.75, g: 0.85, b: 1, a: 1}
-    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: 3ca940c55c0036c4c8fb2dcc10e974af, type: 2}
     Hide: []
   - Name: ettins
     Bodies: 1200t
-    Prefab: {fileID: 1652650793432430, guid: d9162a78a8deb714a9bddd8038021008, type: 3}
+    Prefab: {fileID: 1580364151198782127, guid: 46470ae9efc36f249b19df0d9815db7d, type: 3}
     Height: 3
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: enslaved goblins
+    Bodies: 4e01t
+    Prefab: {fileID: 5190215977624153127, guid: c1c515ff8feb3504194c212f867ca180, type: 3}
+    Height: 1.35
+    Tint: {r: 1, g: 1, b: 1, a: 1}
+    Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
+    Hide: []
+  - Name: gremlins
+    Bodies: d402t
+    Prefab: {fileID: 1653853124727649201, guid: 0b3f6c7296b8ed1499512f8f2e53cf2a, type: 3}
+    Height: 1
     Tint: {r: 1, g: 1, b: 1, a: 1}
     Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
     Hide: []
@@ -162,9 +183,9 @@ MonoBehaviour:
     Hide: []
   - Name: frost trolls
     Bodies: 3700t
-    Prefab: {fileID: 3733808366589169053, guid: 1d4c9650214c5de44bbbb96cb76e407e, type: 3}
+    Prefab: {fileID: 2981004727596121314, guid: 4507cc4d7121606418446c623d1ff6c8, type: 3}
     Height: 2.6
-    Tint: {r: 0.75, g: 0.85, b: 1, a: 1}
+    Tint: {r: 1, g: 1, b: 1, a: 1}
     Animator: {fileID: 9100000, guid: a560562956f76674faee24a4ab460578, type: 2}
     Hide: []
   - Name: daemons

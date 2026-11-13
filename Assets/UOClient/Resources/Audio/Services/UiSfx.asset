@@ -16,4 +16,4 @@ MonoBehaviour:
   audioServiceType: 2
   forgeAudioEventChannel: {fileID: 11400000, guid: 97794374dbacc944d9a11c9ec3903e49, type: 2}
   audioSourcePrefab: {fileID: 1062644404350660314, guid: cee88c06afb4693489d04750c98af235, type: 3}
-  defaultPoolSize: 6
+  defaultPoolSize: 16

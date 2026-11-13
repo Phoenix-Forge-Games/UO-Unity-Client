@@ -75,11 +75,6 @@ namespace UOClient
                 AttackTarget();
             }
 
-            if (input.ToggleWarMode.WasPressedThisFrame())
-            {
-                view.World.SetWarMode(!view.World.WarMode);
-            }
-
             if (Current != 0 && !view.World.Mobiles.ContainsKey(Current) && !view.World.Items.ContainsKey(Current))
             {
                 Set(0); // it's gone

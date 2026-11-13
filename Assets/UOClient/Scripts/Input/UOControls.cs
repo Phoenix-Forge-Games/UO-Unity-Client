@@ -255,16 +255,6 @@ namespace UOClient
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""ToggleWarMode"",
-                    ""type"": ""Button"",
-                    ""id"": ""2180abd4-c754-5ca9-8695-187ab3174eca"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false,
-                    ""priority"": 0
-                },
-                {
                     ""name"": ""Chat"",
                     ""type"": ""Button"",
                     ""id"": ""f703a57d-330c-567d-8e1f-78ed1e4dff68"",
@@ -782,17 +772,6 @@ namespace UOClient
                 },
                 {
                     ""name"": """",
-                    ""id"": ""17b2167f-f3c6-5f88-bd2b-07e3c633cf3c"",
-                    ""path"": ""<Keyboard>/backquote"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ToggleWarMode"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""d3e74b0b-4fd7-5260-a1db-86330b48cd1c"",
                     ""path"": ""<Keyboard>/enter"",
                     ""interactions"": """",
@@ -1197,7 +1176,6 @@ namespace UOClient
             m_Gameplay_Character = m_Gameplay.FindAction("Character", throwIfNotFound: true);
             m_Gameplay_Minimap = m_Gameplay.FindAction("Minimap", throwIfNotFound: true);
             m_Gameplay_Attack = m_Gameplay.FindAction("Attack", throwIfNotFound: true);
-            m_Gameplay_ToggleWarMode = m_Gameplay.FindAction("ToggleWarMode", throwIfNotFound: true);
             m_Gameplay_Chat = m_Gameplay.FindAction("Chat", throwIfNotFound: true);
             m_Gameplay_SplitStack = m_Gameplay.FindAction("SplitStack", throwIfNotFound: true);
             m_Gameplay_BuildMode = m_Gameplay.FindAction("BuildMode", throwIfNotFound: true);
@@ -1321,7 +1299,6 @@ namespace UOClient
         private readonly InputAction m_Gameplay_Character;
         private readonly InputAction m_Gameplay_Minimap;
         private readonly InputAction m_Gameplay_Attack;
-        private readonly InputAction m_Gameplay_ToggleWarMode;
         private readonly InputAction m_Gameplay_Chat;
         private readonly InputAction m_Gameplay_SplitStack;
         private readonly InputAction m_Gameplay_BuildMode;
@@ -1411,10 +1388,6 @@ namespace UOClient
             /// Provides access to the underlying input action "Gameplay/Attack".
             /// </summary>
             public InputAction @Attack => m_Wrapper.m_Gameplay_Attack;
-            /// <summary>
-            /// Provides access to the underlying input action "Gameplay/ToggleWarMode".
-            /// </summary>
-            public InputAction @ToggleWarMode => m_Wrapper.m_Gameplay_ToggleWarMode;
             /// <summary>
             /// Provides access to the underlying input action "Gameplay/Chat".
             /// </summary>
@@ -1545,9 +1518,6 @@ namespace UOClient
                 @Attack.started += instance.OnAttack;
                 @Attack.performed += instance.OnAttack;
                 @Attack.canceled += instance.OnAttack;
-                @ToggleWarMode.started += instance.OnToggleWarMode;
-                @ToggleWarMode.performed += instance.OnToggleWarMode;
-                @ToggleWarMode.canceled += instance.OnToggleWarMode;
                 @Chat.started += instance.OnChat;
                 @Chat.performed += instance.OnChat;
                 @Chat.canceled += instance.OnChat;
@@ -1649,9 +1619,6 @@ namespace UOClient
                 @Attack.started -= instance.OnAttack;
                 @Attack.performed -= instance.OnAttack;
                 @Attack.canceled -= instance.OnAttack;
-                @ToggleWarMode.started -= instance.OnToggleWarMode;
-                @ToggleWarMode.performed -= instance.OnToggleWarMode;
-                @ToggleWarMode.canceled -= instance.OnToggleWarMode;
                 @Chat.started -= instance.OnChat;
                 @Chat.performed -= instance.OnChat;
                 @Chat.canceled -= instance.OnChat;
@@ -2093,13 +2060,6 @@ namespace UOClient
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnAttack(InputAction.CallbackContext context);
-            /// <summary>
-            /// Method invoked when associated input action "ToggleWarMode" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-            /// </summary>
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnToggleWarMode(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Chat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

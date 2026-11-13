@@ -251,7 +251,7 @@ namespace UOClient
                 .Start();
         }
 
-        /// <summary>"ToggleWarMode" → "Toggle war mode".</summary>
+        /// <summary>"CycleTarget" → "Cycle target".</summary>
         private static string Readable(string name)
         {
             var sb = new System.Text.StringBuilder();

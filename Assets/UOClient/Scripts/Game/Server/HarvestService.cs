@@ -367,6 +367,8 @@ namespace UOGame.Server
             if (_gathering.ContainsKey(connection))
             {
                 _gathering.Remove(connection); // E again stops
+                SetWork(body, PlayerIdentity.Standing);
+                ItemService.Instance.KeepTool(connection, 8f);
                 ItemService.Instance.Tell(connection, "You stop.");
                 return;
             }
@@ -384,14 +386,40 @@ namespace UOGame.Server
                 return;
             }
 
+            Definition kind = facing.Value.Def;
+            ItemService.Instance.HoldTool(connection, character, body, type => kind.Tools.Contains(type), 3600f); // pickaxe, hatchet, pole in hand
             var gatherer = new Gatherer { Connection = connection, Def = facing.Value.Def, Tile = facing.Value.Tile, StartedAt = body.transform.position };
             _gathering[connection] = gatherer;
             StartCoroutine(Gather(gatherer, character, body));
         }
 
+        /// <summary>The working pose everyone sees (PlayerIdentity.Pose): digging, chopping, fishing, or standing again.</summary>
+        private static void SetWork(Combatant body, byte pose)
+        {
+            PlayerIdentity id = body != null ? body.GetComponent<PlayerIdentity>() : null;
+            if (id != null && (pose == PlayerIdentity.Standing ? PlayerIdentity.IsWork(id.Pose.Value) : id.Pose.Value == PlayerIdentity.Standing))
+            {
+                id.Pose.Value = pose;
+            }
+        }
+
         private IEnumerator Gather(Gatherer g, AccountStore.Character character, Combatant body)
         {
             ItemService.Instance.Tell(g.Connection, $"You begin {Verb(g.Def)}.");
+            SetWork(body, g.Def.System == "Mining" ? PlayerIdentity.Mining : g.Def.System == "Lumberjacking" ? PlayerIdentity.Chopping : PlayerIdentity.Fishing);
+            try
+            {
+                yield return GatherLoop(g, character, body);
+            }
+            finally
+            {
+                SetWork(body, PlayerIdentity.Standing); // however it ended
+                ItemService.Instance?.KeepTool(g.Connection, 8f); // then the weapon comes back out
+            }
+        }
+
+        private IEnumerator GatherLoop(Gatherer g, AccountStore.Character character, Combatant body)
+        {
             while (_gathering.TryGetValue(g.Connection, out Gatherer current) && current == g)
             {
                 yield return new WaitForSeconds(g.Def.Delay);

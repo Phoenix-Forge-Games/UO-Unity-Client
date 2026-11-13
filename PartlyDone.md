@@ -49,8 +49,25 @@ may be dropped rather than finished.
 - **Creatures**: 76 body groups have models. Still capsules: dragons / drakes / wyverns, birds, spiders, snakes and
   serpents, big cats, ratmen, harpies, rats, gazers, slimes, scorpions, beetles, frogs, farm and forest animals,
   horses / mounts.
-- **Creature animation**: humanoid creatures share the humanoid walk / run / idle; dogs and wolves use the dog pack;
-  no attack, hit or death clips for any creature. AnimGen clips (the animation generator package) aren't wired in.
+- **Creature animation** (2026-11-12): attacks, flinches and deaths play through ActionAnimator (Attack/Hit/Die
+  triggers on any controller that has them). Humanoid creatures and people share AC_UOHumanoid (built by
+  Tools/Game/MakeHumanoidAnimator.eval.cs: attacks by weapon group, flinches, deaths, swimming, your own casting);
+  PolyNext orcs and ogres have their own (Tools/Creatures/CreatureCatalog.eval.cs `Creature()`). Other creatures
+  (dogs, Synty beasts) still only walk; their corpses still tip over. Women use the male clips (no female
+  override yet). Others' spellcasting doesn't animate (casts aren't sent to other clients). Work shows (2026-11-12): the
+  server sets a working pose (PlayerIdentity.Pose: mining, chopping, fishing while gathering; smithing, bench,
+  brewing for about 2.4 s per craft) and everyone sees its loop and hears its sound once a cycle. The hands hold
+  whatever weapon is equipped, not the pickaxe, hatchet or pole. Sitting still uses the old held pose; riding has
+  no clip yet. AnimGen clips aren't wired in.
+- **Combat is MMO style** (2026-11-12): no war mode (the old key action is gone). In combat = a creature has you
+  as its target, or you're attacking one that's still fighting; it ends when they're dead, you are, or the last one
+  gives up. Being attacked makes you fight back unless you're already fighting something. A creature leashes 35 m
+  from where the fight began, or when it can't get any closer for 8 s (no path), then evades back untouchable and
+  heals to full; one that can't walk back is put there after 20 s. Players don't turn to face their attacker.
+- **New creature models** (2026-11-12): PolyNext orcs (Warrior / Hero for captains and lords / Shaman for mages)
+  and ogres; Lowpoly Pack two-headed ogre for ettins, ice troll for frost trolls, gremlins (724) and enslaved
+  goblins (334). The arctic ogre lord uses a colourway, not a blue tint (the PolyNext shader ignores Tint).
+  Skeletons wait for a Sidekick skeleton pack (not imported yet). Lowpoly Pack weapons aren't attached.
 - **Items in the world**: anything without a matching 3D prop is a placeholder cube (loot, dropped gear, corpses).
 - **Item icons**: container tiles are text only.
 - **Minimap**: shows only ground that's already streamed in; re-renders every 0.2 s (cost not measured).
@@ -161,12 +178,16 @@ may be dropped rather than finished.
   are kept.
 
 ## Sound (2026-11-11)
-- **Music is in, effects and ambience aren't**: every music slot has IMAscore tracks (Assets/Secure, gitignored,
-  streamed from disk). The effect, interface and ambience names have no clips yet, so they're silent.
+- **Music, effects and ambience are in** (2026-11-12): swings and hits by weapon type, creature voices by family
+  (GameAudio.Family: orc, goblin, troll, dragon, spider, skeleton, spectre, zombie, insect, daemon, farm animals,
+  a generic beast), doors, spell begin/cast/fizzle, thunder, UI clicks, day / night / town / rain / wind / dungeon
+  ambience, footsteps (by ground for people, by kind then ground for creatures; one clip per ground sound so far).
   Assets/UOClient/Audio/Sounds.json names each sound's clips; run Tools/Game/MakeAudio.eval.cs after changing it.
+  Packs with repeated file names (CombatMagicSpells V2, the Medieval sampler folder) are matched by folder path.
 - **Champion music has tracks but nothing plays it**: the game has no champion spawns yet. When they come in, play
   `music.champion` near an active altar (add it to GameAudio.UpdateMusic above combat).
 - Music and ambience clips sit in Resources, so a build carries them unencrypted, not through the secure-art
   bundles. Move them there with the rest of the paid content before a public build.
-- Not hooked up yet: crafting and gathering, picking up and dropping items, spells cast by others, creature voices,
-  ships, surface-specific footsteps (one "step" sound for every ground).
+- Gathering and crafting sounds play with their work animations (gather.*, craft.*).
+- Not hooked up yet (the packs have the clips): picking up and dropping items, spells by element and spells cast by
+  others, ships, fire crackle near hearths and torches (needs positional loops).

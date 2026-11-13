@@ -32,6 +32,80 @@ namespace UOGame
         private Material[][] _living;
 
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
+        private static readonly int SwimmingParameter = Animator.StringToHash("Swimming"), CastingParameter = Animator.StringToHash("Casting"),
+            CastReleaseTrigger = Animator.StringToHash("CastRelease"), FizzleTrigger = Animator.StringToHash("Fizzle");
+
+        private static readonly int WorkParameter = Animator.StringToHash("Work");
+        private int _workCycle = -1;
+
+        /// <summary>
+        /// At work (the server's pose): the work's loop (digging, chopping, fishing, hammering, a bench, a pot), and its
+        /// sound once each time round, in step with the blows.
+        /// </summary>
+        private void UpdateWork(byte pose)
+        {
+            if (!ActionAnimator.Has(_anim, WorkParameter))
+            {
+                return;
+            }
+
+            int work = pose switch
+            {
+                PlayerIdentity.Mining => 1,
+                PlayerIdentity.Chopping => 2,
+                PlayerIdentity.Fishing => 3,
+                PlayerIdentity.Smithing => 4,
+                PlayerIdentity.Crafting => 5,
+                PlayerIdentity.Brewing => 6,
+                _ => 0,
+            };
+            _anim.SetInteger(WorkParameter, work);
+            if (work == 0)
+            {
+                _workCycle = -1;
+                return;
+            }
+
+            AnimatorStateInfo state = _anim.GetCurrentAnimatorStateInfo(0);
+            if (state.shortNameHash != Animator.StringToHash("Work" + work))
+            {
+                return;
+            }
+
+            int cycle = Mathf.FloorToInt(state.normalizedTime + 0.55f); // about when the blow lands in each loop
+            if (cycle != _workCycle)
+            {
+                _workCycle = cycle;
+                string key = work switch
+                {
+                    1 => "gather.mining",
+                    2 => "gather.chopping",
+                    3 => "gather.fishing",
+                    4 => "craft.smithing",
+                    5 => "craft.bench",
+                    _ => "craft.brewing",
+                };
+                GameAudio.Play(key, _graphic.position + Vector3.up);
+            }
+        }
+
+        /// <summary>Your own spellcasting: the hands charge while the words are spoken, then release, or fizzle.</summary>
+        private void OnCast(UOGame.Net.CastNotice notice)
+        {
+            if (_anim == null || !ActionAnimator.Has(_anim, CastingParameter))
+            {
+                return;
+            }
+
+            if (notice.State == 0)
+            {
+                _anim.SetBool(CastingParameter, true);
+                return;
+            }
+
+            _anim.SetTrigger(notice.State == 1 ? CastReleaseTrigger : FizzleTrigger);
+            _anim.SetBool(CastingParameter, false);
+        }
         private Animator _anim;
         private Vector3 _lastPosition;
         private float _speed;
@@ -41,11 +115,29 @@ namespace UOGame
         private UOClient.GargoyleWings _wings;
         private PlayerIdentity _identity;
         private float _climbRate, _lean, _accel, _brake;
+        /// <summary>How far the model is turned from the body's facing to look at the selected target (degrees).</summary>
+        private float _faceYaw;
+        /// <summary>Driven by the humanoid controller (Speed in metres a second), not a creature's (0, 1, 2).</summary>
+        private bool _humanGait;
+        private readonly Footsteps _steps = new Footsteps();
         private UOClient.GargoyleFlightPose _pose;
+
+        public override void OnStopClient()
+        {
+            base.OnStopClient();
+            ActionAnimator.Unregister(ObjectId);
+            UOGame.Server.SpellService.Noticed -= OnCast;
+        }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
+            if (IsOwner)
+            {
+                UOGame.Server.SpellService.Noticed -= OnCast;
+                UOGame.Server.SpellService.Noticed += OnCast; // only your own casts reach this client
+            }
+
             if (_graphic == null)
             {
                 return;
@@ -142,6 +234,9 @@ namespace UOGame
             }
 
             _anim.applyRootMotion = false;
+            _humanGait = ActionAnimator.IsHumanoid(_anim);
+            PlayerIdentity me = GetComponent<PlayerIdentity>();
+            ActionAnimator.Register(ObjectId, _anim, () => me.Look.Value); // attacks (by weapon) and flinches
             _wings = _built.GetComponent<UOClient.GargoyleWings>();
             BuildCarriedLight(look);
             _built.transform.localPosition = new Vector3(0f, _saddle, 0f);
@@ -237,7 +332,10 @@ namespace UOGame
             float previousSpeed = _speed;
             _speed = Mathf.Lerp(_speed, speed, 1f - Mathf.Exp(-12f * Time.deltaTime));
             _accel = Mathf.Lerp(_accel, (_speed - previousSpeed) / Time.deltaTime, 1f - Mathf.Exp(-6f * Time.deltaTime));
+            // Speed is metres a second: the humanoid controller places each clip at the ground speed it shows, so
+            // the feet keep pace (a borrowed creature body's controller still takes 0 idle, 1 walk, 2 run).
             float parameter = _speed < 0.2f ? 0f
+                : _humanGait ? _speed
                 : _speed <= PlayerMotor.WalkSpeed ? _speed / PlayerMotor.WalkSpeed
                 : 1f + Mathf.Clamp01((_speed - PlayerMotor.WalkSpeed) / (PlayerMotor.RunSpeed - PlayerMotor.WalkSpeed));
             if (_mount != null)
@@ -260,8 +358,73 @@ namespace UOGame
 
             bool airborne = _wings != null && _identity != null && _identity.Flying.Value;
             _anim.SetFloat(SpeedParameter, airborne ? 0f : parameter);
+            var fighter = GetComponent<UOGame.Combat.Combatant>();
+            ActionAnimator.Drive(_anim, fighter != null && fighter.InCombat.Value && !fighter.Dead.Value, _identity != null ? _identity.Look.Value : (Look?)null);
+            UpdateWork(pose);
+            if (_identity != null && ActionAnimator.Has(_anim, SwimmingParameter))
+            {
+                _anim.SetBool(SwimmingParameter, _identity.Swimming.Value && _mount == null && !airborne);
+            }
             UpdateCarriedLight();
+            bool ghost = fighter != null && fighter.Dead.Value;
+            if (!airborne && !ghost && !_shownHidden && Mathf.Abs(_climbRate) < 2.5f)
+            {
+                // Feet on the ground (not mid-jump): theirs, or the mount's longer stride.
+                bool walking = parameter > 0f || (_mount != null && _speed >= 0.2f && pose != PlayerIdentity.Steering && !onMovingDeck);
+                _steps.Update(_graphic.position, walking ? _speed : 0f, _mount != null ? 1.7f : 1f, null,
+                    _identity != null && _identity.Swimming.Value);
+            }
+
+            FaceTarget(fighter, pose, airborne);
             FlyingLook();
+        }
+
+        /// <summary>
+        /// Players turn toward whoever they have selected, in a fight or not (everyone sees it: TargetId is synced).
+        /// Standing still the model turns to face them; walking or running it faces the way it goes (there are no
+        /// strafe or backpedal clips), turning back toward the target when it stops. Not while sitting, steering,
+        /// riding, flying or dead.
+        /// </summary>
+        private void FaceTarget(UOGame.Combat.Combatant fighter, byte pose, bool airborne)
+        {
+            float want = 0f;
+            UOGame.Combat.Combatant target = null;
+            int id = fighter != null ? fighter.TargetId.Value : 0;
+            if (id != 0 && id != ObjectId && !fighter.Dead.Value && _mount == null && !airborne
+                && pose == PlayerIdentity.Standing && _speed < 0.6f)
+            {
+                foreach (UOGame.Combat.Combatant c in UOGame.Combat.Combatant.Seen)
+                {
+                    if (c != null && c.ObjectId == id)
+                    {
+                        target = c;
+                        break;
+                    }
+                }
+            }
+
+            if (target != null && !target.Dead.Value)
+            {
+                Vector3 to = target.transform.position - _graphic.position;
+                to.y = 0f;
+                if (to.sqrMagnitude > 0.04f && to.sqrMagnitude < 60f * 60f)
+                {
+                    float world = Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg;
+                    want = Mathf.DeltaAngle(_graphic.eulerAngles.y, world);
+                }
+                else
+                {
+                    want = _faceYaw; // standing on them: hold
+                }
+            }
+
+            // A brisk turn (about 540 degrees a second), eased at the end.
+            float step = Mathf.Max(Time.deltaTime * 540f, Mathf.Abs(Mathf.DeltaAngle(_faceYaw, want)) * (1f - Mathf.Exp(-10f * Time.deltaTime)));
+            _faceYaw = Mathf.MoveTowardsAngle(_faceYaw, want, step);
+            if (_wings == null && _built != null)
+            {
+                _built.transform.localRotation = Quaternion.Euler(0f, _faceYaw, 0f); // gargoyles: FlyingLook folds it in
+            }
         }
 
         // ------------------------------------------------------------------ a carried light (torch, lantern, candle)
@@ -419,7 +582,7 @@ namespace UOGame
             _pose = _pose != null ? _pose : _built.GetComponent<UOClient.GargoyleFlightPose>();
             float CrouchDrop = _pose != null ? 0.34f * _pose.Crouch : 0f;
             // Pitched about the pelvis, not the feet.
-            Quaternion target = Quaternion.Euler(_lean, 0f, 0f);
+            Quaternion target = Quaternion.Euler(0f, _faceYaw, 0f) * Quaternion.Euler(_lean, 0f, 0f);
             _built.transform.localRotation = target;
             _built.transform.localPosition = UOClient.GargoyleFlightPose.Pivot - target * UOClient.GargoyleFlightPose.Pivot
                 + Vector3.up * ((flying && _wings.Beating ? 0.07f * Mathf.Sin(2f * Mathf.PI * _wings.Phase) : 0f) - CrouchDrop); // up on the downstroke, down on the upstroke

@@ -613,9 +613,60 @@ All ServUO-protocol client work is paused. Design: Docs/ServerDesign.md (draft, 
 - [ ] Collider cost: every map block bakes mesh colliders when it streams in; if it causes hitches, bake them on a background thread (Physics.BakeMesh) or use simpler box colliders
 
 ## Animation
-- [ ] Female bodies: use the Base Locomotion Feminine clip set (an override controller for AC_UOHumanoid)
+- [x] **Players always turn toward their target** (user, 2026-11-12), in combat or not: whenever you have a target
+  selected, your character faces it. `PlayerAppearance.FaceTarget` turns the model (yaw only, about 540°/s) toward
+  the synced `Combatant.TargetId`, so everyone sees it; while walking or running the model faces the way it goes
+  (no strafe or backpedal clips yet) and turns back when it stops; off while sitting, steering, riding, flying or
+  dead. Seen in Solo: selected a cow behind the player, the model swung round to it, tracked it as it wandered and
+  turned back when the target was cleared (2026-11-12).
+- [x] **Equip the tool for the job before doing it** (user, 2026-11-12): starting to gather or craft puts the right
+  tool in hand first (pickaxe or shovel for mining, hatchet/axe for lumberjacking, fishing pole, smith's hammer for
+  blacksmithing, the craft's own tool for the others), swapping the weapon out, so nobody chops trees with a sword
+  or smiths with an axe. `ItemService.HoldTool` (called by gathering and crafting) puts the tool in hand and the hands'
+  own things in the pack; they come back 8 s after gathering stops or 20 s after the last craft, at once when a
+  fight starts or on logging out, or after walking 4 m away. Choosing what to hold yourself cancels the swap back.
+  Tools with no hand slot (smith's hammer, sewing kit...) are held in the main hand. Double-clicking a craft tool now
+  opens its craft even when it can be worn (a sledgehammer used to get equipped instead). Seen in Solo: sword →
+  smith's hammer → sword after the wait; sword → pickaxe → sword; the sword came straight back when a fight started
+  (2026-11-12).
+- [ ] Hand props for the remaining tools: the wardrobe draws pickaxes, shovels, axes/hatchets and hammers/tongs; a
+  fishing pole, sewing kit, saw, skillet, mortar and pestle, pens, tinker tools and the fletcher's tools have no prop
+  yet, so the hands are just empty while they work (still no weapon).
+- [ ] Female bodies: use the Base Locomotion Feminine clip set (an override controller for AC_UOHumanoid); the
+  Kevin Iglesias pack has a matching female (HumanF@) set for the combat clips too
 - [ ] Tune walk/run playback rates (currently 1.6x / 1.25x) so feet don't slide at UO speeds
-- [ ] Combat animations (ANIMATION - Sword Combat / Bow Combat packs in SyntyPass)
+- [x] Combat animations (2026-11-12): attacks by weapon group, flinches, deaths, combat stances, casting
+  (Tools/Game/MakeHumanoidAnimator.eval.cs, ActionAnimator)
+
+## Sound
+- [x] **Some ambient loops have engines in the background** (user, 2026-11-12): wrong for a world without engines.
+  Measured the low rumble (below ~180 Hz) of every ambience loop against the pack's "Highway Busy Loop": City Amb
+  Loops 02-04 carry as much as the highway or more (0.53-0.76 of their level vs 0.58), 01 and 05 less but they're the
+  same modern-city set, so all five are out. ambient.town is now Village Amb Loop 01 + Crowd Loop 04 and 05 (the
+  quietest, steadiest crowds: 0.12 and 0.17). Day (birds 0.02), night (insects 0.01), rain (0.05) are clean; wind's
+  rumble is wind. Not listened to: Crowd 04/05 could still hold modern voices or phones (2026-11-12).
+- [x] Footsteps (user, 2026-11-12): `Footsteps` (Game/Audio) steps each stride (longer running, scaled by body size)
+  for walkers within 28 m. People: the ground's sound first, then step.plain (the Monster Library's orc and goblin
+  steps). Creatures: their own kind's (step.orc, goblin, troll, dragon, skeleton, insect; daemons get the
+  behemoth's), then the ground's, then plain; birds, bats, spirits, snakes, slimes and sea creatures make none.
+  The ground under the feet, folded into the five ground sounds there are (Vol 1 "Step With Materials"): terrain
+  layers SandUnderwater/Moss -> water, SandBeach/Snow/Mud (dirt, furrows) -> sand, Gravel/Mud_rubble/LavaDry ->
+  gravel, the grasses -> leaves; cobbles, flagstones, brick and terrace stone and building floors -> plain; meshes
+  by name (metal, grass, sand...); swimming -> water. Replaced GameAudio's empty "step" tracker. Seen in Solo
+  (2026-11-12): grass -> leaves, shore -> water, Britain's cobbles and roofs -> plain, dirt -> sand; a chasing orc
+  played step.orc, a troll step.troll, a cow on grass step.leaves.
+- [x] **Feet slid in game and on the menu** (user, 2026-11-12): the humanoid controller's Speed is now metres a
+  second, each clip placed at the ground speed its root-motion twin shows (A_MOD_BL_*_RM_Masc, RootT.z a cycle):
+  idle 0, walk 1.54, run 2.74, and Synty's sprint 7.69 added (MakeHumanoidAnimator), on Locomotion and every combat
+  stance; swim forward at 1.5. Players, human NPCs and the menu walkers pass their real speed
+  (`ActionAnimator.IsHumanoid`); creature controllers keep 0/1/2. Seen in Solo: running (7 m/s) is 87% sprint, the
+  3 m/s walk is 94% run (a jog: 3 m/s is twice a walking pace); the menu stand-in walks at 1.3 m/s on the walk clip.
+  The old UO-protocol client's MobileView still sends 1/2 (it would show a slow walk); untouched.
+- [x] Walking pace: the game's walk (PlayerMotor.WalkSpeed 3 m/s) shows as a jog now that the feet match; kept as a
+  jog (user, 2026-11-12).
+- [ ] Footsteps by ear: each ground sound is one clip (Vol 1 has one per material), so steps on grass or sand repeat
+  the same sample; the gravel clip is 1.1 s long and may drag at a run. A real footstep pack (several per surface,
+  wood and stone too) would replace step.* without code changes.
 - [ ] Creature clips from AnimGen (`com.phoenixforgegames.animgen`, repo G:\Git\Personal\PhoenixForgeGames\Unity.AnimGen): generate per creature model with its UO body as reference and wire them into the creature views; drive `animator.speed` from WalkNaturalSpeed/RunNaturalSpeed in the `<Model>_AnimGen.json` report
 - [ ] `Packages/manifest.json` references AnimGen by absolute local path (`file:G:/Git/...`), which breaks other clones; switch to a git URL once the package repo is pushed
 - [ ] AnimGen: apply `AnimationSequence.uop` group replacements so UOP-only bodies don't miss action groups in reference fitting

@@ -156,6 +156,26 @@ namespace UOGame
             _human = global::UOClient.Content.SecureArt.Resolve(_human, global::UOClient.Content.SecureArtAddresses.HumanModel);
             _humanAnimator = global::UOClient.Content.SecureArt.Resolve(_humanAnimator, global::UOClient.Content.SecureArtAddresses.HumanAnimator);
             GameObject model = ActorModel.Build(body, _graphic, _catalog, _human, _humanAnimator, out Animator animator, out bool human, look);
+            bool sawIt = TimeManager.TimePassed(DiedTick.Value) < 1.5;
+            if (animator != null && ActionAnimator.Has(animator, ActionAnimator.DieTrigger))
+            {
+                // It has a death of its own: played out when you saw it fall, else lying as it ends.
+                if (ActionAnimator.Has(animator, ActionAnimator.WeaponParam))
+                {
+                    animator.SetInteger(ActionAnimator.WeaponParam, (int)ActionAnimator.Weapon(look));
+                }
+
+                animator.SetInteger(ActionAnimator.VariantParam, Random.Range(0, 3));
+                animator.SetTrigger(ActionAnimator.DieTrigger);
+                if (!sawIt)
+                {
+                    animator.Update(0f);
+                    animator.Update(10f); // to the end of the fall at once
+                }
+
+                return;
+            }
+
             if (animator != null)
             {
                 // Hold the standing pose (idle's first frame), then stop animating for good.

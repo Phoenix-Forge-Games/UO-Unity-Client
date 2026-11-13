@@ -51,6 +51,12 @@ namespace UOGame
             }
         }
 
+        public override void OnStopClient()
+        {
+            base.OnStopClient();
+            ActionAnimator.Unregister(ObjectId);
+        }
+
         private void Build(int body)
         {
             if (_graphic == null || body <= 0)
@@ -67,6 +73,8 @@ namespace UOGame
             _human = global::UOClient.Content.SecureArt.Resolve(_human, global::UOClient.Content.SecureArtAddresses.HumanModel);
             _humanAnimator = global::UOClient.Content.SecureArt.Resolve(_humanAnimator, global::UOClient.Content.SecureArtAddresses.HumanAnimator);
             _model = ActorModel.Build(body, _graphic, _catalog, _human, _humanAnimator, GetComponent<NpcMobile>().Look, out _animator);
+            NpcMobile self = GetComponent<NpcMobile>();
+            ActionAnimator.Register(ObjectId, _animator, () => self.Look); // attacks and flinches
             float height = 1.8f;
             if (ActorModel.Bounds(_model, out Bounds bounds))
             {
@@ -74,6 +82,11 @@ namespace UOGame
             }
 
             GetComponent<NpcMobile>().SetModelHeight(height);
+            var steps = GetComponent<UOGame.Combat.Combatant>();
+            _footed = GameAudio.Footed(steps);
+            _stepFamily = steps != null ? GameAudio.Family(steps) : null;
+            _stepScale = height / 1.8f;
+            _humanGait = ActionAnimator.IsHumanoid(_animator);
             _last = _graphic.position;
             _renderers = _model != null ? _model.GetComponentsInChildren<Renderer>(true) : new Renderer[0];
             _living = new Material[_renderers.Length][];
@@ -137,8 +150,23 @@ namespace UOGame
             _last = _graphic.position;
             moved.y = 0f;
             _speed = Mathf.Lerp(_speed, moved.magnitude / Time.deltaTime, 1f - Mathf.Exp(-10f * Time.deltaTime));
-            float parameter = _speed < 0.2f ? 0f : _speed <= 3f ? _speed / 3f : 1f + Mathf.Clamp01((_speed - 3f) / 3f);
+            // People: Speed in metres a second (the humanoid controller has each clip at its own ground speed);
+            // creatures' controllers take 0 idle, 1 walk, 2 run.
+            float parameter = _speed < 0.2f ? 0f : _humanGait ? _speed : _speed <= 3f ? _speed / 3f : 1f + Mathf.Clamp01((_speed - 3f) / 3f);
             _animator.SetFloat(SpeedParameter, parameter);
+            var mobile = GetComponent<NpcMobile>();
+            ActionAnimator.Drive(_animator, hiddenBy != null && hiddenBy.InCombat.Value && !hiddenBy.Dead.Value,
+                mobile != null && ActorModel.IsHumanBody(mobile.BodyId) ? mobile.Look : (Look?)null);
+            if (_footed && _model != null && _model.activeSelf && (hiddenBy == null || !hiddenBy.Dead.Value))
+            {
+                _steps.Update(_graphic.position, parameter > 0f ? _speed : 0f, _stepScale, _stepFamily, false);
+            }
         }
+
+        private readonly Footsteps _steps = new Footsteps();
+        private bool _footed;
+        private string _stepFamily;
+        private float _stepScale = 1f;
+        private bool _humanGait;
     }
 }

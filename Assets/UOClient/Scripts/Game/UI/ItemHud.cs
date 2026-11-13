@@ -851,6 +851,10 @@ namespace UOGame.UI
             {
                 _network.ClientManager.Broadcast(new MoveItem { Id = item.Id, Amount = item.Amount, To = ItemPlace.Backpack, Container = from == Source.Animal ? _animalPet : 0 });
             }
+            else if (CraftService.TryOpenFor(ItemService.Catalog?.Get(item.Kind)?.Type))
+            {
+                // A craft's tool (a sledgehammer, held or carried) opens its craft; using it puts it in hand.
+            }
             else if (from == Source.Worn)
             {
                 _network.ClientManager.Broadcast(new WearItem { Id = item.Id, Wear = false });
@@ -863,7 +867,7 @@ namespace UOGame.UI
             {
                 _backpack.Close();
             }
-            else if (!CraftService.TryOpenFor(ItemService.Catalog?.Get(item.Kind)?.Type))
+            else
             {
                 _network.ClientManager.Broadcast(new UseItem { Id = item.Id });
             }

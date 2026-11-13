@@ -151,15 +151,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleWarMode",
-                    "type": "Button",
-                    "id": "2180abd4-c754-5ca9-8695-187ab3174eca",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Chat",
                     "type": "Button",
                     "id": "f703a57d-330c-567d-8e1f-78ed1e4dff68",
@@ -658,17 +649,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "17b2167f-f3c6-5f88-bd2b-07e3c633cf3c",
-                    "path": "<Keyboard>/backquote",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleWarMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -717,6 +717,7 @@ namespace UOGame.Combat
 
         public bool IsEnemyOf(Combatant other) =>
             other != null && other != this && !other.Dead.Value && !other.Protected && !Protected && !other.Hidden.Value &&
+            !Evading && !other.Evading &&
             !other.AdminMode.Value && !AdminMode.Value &&
             !(other.Ethereal && Team != Side.Player) &&
             (Team == Side.Player && (other.Team == Side.Monster || other.Team == Side.Neutral) ||
@@ -768,6 +769,35 @@ namespace UOGame.Combat
             AutoAttack = false;
         }
 
+        /// <summary>
+        /// Server: a creature that gave up the chase (past its leash) walking back to where the fight began. Nothing can
+        /// hurt or attack it on the way and it attacks no one; it heals to full once back (<see cref="EndEvade"/>).
+        /// </summary>
+        public bool Evading { get; private set; }
+
+        /// <summary>Server: drop the fight and evade: everyone after it stops, so their fight ends unless something
+        /// else still wants them dead.</summary>
+        public void BeginEvade()
+        {
+            foreach (Combatant a in new List<Combatant>(_attackers))
+            {
+                if (a != null && a.Target == this)
+                {
+                    a.StopAttacking();
+                }
+            }
+
+            DropFight();
+            Evading = true;
+        }
+
+        /// <summary>Server: back where the fight began: whole again, and fair game.</summary>
+        public void EndEvade()
+        {
+            Evading = false;
+            Hits.Value = HitsMax.Value;
+        }
+
         /// <summary>Server: give up the fight (a creature leashing home): drop everything and heal to full.</summary>
         public void Evade()
         {
@@ -810,7 +840,11 @@ namespace UOGame.Combat
                 AutoAttack = false;
             }
 
-            bool fighting = _attackers.Count > 0 || AutoAttack && Target != null;
+            // In combat (MMO style; no war mode, no timer): something wants you dead (has you as its target), or you're
+            // attacking something that's still fighting. It ends when they're all dead, when you are, or when the last
+            // one gives up the chase (BeginEvade stops everyone attacking it).
+            bool attacking = AutoAttack && Target != null && !Target.Evading;
+            bool fighting = _attackers.Count > 0 || attacking;
             if (InCombat.Value != fighting)
             {
                 InCombat.Value = fighting;
@@ -908,6 +942,7 @@ namespace UOGame.Combat
             {
                 return;
             }
+
 
             Moves?.BeforeSwing(this, target);
             RevealingAction(); // swinging gives you away (a stealth move has seen you hidden)
@@ -1008,9 +1043,9 @@ namespace UOGame.Combat
         /// <summary>Server: takes a hit (or a miss, which still starts the fight), already cut by resists.</summary>
         public void Hit(Combatant attacker, int damage)
         {
-            if (Dead.Value || AdminMode.Value)
+            if (Dead.Value || AdminMode.Value || Evading)
             {
-                return;
+                return; // an evading creature can't be hurt (it's walking back to where the fight began)
             }
 
             if (damage > 0 && UnderEvilOmen)
@@ -1030,10 +1065,12 @@ namespace UOGame.Combat
             {
                 _attackers.Add(attacker);
                 InCombat.Value = true;
-                // Someone hit with nothing else to do fights back.
-                if (Target == null || !AutoAttack)
+                // Someone attacked (hit or missed) with nothing else to fight fights back: creatures, and players too
+                // (UO: an attacker becomes your combatant). A player already attacking someone keeps their own foe;
+                // IsEnemyOf keeps players from turning on each other.
+                if (Target == null || !AutoAttack || Target.Dead.Value)
                 {
-                    if (IsEnemyOf(attacker) && (Team == Side.Monster || Team == Side.Neutral))
+                    if (IsEnemyOf(attacker))
                     {
                         Engage(attacker);
                     }

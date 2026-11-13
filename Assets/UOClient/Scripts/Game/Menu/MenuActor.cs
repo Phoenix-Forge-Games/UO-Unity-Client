@@ -180,8 +180,8 @@ namespace UOGame.Menu
 
             if (_animator != null && _animator.isActiveAndEnabled)
             {
-                // The humanoid controller: 0 idle, 1 walk (3 m/s), 2 run.
-                _animator.SetFloat(SpeedParam, moved <= 0f ? 0f : moved <= 3f ? moved / 3f : 1f + (moved - 3f) / 4f, 0.1f, Time.deltaTime);
+                // The humanoid controller takes Speed in metres a second (each clip at the ground speed it shows).
+                _animator.SetFloat(SpeedParam, moved, 0.07f, Time.deltaTime);
             }
         }
 

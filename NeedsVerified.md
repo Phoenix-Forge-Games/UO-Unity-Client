@@ -5,6 +5,60 @@ remove it once it's been seen working (by the user or a test on the local server
 TODO.md.
 Last updated 2026-11-12.
 
+## Town ambience without engines, 2026-11-12
+- Picked by measurement, not by ear: listen in a town by day that the village and crowd loops (Crowd Loop 04, 05)
+  have no traffic, engines, modern voices or phones.
+
+## The mix and the menu walk, 2026-11-12 (user: no footsteps, no ambience, the walk-out slides)
+- The sounds were playing but buried: the ambience loops are 20-28 dB quieter than the music and footsteps 19-30 dB
+  under full scale, all at the same channel volume. Now Resources/Audio/GameMix.mixer (made by MakeAudio): Music
+  -10 dB, Ambient +10 dB, Sfx and UI as recorded; pools raised (effects 128, ambience 12, interface 16). Seen: every
+  channel routed through its group. Not heard: the new balance.
+- Feet matched to the ground everywhere (Speed in m/s, clips at their root-motion speeds, a sprint for the 7 m/s
+  run). Seen: the clip weights at each pace (menu walk-out on the walk clip; 3 m/s mostly run; 7 m/s mostly
+  sprint). Not seen by eye: no sliding left; the walk/run/sprint blends at in-between paces; NPCs chasing (5.5).
+
+## Footsteps, 2026-11-12
+- Seen in Solo: which sound each walker picks (orc, troll, a cow on grass, the grounds around Britain).
+- Not heard: whether the orc/goblin steps pass for people; the single-clip grounds repeating; the stride timing
+  against the walk and run animations; riding (the rider steps with a longer stride, not hooves); swimming.
+
+## The tool for the job, 2026-11-12
+- Seen in Solo (the swap called directly): the sword goes into the pack and the smith's hammer or pickaxe is drawn in
+  hand; the sword comes back after the wait, and straight away when a fight starts.
+- Not checked: through real gathering (E at a rock or tree) and real crafting at an anvil; walking away; logging out
+  mid-work; a two-handed weapon or a shield coming back; other players seeing the tool; double-clicking a
+  sledgehammer opening Blacksmithy.
+
+## Facing your target, 2026-11-12
+- Seen in Solo: standing still, the model turns to a selected cow and follows it; clearing the target turns it back.
+- Not checked: stopping after a run and turning to the target; facing a foe mid-fight (swings land facing it);
+  another player watching you turn; a gargoyle (the turn folds into its flight lean).
+
+## Working poses, 2026-11-12 (Solo, poses set by hand)
+- Seen: each working pose (chopping, fishing, smithing, bench, brewing) switching the player into its loop; mining
+  waited while the player was fighting a skeleton (work starts from the normal stance only).
+- Not checked: real gathering and crafting setting and clearing the pose (E to stop, moving away, combat, the
+  resource running out); hearing the work sounds in time with the blows; other players seeing it.
+
+## Combat, aggro and leashing (MMO style, no war mode), 2026-11-12 (Solo)
+- Seen: idle out of combat in the normal stance; attacked by an orc, the player takes it as their target, goes into
+  the combat stance (one-handed, sword) and swings back; the orc dead, back to the normal stance and out of combat;
+  an orc that can't reach the player gives up, drops aggro (the player leaves combat at once, no timer), walks back
+  untouchable (a hit did nothing; it can't be targeted), then heals to full and is fair game again; the menu's
+  character standing relaxed (no longer in a fighting pose).
+- Not checked: a creature leashing by distance (35 m from where the fight began) with a clear path; two creatures
+  on the player with one leashing (the player should stay in combat); pets and summons; the stance with two-handed,
+  polearm and ranged weapons; swimming while in combat.
+
+## Creatures, combat animation and sound packs, 2026-11-12 (Solo, state sampling and captures)
+- Seen: the new orcs, orcish lord, ogre and ettin spawning in Britain; orcs playing both attack clips, the ettin
+  punching (no weapon), the player flinching (all three); an orc corpse and the player's corpse lying in their
+  death pose instead of tipping over; 70 sound keys filled with clips.
+- Not checked: hearing any of the new sounds (only that they're picked); weapon-group attacks with real weapons
+  (sword, mace, bow...); swimming and casting animations; the ogre, shaman and hero deaths; gremlins and enslaved
+  goblins in the world; how the PolyNext models' heights look next to players.
+
 ## Ground under water, 2026-11-12 (scratch bake of chunks 22,24 and 23,24; raycasts)
 - Fixed: most UO water is water statics over "NoName" (void) land, and the terrain cut a hole at every void tile, so
   there was nothing under rivers, canals and much of the sea (Trammel 815k tiles in 1535 chunks, Felucca 832k).

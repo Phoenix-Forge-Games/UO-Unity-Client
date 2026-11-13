@@ -2446,7 +2446,7 @@
      "Unit": "s",
      "Note": "= 1.2 x Magery seconds (not rounded)"
     },
-    "Also": "clears the target's combatant and war mode; ends early on any revealing action",
+    "Also": "clears the target's combatant (they stop fighting); ends early on any revealing action",
     "FailsIf": "target is a vendor or higher staff level"
    },
    "Resistable": false,

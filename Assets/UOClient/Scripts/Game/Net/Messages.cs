@@ -7,7 +7,7 @@ namespace UOGame.Net
     public static class Protocol
     {
         /// <summary>Bump when any message changes shape.</summary>
-        public const int Version = 27;
+        public const int Version = 28; // 28: MMO-style combat (no war mode, leash and evade), tools for the job
 
         /// <summary>
         /// What this build's world content is: the chunk format and the palette it was baked against. A client whose

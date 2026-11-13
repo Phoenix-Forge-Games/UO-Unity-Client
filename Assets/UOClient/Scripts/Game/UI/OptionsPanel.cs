@@ -262,7 +262,7 @@ namespace UOGame.UI
 
         // ------------------------------------------------------------------ building blocks
 
-        /// <summary>"ToggleWarMode" → "Toggle war mode".</summary>
+        /// <summary>"CycleTarget" → "Cycle target".</summary>
         private static string Readable(string name)
         {
             var sb = new System.Text.StringBuilder();

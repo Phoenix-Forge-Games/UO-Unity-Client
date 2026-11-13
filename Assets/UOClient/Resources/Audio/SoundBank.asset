@@ -13,30 +13,1049 @@ MonoBehaviour:
   m_Name: SoundBank
   m_EditorClassIdentifier: UOGame::UOGame.SoundBank
   Entries:
-  - Key: step
-    Clips: []
+  - Key: step.gravel
+    Clips:
+    - {fileID: 11400000, guid: 230f5e891ad2db24fa89759c43ad55f3, type: 2}
+  - Key: step.leaves
+    Clips:
+    - {fileID: 11400000, guid: 1cd8b17b62baad74cb0da75aa2cc3182, type: 2}
+  - Key: step.sand
+    Clips:
+    - {fileID: 11400000, guid: b4658eff515c8c44aa960b128a65b590, type: 2}
+  - Key: step.water
+    Clips:
+    - {fileID: 11400000, guid: df30f9dd0c17cc54d815ebe2d6f4a32a, type: 2}
+  - Key: step.metal
+    Clips:
+    - {fileID: 11400000, guid: 3e4e6420c0912164ca4517745758e48d, type: 2}
+  - Key: step.plain
+    Clips:
+    - {fileID: 11400000, guid: 3e0661db9b376d746971a54f9e6c4e6f, type: 2}
+    - {fileID: 11400000, guid: 0989f7001cadf1a4187b0c49550e8e51, type: 2}
+    - {fileID: 11400000, guid: 4292f4839b364c8428138265ceb6d4de, type: 2}
+    - {fileID: 11400000, guid: 86ac4bbcfc8e3314681b75f7f03246cc, type: 2}
+    - {fileID: 11400000, guid: ce7cf9b01220e7441ba5661f3dc8c165, type: 2}
+    - {fileID: 11400000, guid: 0d4ff35c44765534ea6021a62555488e, type: 2}
+    - {fileID: 11400000, guid: 781bb3391454cc841b05e939814c44e7, type: 2}
+    - {fileID: 11400000, guid: 0d713166ab3290b47864a56692b27f14, type: 2}
+    - {fileID: 11400000, guid: 44a32d16a15069a4a9cfa9adb5772ee2, type: 2}
+    - {fileID: 11400000, guid: f455ba241bf11894cb07f1a3e5fea47d, type: 2}
+    - {fileID: 11400000, guid: 3fd343b8c26838b488672d23045c006b, type: 2}
+  - Key: step.orc
+    Clips:
+    - {fileID: 11400000, guid: 45beb15c6dd350b49908ba29425b21a1, type: 2}
+    - {fileID: 11400000, guid: d04a60d9218a6a747ad95ffbe740644c, type: 2}
+    - {fileID: 11400000, guid: 85647bdc4a841e24894b0ccf20197918, type: 2}
+    - {fileID: 11400000, guid: 7a0f13addaeb2404c80ce701537dc821, type: 2}
+    - {fileID: 11400000, guid: bc1f1765f7e354943ae79677324c7a20, type: 2}
+    - {fileID: 11400000, guid: 71439f736cc38dd4daf904645474096e, type: 2}
+    - {fileID: 11400000, guid: 99b0e80c71a0b0a4f97c62f169bd73d5, type: 2}
+    - {fileID: 11400000, guid: 95c87bce0df7af741bda6a589f338f64, type: 2}
+    - {fileID: 11400000, guid: 8e8e2f7a539028b44b37db6783e527ca, type: 2}
+    - {fileID: 11400000, guid: c0c7150b05296cf43b9c1169a29ee295, type: 2}
+  - Key: step.goblin
+    Clips:
+    - {fileID: 11400000, guid: 7c9b03185befdd44f9be2a88ecf6ebdc, type: 2}
+    - {fileID: 11400000, guid: 8b2666c9ad0224d4b886367468618d27, type: 2}
+    - {fileID: 11400000, guid: 3879a3025152a1b458e5cb2e15702fdb, type: 2}
+    - {fileID: 11400000, guid: d728478c496058244a7da9da21ce712c, type: 2}
+    - {fileID: 11400000, guid: 29c068343ce001c42adf33bf13403d8b, type: 2}
+    - {fileID: 11400000, guid: 935507a157a38554fb99ab4e3035420b, type: 2}
+  - Key: step.troll
+    Clips:
+    - {fileID: 11400000, guid: bdac592737e0f1d4d91ddc7a89abc069, type: 2}
+    - {fileID: 11400000, guid: 6908cb60912588d48a6bbe494844a74d, type: 2}
+    - {fileID: 11400000, guid: 95c33e2fa261ea945af16f107bcd8830, type: 2}
+    - {fileID: 11400000, guid: 103277c3d0a804640a3b17f2b5b6973e, type: 2}
+    - {fileID: 11400000, guid: 77215905f62e5dd498876a97c40297ad, type: 2}
+  - Key: step.dragon
+    Clips:
+    - {fileID: 11400000, guid: 6ae3fbbbcd772e7468fa2696aac00f48, type: 2}
+    - {fileID: 11400000, guid: 46de0c9522164114eb6fe850bbc08440, type: 2}
+    - {fileID: 11400000, guid: 178b2fb81f7d03542b47aa3a4c2d5c3c, type: 2}
+    - {fileID: 11400000, guid: fcd25f66ea5aca0439542b0ead445244, type: 2}
+  - Key: step.daemon
+    Clips:
+    - {fileID: 11400000, guid: 22556c1b3035c134089c6bb2ec48490a, type: 2}
+    - {fileID: 11400000, guid: 9df0475f5975a5b40903859c79b82749, type: 2}
+    - {fileID: 11400000, guid: c5020a335a1f32249be258b6db87fc4a, type: 2}
+    - {fileID: 11400000, guid: 9032bd1fafbf5f54ab4f781b3e8719cf, type: 2}
+  - Key: step.skeleton
+    Clips:
+    - {fileID: 11400000, guid: 83f5d4e73f8a7b54f8914f7629851e7b, type: 2}
+    - {fileID: 11400000, guid: 9eb172944a606a8458c459f3cfbcb9f0, type: 2}
+    - {fileID: 11400000, guid: 3c7cb21aef6815349a9b0e684b79754e, type: 2}
+    - {fileID: 11400000, guid: c5db399e596af9947b042943fc5a3162, type: 2}
+  - Key: step.insect
+    Clips:
+    - {fileID: 11400000, guid: bcdcd4f33ac1f0e48a4fc3949bc046c9, type: 2}
+    - {fileID: 11400000, guid: d63dac16d31a2154fa372b80bd7c1305, type: 2}
+    - {fileID: 11400000, guid: cfc4f4f1cf8c805438df8ef1708f187b, type: 2}
+    - {fileID: 11400000, guid: 8b345c914d60eb448a9a81690026f3a1, type: 2}
+    - {fileID: 11400000, guid: 88b60bff882ad1e4d972f6ccc32c2751, type: 2}
+    - {fileID: 11400000, guid: c63f9ce6e9098324f86f51949a02f589, type: 2}
   - Key: swing
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: a6a02f2675268cf4394b6622b4703274, type: 2}
+    - {fileID: 11400000, guid: 1cdddb1bab2912b4f89b904370358f7a, type: 2}
+    - {fileID: 11400000, guid: 6f14804f050bc214a8610cee6e75e079, type: 2}
+    - {fileID: 11400000, guid: 3fef83c5f4aa3314f94680270e04cdf5, type: 2}
+    - {fileID: 11400000, guid: 4e68179c9afbe484e95b84c6f5772bf9, type: 2}
+    - {fileID: 11400000, guid: 328cd675413aaab4a8ce49783d7fedfd, type: 2}
+    - {fileID: 11400000, guid: 6936beb531ff8f64e84b8ca013d5224a, type: 2}
+    - {fileID: 11400000, guid: 15d231cd180964e4c82c81047d6c5d45, type: 2}
+    - {fileID: 11400000, guid: 5e807047ba09d354882ac62a1b426d4d, type: 2}
+    - {fileID: 11400000, guid: be7236c3e7eefef41bb0cd902447dd90, type: 2}
+    - {fileID: 11400000, guid: 27d8906f5c467f149bf9da0586440ef5, type: 2}
+    - {fileID: 11400000, guid: f9a91bf898d58344eb58d2279aebbf9a, type: 2}
+    - {fileID: 11400000, guid: 5236140cba1b4554ebe9922a7435d1ce, type: 2}
+    - {fileID: 11400000, guid: d36eaedd6630cb04b80e913455b7d0e3, type: 2}
+    - {fileID: 11400000, guid: 5c593a4aa8ad1824b97dc35c84258479, type: 2}
+    - {fileID: 11400000, guid: eaad51e41dff1a94a949a52320d06fe8, type: 2}
+    - {fileID: 11400000, guid: 79e573e1fb55e8f41b93139ba41092b3, type: 2}
+    - {fileID: 11400000, guid: bf943c584607bf44ba333d5a80585153, type: 2}
+    - {fileID: 11400000, guid: 46c8b29e43ed8c44aa9c84ebfb7a3ea1, type: 2}
+    - {fileID: 11400000, guid: be56441c8ee519f4b8be77ff0bef3922, type: 2}
+    - {fileID: 11400000, guid: ef59088a7abf39747a3241c9096192c0, type: 2}
+    - {fileID: 11400000, guid: cdc808162e55e4a40864550c66584304, type: 2}
+    - {fileID: 11400000, guid: b3642f99b3cd83b4190be5bc79b0d222, type: 2}
+    - {fileID: 11400000, guid: 944d8e8963eef3e4ea5666efa27e45c6, type: 2}
+    - {fileID: 11400000, guid: 6d8f5d6a498bab043b71acf83822c504, type: 2}
+    - {fileID: 11400000, guid: 2780ff8b02e71e947854c4854d5b8fcc, type: 2}
+    - {fileID: 11400000, guid: 321fc4370f7f08049ac555ae4ecd14bd, type: 2}
+    - {fileID: 11400000, guid: 3352f9f5d3919854cb000d7dfba9ae0a, type: 2}
+    - {fileID: 11400000, guid: d633f9a6adeac5349bb3569b67c3985b, type: 2}
+    - {fileID: 11400000, guid: 02a2137664b82844698e3c93c3b967ba, type: 2}
+    - {fileID: 11400000, guid: b822137ff580d8948834acfab545be4e, type: 2}
+    - {fileID: 11400000, guid: 937701ea7f4b328418d3a556411a555a, type: 2}
+    - {fileID: 11400000, guid: bc48f5beecb83e740abbcc4cd8d92e42, type: 2}
+  - Key: swing.heavy
+    Clips:
+    - {fileID: 11400000, guid: e9b88b6d88a39584ab8f7efd1401ddf4, type: 2}
+    - {fileID: 11400000, guid: d02570e6e768602439547ad517208fe7, type: 2}
+    - {fileID: 11400000, guid: 42f1a49a50055f94995376f436cb51df, type: 2}
+    - {fileID: 11400000, guid: 023a6b1819466bc46bf59fa1c70c4e2f, type: 2}
+    - {fileID: 11400000, guid: 7caf5e6b22fe66045a6f211937054f9e, type: 2}
+    - {fileID: 11400000, guid: acc6a657ade747c4c85f8ecd4ed49067, type: 2}
+    - {fileID: 11400000, guid: 6657a67963d1e1d4cb667c54072577ed, type: 2}
+    - {fileID: 11400000, guid: 2e9d405fb48ce2e47ae2cd536157f637, type: 2}
+    - {fileID: 11400000, guid: 2574e79c99778ec45974dc0c33b37f08, type: 2}
+    - {fileID: 11400000, guid: 5a6f7dcacedb9a44497f30087dc0b08c, type: 2}
+    - {fileID: 11400000, guid: 00487e892e4254c4182b60f6c9fe1e90, type: 2}
+    - {fileID: 11400000, guid: cb274bd4c567ce247bfa003914ec3a42, type: 2}
+    - {fileID: 11400000, guid: 631919053b6f6aa4d9a3dff5215a5ccb, type: 2}
+    - {fileID: 11400000, guid: aad9a8fac1678174aa5a2234d305be55, type: 2}
+    - {fileID: 11400000, guid: 6ae0cddf426698c41a359082d4f0ca5f, type: 2}
+    - {fileID: 11400000, guid: 0b85f3f3d0ce090409aac3ab6a128b34, type: 2}
+  - Key: swing.unarmed
+    Clips:
+    - {fileID: 11400000, guid: 88da52a028e67454d997993d75499b89, type: 2}
+    - {fileID: 11400000, guid: c93967e9c304b0f4db50ef547c571b44, type: 2}
+    - {fileID: 11400000, guid: 9af965749f8ba2d46b1a94139595f4d6, type: 2}
+    - {fileID: 11400000, guid: 1f3d47558cd23df4d9fa43c4282042a2, type: 2}
+    - {fileID: 11400000, guid: bb3d49cc6fe77854b90ebdebe894d7bb, type: 2}
+    - {fileID: 11400000, guid: 39df3182ba8ce1c45b6c41e8a25bc423, type: 2}
+    - {fileID: 11400000, guid: 47477a0abb641914d891a6a344d19b92, type: 2}
+    - {fileID: 11400000, guid: a1e39504715866d448db5e49d0b78436, type: 2}
+    - {fileID: 11400000, guid: 9cfb4209f19816643a3d276614f6b6fe, type: 2}
+    - {fileID: 11400000, guid: be7a451d196367946b67239b0a5cb9c6, type: 2}
+    - {fileID: 11400000, guid: 88a81b557340ff04480d8d5c64821171, type: 2}
+    - {fileID: 11400000, guid: 66d0fb217a892fa40a8aa3ebf4250f18, type: 2}
+    - {fileID: 11400000, guid: a1c87c1bc420fb246a181c5d8e22796b, type: 2}
+    - {fileID: 11400000, guid: 28d8b89afb88f824e827e0288d97b713, type: 2}
+    - {fileID: 11400000, guid: a3a480df94063144eac17b97b1db584d, type: 2}
+    - {fileID: 11400000, guid: ec214dfb6ddc842459c645c78a8a2b74, type: 2}
+  - Key: swing.bow
+    Clips:
+    - {fileID: 11400000, guid: 303d9e97497c10b438cf46e5c2e6777a, type: 2}
+    - {fileID: 11400000, guid: 089b1d114f8b47140811c563c2686c1f, type: 2}
+    - {fileID: 11400000, guid: fcb7177c38ef18642a9e5bb54b7bee0f, type: 2}
+    - {fileID: 11400000, guid: 98d4ed07287f47b40814bc64f7d396fd, type: 2}
+  - Key: swing.crossbow
+    Clips:
+    - {fileID: 11400000, guid: 507b2f1dd6e0bb349ad14fd6ea1e8a5d, type: 2}
+    - {fileID: 11400000, guid: 2c3e8662b49fd144fb8aca9f1d98df2c, type: 2}
+    - {fileID: 11400000, guid: 0ab772549d9f26442b7277430601bd05, type: 2}
+    - {fileID: 11400000, guid: 9a520fb678ac9a643bb8fb2d5ff969ec, type: 2}
   - Key: hit
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 6c554bf86238426409130f4e3612a756, type: 2}
+    - {fileID: 11400000, guid: ff41d33aa3344ab479c53af500d0e946, type: 2}
+    - {fileID: 11400000, guid: 4b2992812ffd91e46958ae8b0ff05119, type: 2}
+    - {fileID: 11400000, guid: ebc5653410587b84086e5bd95dc7b118, type: 2}
+    - {fileID: 11400000, guid: 3476b897c553427488ba29e9952c0a0b, type: 2}
+    - {fileID: 11400000, guid: 43d3aa05e2451f34e804e3bdc8eba401, type: 2}
+    - {fileID: 11400000, guid: c1d402b67d360b542a56890535684985, type: 2}
+    - {fileID: 11400000, guid: ee4aab6e504fca7418f602edc1005004, type: 2}
+    - {fileID: 11400000, guid: 191b0fe01f6538e4e98e38d2c60ae4a3, type: 2}
+    - {fileID: 11400000, guid: 99dfecf5629dc91438876478d85c1bee, type: 2}
+    - {fileID: 11400000, guid: 294cd45dae81d294f96570136caad6ef, type: 2}
+    - {fileID: 11400000, guid: 4706af2172d7de14587725d71674c8e1, type: 2}
+    - {fileID: 11400000, guid: 79f1f4cd54f8d20428d275ef70493129, type: 2}
+    - {fileID: 11400000, guid: 1238e4d8d8adacf43b5e4da442b41e1c, type: 2}
+    - {fileID: 11400000, guid: 255f5e25c4c58d94eb3318d133ea808e, type: 2}
+    - {fileID: 11400000, guid: decb23d87be87c54aabc5627b22d6b51, type: 2}
+    - {fileID: 11400000, guid: b48768f45086fe947a9275e071c185a5, type: 2}
+    - {fileID: 11400000, guid: 39ebd3ea83b49454bb1d025bad29faf3, type: 2}
+    - {fileID: 11400000, guid: 5587743134d212845ac6a2a7301895f0, type: 2}
+    - {fileID: 11400000, guid: a72271b1b3f9ad1448ac31a57d781cf7, type: 2}
+  - Key: hit.blunt
+    Clips:
+    - {fileID: 11400000, guid: c24fd50cdc2303a40825b80da6c88bfd, type: 2}
+    - {fileID: 11400000, guid: e5418b0b1a70c994aa171e408fa21d44, type: 2}
+    - {fileID: 11400000, guid: ad2da4c3f5e3ebc4f998fb3b051e19dd, type: 2}
+    - {fileID: 11400000, guid: c0d8bf7b257c89d4b8d7c36189f55168, type: 2}
+    - {fileID: 11400000, guid: 0702a5afb1391e946b25fed62cb02ad1, type: 2}
+    - {fileID: 11400000, guid: 2c8cfa0bc3ce25640a680acd1f947738, type: 2}
+    - {fileID: 11400000, guid: 75182cbf04e46564aa00d7cc03dc4b84, type: 2}
+    - {fileID: 11400000, guid: abc6965336f6f9140b734f63979eb817, type: 2}
+    - {fileID: 11400000, guid: a9cec5c4eaad72847abaff5a4ff74ab5, type: 2}
+    - {fileID: 11400000, guid: 6be42639d260b704eb3bc6ee9c53761e, type: 2}
+    - {fileID: 11400000, guid: 3788f88790c63de40b4369ce0b760499, type: 2}
+    - {fileID: 11400000, guid: 5e67e640bcb9d014b89c26dc2c013aca, type: 2}
+    - {fileID: 11400000, guid: faf539eea2a1b044384cdb8d96167d0f, type: 2}
+    - {fileID: 11400000, guid: fd3bbd5b32ce3ba42a290c01873da2f7, type: 2}
+    - {fileID: 11400000, guid: 49c51fccd4a7cc649b0fcd30fdeb7633, type: 2}
+    - {fileID: 11400000, guid: 7b0729568a7b12e4e8c18b7a7caaf605, type: 2}
+    - {fileID: 11400000, guid: a37e80e10357977409979f283d336c5d, type: 2}
+    - {fileID: 11400000, guid: a0aaa3c1f34b90641bda9a449d783af1, type: 2}
+    - {fileID: 11400000, guid: f484841111be11240832c24f736fe8cf, type: 2}
+    - {fileID: 11400000, guid: cca5c95835e548e40ac9dd6331713fab, type: 2}
+    - {fileID: 11400000, guid: 6f7a70b271367a440937fc6847d80583, type: 2}
+    - {fileID: 11400000, guid: 896c9e3346aa3504bb271f8ac960a2f2, type: 2}
+    - {fileID: 11400000, guid: 21372691ed8905b44877d29218a46829, type: 2}
+    - {fileID: 11400000, guid: bb42f4fb0fddb40498f3b3b25567823e, type: 2}
+    - {fileID: 11400000, guid: 29b62ab282f308b4baec39c9a915d0bb, type: 2}
+    - {fileID: 11400000, guid: 0c032b9a7090dd645b493b48029210df, type: 2}
+    - {fileID: 11400000, guid: 9e29a3896d13be14294dbdbab3035ed2, type: 2}
+    - {fileID: 11400000, guid: 61a870536d6e4f24aa6513b64b98a1b8, type: 2}
+    - {fileID: 11400000, guid: 05da865f550eef1499f89653ff61751b, type: 2}
+    - {fileID: 11400000, guid: 5957e06cd822a044a83a9375c0cd034f, type: 2}
+    - {fileID: 11400000, guid: d6c0ea11d59ef754b9198624b758638e, type: 2}
+    - {fileID: 11400000, guid: 422845323b0ded640a5533c85fa09bbc, type: 2}
+  - Key: hit.pierce
+    Clips:
+    - {fileID: 11400000, guid: cfc1378e20579704c8eb711771d8834e, type: 2}
+    - {fileID: 11400000, guid: 808ae78d4b39a804f8e61d051eb58439, type: 2}
+    - {fileID: 11400000, guid: 61298a766e24e41469fe890b12a55ff5, type: 2}
+    - {fileID: 11400000, guid: d99259b0651e1154ab2a1eb169d3cbd1, type: 2}
+    - {fileID: 11400000, guid: fc9d2ef22e45cc74cb1308ee3316d5d0, type: 2}
+    - {fileID: 11400000, guid: 4b4cfe2c9dfd4724ab3fd8fe4f982947, type: 2}
+    - {fileID: 11400000, guid: d4a1bd87b04a2104496f6b18a22124b4, type: 2}
+    - {fileID: 11400000, guid: 084063a32e8d52f4bad2c90b01b9d925, type: 2}
+    - {fileID: 11400000, guid: 1204fd3b4a561ad49bdad9d552f42a94, type: 2}
+    - {fileID: 11400000, guid: e8413b4c93206d94dbc595a3212d5735, type: 2}
+    - {fileID: 11400000, guid: 33910c446d40d2a458eafef2017cd3ce, type: 2}
+    - {fileID: 11400000, guid: ed91ab2b86fd9a74bba45ac711c990a6, type: 2}
+    - {fileID: 11400000, guid: 6ae4c98b39d72a94c894c5a798c15666, type: 2}
+    - {fileID: 11400000, guid: f6d0b81e5e9a7c04091af2606cfa572b, type: 2}
+    - {fileID: 11400000, guid: 90fea66bed2807b4aa24222a26843004, type: 2}
+    - {fileID: 11400000, guid: 8be82902d67ea6449ae0f98d95d9fdf4, type: 2}
+    - {fileID: 11400000, guid: a884c49f6abc93348aa91c1e328f310d, type: 2}
+    - {fileID: 11400000, guid: 4b673dd47c17da1438ffb1e9b7a3ff1c, type: 2}
+    - {fileID: 11400000, guid: 4c82fc42dda9d4640ad91b8431cd1547, type: 2}
+    - {fileID: 11400000, guid: 658c87608e81e7c46818577e254ac254, type: 2}
+  - Key: hit.arrow
+    Clips:
+    - {fileID: 11400000, guid: 6f38eb53c5475d341b437897397bb581, type: 2}
+    - {fileID: 11400000, guid: 58e50083ca3b93d4bbff60c3a4c583d2, type: 2}
+    - {fileID: 11400000, guid: ae6ab1b8a7afd9740943b428c5531bca, type: 2}
+    - {fileID: 11400000, guid: 5c35646939336cd478bc5c74b5adeb05, type: 2}
+    - {fileID: 11400000, guid: 0bfbfbeb9541edb40af60a9919221f29, type: 2}
+    - {fileID: 11400000, guid: 48d6357867136f142aeb8707f97ebabf, type: 2}
+    - {fileID: 11400000, guid: 23b6254fe45130d4eb14d10d3aa3176e, type: 2}
+    - {fileID: 11400000, guid: 88df0a5465e5f02459d999393d5ba5ba, type: 2}
+    - {fileID: 11400000, guid: 4dc4ee788a0172947a44682da9b0872a, type: 2}
+    - {fileID: 11400000, guid: 993803c7189ecc740abd44cea204d3a5, type: 2}
+    - {fileID: 11400000, guid: 279d0bd726dbea049bd84f0d2586ecc6, type: 2}
+    - {fileID: 11400000, guid: 99ba2b93ce0b41d48a7ef124b025b1fd, type: 2}
+    - {fileID: 11400000, guid: e926ff4a46cbfbc46b8dc67cd5c2b25d, type: 2}
+    - {fileID: 11400000, guid: d12438dd25bd4a048ac746cafd484559, type: 2}
+    - {fileID: 11400000, guid: 58f4a3746f38a174cada87493b36eb59, type: 2}
+    - {fileID: 11400000, guid: 6a60ad9f60358e94da88b04fcb2c6ce9, type: 2}
+    - {fileID: 11400000, guid: a0c3af8cea70d9c4880f2ef4a70db895, type: 2}
+    - {fileID: 11400000, guid: 42ea75b808ca13e409f36322022e0ccd, type: 2}
+    - {fileID: 11400000, guid: 8f355216090b724438bd9a439c7c5783, type: 2}
+    - {fileID: 11400000, guid: 37598f41dd06e374d9d4b117a38f8378, type: 2}
   - Key: miss
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 6f5e9aa1532acc747bfcb00376ff7563, type: 2}
+    - {fileID: 11400000, guid: 4307c8e5e8d2e5f4dac0e17bf97d707e, type: 2}
+    - {fileID: 11400000, guid: c28ac85d96daf81418ac9f945ee86418, type: 2}
+    - {fileID: 11400000, guid: 86f2ae76ac3ebb6479bbc1a88d5bd174, type: 2}
+    - {fileID: 11400000, guid: 8aefc471133852540854d585f88f4f92, type: 2}
+    - {fileID: 11400000, guid: b033ea92bf2438a408a7c22a4c69b1ff, type: 2}
+    - {fileID: 11400000, guid: 9a6de0ff6a9e1dd438c0be5834d301f2, type: 2}
+    - {fileID: 11400000, guid: 54a1ad90adf4ac143b062cecfd746d2f, type: 2}
+    - {fileID: 11400000, guid: d789e0c6b817a024eb87a436f867c4d7, type: 2}
+    - {fileID: 11400000, guid: 948f12f2e1ae05d438944f50c00f9172, type: 2}
+    - {fileID: 11400000, guid: 3db9f12b288a82c49916da62084075ad, type: 2}
+    - {fileID: 11400000, guid: 13a2c540151cdd2409d267651e2f09a5, type: 2}
+    - {fileID: 11400000, guid: 99622bcde8fa0534292038e42b64930a, type: 2}
+    - {fileID: 11400000, guid: 0e79e34503fa5a64087bbf26cc0d0073, type: 2}
+    - {fileID: 11400000, guid: 37e89ff2a747a954086eda0a898bc3c9, type: 2}
+    - {fileID: 11400000, guid: 8939033029ec0674aa2561c77e3b56a7, type: 2}
+    - {fileID: 11400000, guid: c1da51d797d63334c827c7777172533f, type: 2}
+    - {fileID: 11400000, guid: fd7df501eafe57141bb70d070d5a62e0, type: 2}
+    - {fileID: 11400000, guid: cd5764126551fc4429c2ea85ff540e00, type: 2}
+    - {fileID: 11400000, guid: 0d77ed9b48681f643bc42e4808505026, type: 2}
+    - {fileID: 11400000, guid: 0698185dcef7d5c41bc0100115e19c0e, type: 2}
+    - {fileID: 11400000, guid: 9819e96daef37584cbdc32d3486dd4cd, type: 2}
+    - {fileID: 11400000, guid: f24c25d968408c746946fb90cf08e367, type: 2}
+    - {fileID: 11400000, guid: 761a5e998d5daaa45bd2a85628dca383, type: 2}
+    - {fileID: 11400000, guid: 0c47b5a90e37cdc469e6d8254422f439, type: 2}
+    - {fileID: 11400000, guid: 36b417d44689aec48a6b36f992bbde99, type: 2}
+    - {fileID: 11400000, guid: 25be4f3810e3e5a4daa05a4ed0a489a0, type: 2}
+    - {fileID: 11400000, guid: 5552cd4e0233be7449d2199392f40bb2, type: 2}
+    - {fileID: 11400000, guid: 03b68eecf6ba94f44816f4c43ae9cba7, type: 2}
+    - {fileID: 11400000, guid: 33b1a3e68a1f65b40a0d14b64bf3110a, type: 2}
+    - {fileID: 11400000, guid: 167d6a798b4c8634591e83e5db47a81e, type: 2}
+    - {fileID: 11400000, guid: 3f4e8fa4bfff29743aae8c90f98853d2, type: 2}
+    - {fileID: 11400000, guid: e73cc5db73d001f4386ef15f838a9f2f, type: 2}
+    - {fileID: 11400000, guid: 3fbdbb792a9e46243b1463513738de6a, type: 2}
+    - {fileID: 11400000, guid: 0a4fa8dcde0bc34469e8964a67c59e66, type: 2}
+    - {fileID: 11400000, guid: bd4ab7b8b24dea843bdc89b801010b49, type: 2}
+    - {fileID: 11400000, guid: 7b15484415763c140ad5f6fa9a4e4d71, type: 2}
+    - {fileID: 11400000, guid: b10e42bc6082b1d4295fd8e4a2e51b3b, type: 2}
+    - {fileID: 11400000, guid: 6e765d7a8e243b1409293f7e434413f2, type: 2}
+    - {fileID: 11400000, guid: 86885096d8dcf9e439386248f55f5564, type: 2}
   - Key: death
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 064da0bbf45b6984d953488b72b9afbd, type: 2}
+    - {fileID: 11400000, guid: 91e1b2713583ee546a6a4da35568c7ca, type: 2}
+    - {fileID: 11400000, guid: f29b0eacdb8f4704a8fcaec898b30b3d, type: 2}
+    - {fileID: 11400000, guid: 16492f89bd99fde42bdc02425bfc6966, type: 2}
+    - {fileID: 11400000, guid: 7dd22b1a3cb34934b8e4a305ef577cdd, type: 2}
+    - {fileID: 11400000, guid: 773a38b31bc509046be87f4afbf323ae, type: 2}
+    - {fileID: 11400000, guid: 1131d7419aed44f488d98a2b709d1459, type: 2}
+    - {fileID: 11400000, guid: 371bf96f20408a342b7bb204c93de782, type: 2}
+    - {fileID: 11400000, guid: 4ffb6b77c1d498e4c8a038216af8380b, type: 2}
+    - {fileID: 11400000, guid: 27164d1649af21743ab5f9a187c5c199, type: 2}
+    - {fileID: 11400000, guid: 61121afa3bba4d040be298b8c58260b7, type: 2}
+    - {fileID: 11400000, guid: 0641ee0dde57ff045be8f572731ea4c9, type: 2}
+    - {fileID: 11400000, guid: 9ac07fbba3760e34b97cd3e656c01fbd, type: 2}
+    - {fileID: 11400000, guid: 365665a5cc26dea45b292dd1a675f04a, type: 2}
+    - {fileID: 11400000, guid: 76c623dcb90b2e648b10f918e370ef1b, type: 2}
+    - {fileID: 11400000, guid: 79e2767ac2a41fe478db14d0f880bd6f, type: 2}
+    - {fileID: 11400000, guid: 4574527c9ca4f7947ae0eefa66a5afcb, type: 2}
+    - {fileID: 11400000, guid: 3d51b21c45e76e24680279a5207026d2, type: 2}
+    - {fileID: 11400000, guid: 0734889fa2c560b46a991fbf39507e40, type: 2}
+    - {fileID: 11400000, guid: a41980526e0be924f9b5a6d6dc7d61be, type: 2}
+    - {fileID: 11400000, guid: cdbe24d47efb13e4180792258c491414, type: 2}
+    - {fileID: 11400000, guid: d406ff8361fdf7e46ba253b4d06f49d4, type: 2}
+    - {fileID: 11400000, guid: 805d6f4302fda0649b371d5fd1d79ac0, type: 2}
+    - {fileID: 11400000, guid: 57257211c101ac741a91ea9239204e20, type: 2}
+    - {fileID: 11400000, guid: cac373581b2540841b205f83f7d1c76b, type: 2}
+    - {fileID: 11400000, guid: 88af1bd36e89c3e4eab35054695750e2, type: 2}
+    - {fileID: 11400000, guid: a0393e9483e7c3e44928a0749ee49890, type: 2}
+    - {fileID: 11400000, guid: 7c650ed2191daaf40b65500407172db8, type: 2}
+    - {fileID: 11400000, guid: de1dbf20b3e34c84289b3b95bd7a3045, type: 2}
+    - {fileID: 11400000, guid: c6a1338195d407647b32cf8e5a57caa3, type: 2}
+    - {fileID: 11400000, guid: d42939bc07b4a5e48b10cf89ed79fec6, type: 2}
+    - {fileID: 11400000, guid: d2a125884c780ec45bc0f524129dfe81, type: 2}
+  - Key: creature.orc.attack
+    Clips:
+    - {fileID: 11400000, guid: 5ec6532dfb8149d4f8e2a7f4b4a7a1a6, type: 2}
+    - {fileID: 11400000, guid: 0f76ce71067b7624bbff5b2d5e5dca20, type: 2}
+    - {fileID: 11400000, guid: 61d6d331487e55941a330620196b3f3e, type: 2}
+    - {fileID: 11400000, guid: e3381e9acbe8224459e6d46d7b47d5f4, type: 2}
+    - {fileID: 11400000, guid: 0ee202f642766414fac58f72aa82406c, type: 2}
+    - {fileID: 11400000, guid: 9eb874096e59f40478d69de6b64b2f5a, type: 2}
+    - {fileID: 11400000, guid: 86db33cdfb616994da7f75da757214e8, type: 2}
+    - {fileID: 11400000, guid: 33b865d890ef1c74892e9a68ee9c2c0a, type: 2}
+    - {fileID: 11400000, guid: 0084bd3d4a8c3ba468c208e33c2c0451, type: 2}
+    - {fileID: 11400000, guid: a7f086e10c076e44abc007cf394f4d4f, type: 2}
+    - {fileID: 11400000, guid: 7d0dc8d7acc5ee04cac437295e28c541, type: 2}
+    - {fileID: 11400000, guid: 00666c73bd37bee4b8d497d638ffc1e2, type: 2}
+    - {fileID: 11400000, guid: 1f59e2e960b25864da9934c50a2c80c3, type: 2}
+    - {fileID: 11400000, guid: c2cadba12badc584bbd0af031382316e, type: 2}
+    - {fileID: 11400000, guid: fc75bc596df889a4aa966c1cafdce210, type: 2}
+    - {fileID: 11400000, guid: 14a60a516009438459ecada4081551c9, type: 2}
+    - {fileID: 11400000, guid: b376e79c9c5d04148903d38c63b670b3, type: 2}
+    - {fileID: 11400000, guid: 9908b85d30bb8b84c82d12fa0d93d843, type: 2}
+    - {fileID: 11400000, guid: 435ca30876e6b7f4ab348d51bea1bdc9, type: 2}
+    - {fileID: 11400000, guid: b73cd9f64d1044b41875c4cec6b39d0e, type: 2}
+  - Key: creature.orc.hurt
+    Clips:
+    - {fileID: 11400000, guid: 4799024199b81804c8f870e6bf619bb9, type: 2}
+    - {fileID: 11400000, guid: 0db6038aba1c95544b2fddbcb2d7baaa, type: 2}
+    - {fileID: 11400000, guid: e9669e449b19d10429d06e63a2ec1e73, type: 2}
+    - {fileID: 11400000, guid: 7b59137e72b92da4bbe2df2148526b2e, type: 2}
+    - {fileID: 11400000, guid: b0fba51497ed7184aa3c663690f54199, type: 2}
+    - {fileID: 11400000, guid: 2dcb0ecb70c8e4f4cb8a91159712c0fc, type: 2}
+    - {fileID: 11400000, guid: f052122d5f7768349b73d9bbf21be5dc, type: 2}
+    - {fileID: 11400000, guid: b4d2b0b65ac1c9042805d5cb944ff5af, type: 2}
+    - {fileID: 11400000, guid: f3af59404af79dc48896427486a2e9eb, type: 2}
+    - {fileID: 11400000, guid: c673d6c561a616942be860c2e526dde1, type: 2}
+    - {fileID: 11400000, guid: be19a17138cfab34fbdd97eec0ee5b14, type: 2}
+    - {fileID: 11400000, guid: 88d3cd5c0e362d449a37c1a4c1384c49, type: 2}
+    - {fileID: 11400000, guid: dbcd2ff7c5c94074ca86b4a132ebd7a2, type: 2}
+    - {fileID: 11400000, guid: 6d66c6ee1fc5cd44b9d29bfcf6f8cab4, type: 2}
+  - Key: creature.orc.death
+    Clips:
+    - {fileID: 11400000, guid: 938849ed3d38b934184840685dc044ec, type: 2}
+    - {fileID: 11400000, guid: d3d417e35580f4a4db75e8aac2b41adb, type: 2}
+    - {fileID: 11400000, guid: 92becc031f7c0c942b1d4c8465dd5432, type: 2}
+    - {fileID: 11400000, guid: 5270c07cd858e234699153d0948fcdb6, type: 2}
+    - {fileID: 11400000, guid: 7a6519be73dfb44429db94f44b744b49, type: 2}
+    - {fileID: 11400000, guid: 1b1e47bc9e7a2b146a3c0c3e1fe0c460, type: 2}
+    - {fileID: 11400000, guid: a0f5b6596bfba904883accb0d66ea960, type: 2}
+    - {fileID: 11400000, guid: 3522f5fda8567d24a8f760539b1dd112, type: 2}
+    - {fileID: 11400000, guid: c5b91fd94ccf4fe4eaf25335eb8fdc0e, type: 2}
+    - {fileID: 11400000, guid: 857da6cf7371f8d488cfe1fe227c2950, type: 2}
+  - Key: creature.goblin.attack
+    Clips:
+    - {fileID: 11400000, guid: 10d6e68c8351b7b41a753226bcfde6ea, type: 2}
+    - {fileID: 11400000, guid: 238fb4c183007b7448bf97feab4ec4e0, type: 2}
+    - {fileID: 11400000, guid: 7b6d55c3be1dbd841b862bc8fb2f3597, type: 2}
+    - {fileID: 11400000, guid: 39eb11d7a26c00e4cb20e998d30fbb3f, type: 2}
+    - {fileID: 11400000, guid: f1e5679b912fd0c4ba594eb7fc0f2ecc, type: 2}
+  - Key: creature.goblin.hurt
+    Clips:
+    - {fileID: 11400000, guid: 98ce5c0c69e076046965fc13c69f748b, type: 2}
+    - {fileID: 11400000, guid: bdc0b806f854c044585613ac654c542a, type: 2}
+    - {fileID: 11400000, guid: b9d93dd68aad1a748a4fa6fd4179b2be, type: 2}
+    - {fileID: 11400000, guid: 59b15f957f41082448524ac931a51e7f, type: 2}
+    - {fileID: 11400000, guid: 12f9b128d4880ef42945d5cb9bb63db5, type: 2}
+    - {fileID: 11400000, guid: 34d7d19691fa8e547989bb757df8d379, type: 2}
+    - {fileID: 11400000, guid: 261217ff177d5b54787446032560f698, type: 2}
+    - {fileID: 11400000, guid: b0aec2922241022479868be4baa30b33, type: 2}
+    - {fileID: 11400000, guid: 4ef6eac138526c14e8ca59303cdb8303, type: 2}
+    - {fileID: 11400000, guid: a684411f8954049439fb3d68fe7833e0, type: 2}
+    - {fileID: 11400000, guid: d01f45f73f8172a41b536b777d0acea6, type: 2}
+    - {fileID: 11400000, guid: 9a3c45df69d539c448348a040c4ed3aa, type: 2}
+  - Key: creature.goblin.death
+    Clips:
+    - {fileID: 11400000, guid: e29cd9e4c32c57541adefaa9c60e3a71, type: 2}
+    - {fileID: 11400000, guid: bce36a36b77e03541865de25a61c4689, type: 2}
+    - {fileID: 11400000, guid: 6c69963718f75634bbf029aaad83aaf3, type: 2}
+    - {fileID: 11400000, guid: 50f4ee4a7b54a0f469131cf97a5f51e1, type: 2}
+    - {fileID: 11400000, guid: 591173b2a4eaac34abd5bc040cc22a01, type: 2}
+    - {fileID: 11400000, guid: 8c0c28e4b70cc684d994b2d8234b1237, type: 2}
+    - {fileID: 11400000, guid: ac70091709d00b745938af8c521e6540, type: 2}
+    - {fileID: 11400000, guid: c44ba92633c289748b6c93acbbca0ce6, type: 2}
+  - Key: creature.troll.attack
+    Clips:
+    - {fileID: 11400000, guid: 58c87f4078a22514fa517e3170edf4d5, type: 2}
+    - {fileID: 11400000, guid: 45a02d8be80f6454f83cab036416fd5f, type: 2}
+    - {fileID: 11400000, guid: 3be23c3fcc457a54eafc59edd5c32785, type: 2}
+    - {fileID: 11400000, guid: e6ed3b67bae788c49b6e5cbd0365bc02, type: 2}
+    - {fileID: 11400000, guid: a616d9af493644a4aaf2f70709e15904, type: 2}
+    - {fileID: 11400000, guid: 14333952a330cdd46894d5262d9f865c, type: 2}
+    - {fileID: 11400000, guid: 59a821545e0b4ca4d9c12012b940fc03, type: 2}
+    - {fileID: 11400000, guid: 996143773cccc2b439afa35196f0cb33, type: 2}
+    - {fileID: 11400000, guid: dae5a13ea0f800546888ace37e492d5a, type: 2}
+  - Key: creature.troll.hurt
+    Clips:
+    - {fileID: 11400000, guid: 97b4c09d2ddcdc04fbc26a91e77d2182, type: 2}
+    - {fileID: 11400000, guid: ca861bda6eef47443a84c0f616b3d3f6, type: 2}
+    - {fileID: 11400000, guid: 24759747b2fa5154a9bae21677d98f57, type: 2}
+    - {fileID: 11400000, guid: 209ba88954d0b4a438b2b2e49cacdb5e, type: 2}
+    - {fileID: 11400000, guid: 72895793c2c512d4c99a672cb92be832, type: 2}
+  - Key: creature.troll.death
+    Clips:
+    - {fileID: 11400000, guid: 9a152345f816b9a46bdba6f629ca3c84, type: 2}
+    - {fileID: 11400000, guid: 67e4d54d7e853a04ba17b09c418803b6, type: 2}
+    - {fileID: 11400000, guid: dfbeeffa6b5587d438dbf4647e449a95, type: 2}
+    - {fileID: 11400000, guid: 17ce6fd734c70984bb2816f6773fafc2, type: 2}
+  - Key: creature.dragon.attack
+    Clips:
+    - {fileID: 11400000, guid: 016d40ef7169c2c4487312123b3074f8, type: 2}
+    - {fileID: 11400000, guid: 94daf3cad6a9afa43973827892158f38, type: 2}
+    - {fileID: 11400000, guid: 6b96e8e99f354494989f3512ef732ce0, type: 2}
+    - {fileID: 11400000, guid: 41628c0c4983b784e8aa7038323242ef, type: 2}
+    - {fileID: 11400000, guid: 096d2bb2d835d3145a74a15b67e82cf9, type: 2}
+    - {fileID: 11400000, guid: 3fe397148e6435549ac38600578a4e55, type: 2}
+    - {fileID: 11400000, guid: dd80bc0893509aa41afbb34f6bf943cb, type: 2}
+    - {fileID: 11400000, guid: 1096ae98c2fc5a346a0bdd126bcbf7b2, type: 2}
+    - {fileID: 11400000, guid: 37dde0a3d360e9e4f81b9717a2c121f8, type: 2}
+    - {fileID: 11400000, guid: c8ad5f1574307bb45bde804af17d35a8, type: 2}
+  - Key: creature.dragon.hurt
+    Clips:
+    - {fileID: 11400000, guid: ce56f44fb5a51bc4f834a608e6d0507f, type: 2}
+    - {fileID: 11400000, guid: 66bd51c42c5beb44ba200745dfdcf8aa, type: 2}
+    - {fileID: 11400000, guid: 1c1089e4e47014442ac46a7657d6e243, type: 2}
+    - {fileID: 11400000, guid: e54e816e16f65454a89435b814c5acf2, type: 2}
+    - {fileID: 11400000, guid: eae588107b2fd1e4c8aea076d229f122, type: 2}
+  - Key: creature.dragon.death
+    Clips:
+    - {fileID: 11400000, guid: b3d48bfd709d0bf4fbdfcd14987ed543, type: 2}
+    - {fileID: 11400000, guid: e14480f5c6f07b946a96d856274f5bd7, type: 2}
+    - {fileID: 11400000, guid: f98eade76b34db442bb0848c2f2febfb, type: 2}
+    - {fileID: 11400000, guid: 7a913a06baea0a143880365830c2146e, type: 2}
+    - {fileID: 11400000, guid: d34906871d766474ea6f1f4885decb00, type: 2}
+  - Key: creature.spider.attack
+    Clips:
+    - {fileID: 11400000, guid: 9176e0a7fa90a884abc28b96b9c3bc54, type: 2}
+    - {fileID: 11400000, guid: aac0a1d006ff09f4e81ce243a42cf4ec, type: 2}
+    - {fileID: 11400000, guid: ba319dc03acba48478e3b836db9225fc, type: 2}
+    - {fileID: 11400000, guid: 03e3b0a150241b34cbc351ba712df46d, type: 2}
+    - {fileID: 11400000, guid: b01cbdc79975470458f9967609183aa2, type: 2}
+    - {fileID: 11400000, guid: 4d6e14e224a365542b330bf6794c4846, type: 2}
+    - {fileID: 11400000, guid: be32776be4f6da44297de98d45bb947c, type: 2}
+    - {fileID: 11400000, guid: a478a8893a9b6fd48ab9b3fb2159ebb2, type: 2}
+    - {fileID: 11400000, guid: 6050f9fd14a8c13458386aeb947ef845, type: 2}
+  - Key: creature.spider.hurt
+    Clips:
+    - {fileID: 11400000, guid: 83671110d7952b14a86544a661954eb5, type: 2}
+    - {fileID: 11400000, guid: 1e915d68055581c44bbd6d3eba7fc32c, type: 2}
+    - {fileID: 11400000, guid: 9c452be2e4d692e4692449c59ec705e3, type: 2}
+    - {fileID: 11400000, guid: 6e3deb8018ba8d1499222ecd38bbfdaf, type: 2}
+    - {fileID: 11400000, guid: cdf3255301fd8694ba849ff3a1c0da84, type: 2}
+    - {fileID: 11400000, guid: 258e67d1ab6ad9b49a61f5d983a215a7, type: 2}
+  - Key: creature.spider.death
+    Clips:
+    - {fileID: 11400000, guid: d4375805bc78d654e91ba18de9f8d1c4, type: 2}
+    - {fileID: 11400000, guid: b620d906687f56140ada0bc1ce26d621, type: 2}
+    - {fileID: 11400000, guid: 839d5528eed289542897452001396b95, type: 2}
+    - {fileID: 11400000, guid: 5720bfd1b2b05a748964e9b9651a63ee, type: 2}
+    - {fileID: 11400000, guid: 49ed5073d4384f34ca677ba854d5870c, type: 2}
+  - Key: creature.skeleton.attack
+    Clips:
+    - {fileID: 11400000, guid: de1bca59547aa854aa6dd588c912a93a, type: 2}
+    - {fileID: 11400000, guid: c4ce78ebcd235d546afdbffb1cd30815, type: 2}
+    - {fileID: 11400000, guid: 366afcfe659cc8045b49ae6cda4528e3, type: 2}
+    - {fileID: 11400000, guid: 2ce72653dec7a4f45adb4a3b26c1f697, type: 2}
+    - {fileID: 11400000, guid: e74645ab263362d4fb6eb5c3fddead43, type: 2}
+    - {fileID: 11400000, guid: 9d7ec206bcc5ab54fa19430fd826762e, type: 2}
+    - {fileID: 11400000, guid: 967b35a6adffc314490f088c7cceb84a, type: 2}
+    - {fileID: 11400000, guid: 79f81f66f7d6c1a4eade060af1d064f3, type: 2}
+  - Key: creature.skeleton.hurt
+    Clips:
+    - {fileID: 11400000, guid: 2877107d7ad61c746b45efdf94f7febe, type: 2}
+    - {fileID: 11400000, guid: 98456dea5e47b4f439a575494f725179, type: 2}
+    - {fileID: 11400000, guid: a42073cec6046414ea5dc55fe6f80770, type: 2}
+    - {fileID: 11400000, guid: 1802ea011374b4145ac5061dfa1cba8f, type: 2}
+    - {fileID: 11400000, guid: 44b0a1a7df3f52340921fa30d2fcdc10, type: 2}
+    - {fileID: 11400000, guid: d06eec5072f0ec344b6b935be29f452a, type: 2}
+    - {fileID: 11400000, guid: 346d594a8c84977479a77910d5e51331, type: 2}
+    - {fileID: 11400000, guid: 2981d5b85ac2ab345baec6eeedbb921d, type: 2}
+    - {fileID: 11400000, guid: 4a90f54a298d77946ad6bb6aff7e69ab, type: 2}
+    - {fileID: 11400000, guid: 46d11915e4f1818469dade92c3d809ef, type: 2}
+    - {fileID: 11400000, guid: 23c6f2e809e933a4c9187429952e587f, type: 2}
+    - {fileID: 11400000, guid: 30dfac7f1f29c9748b3f13a2fed18b3b, type: 2}
+    - {fileID: 11400000, guid: ade4c93740e1a1d4aa183aed671e4ad2, type: 2}
+  - Key: creature.skeleton.death
+    Clips:
+    - {fileID: 11400000, guid: a5b7531550e1fd74789fbd570cb3f9ae, type: 2}
+    - {fileID: 11400000, guid: 338d03de965ef8b488a065eb6736e363, type: 2}
+    - {fileID: 11400000, guid: 4e9afdcb0143b6a458478cafbeb7b176, type: 2}
+    - {fileID: 11400000, guid: 15cc894fa76ec204480b582484255499, type: 2}
+    - {fileID: 11400000, guid: 814216e24b7057c4cae2df25d58933c8, type: 2}
+    - {fileID: 11400000, guid: 8db16d790dcc56e4d8fe20575b013c1f, type: 2}
+    - {fileID: 11400000, guid: a6d187e15e56f5f4992d185e2a6a6446, type: 2}
+  - Key: creature.spectre.attack
+    Clips:
+    - {fileID: 11400000, guid: 51a2f2c62d22ae64abaf31ec5c51fa04, type: 2}
+    - {fileID: 11400000, guid: 515f3b4444f99b546a5789130c983266, type: 2}
+    - {fileID: 11400000, guid: 8510c31bc7d116844b975b66208b5787, type: 2}
+    - {fileID: 11400000, guid: 44edc7ae33ca7c147965b30ae61eb925, type: 2}
+    - {fileID: 11400000, guid: 9eca194997a66ab41a5e67057e046b19, type: 2}
+  - Key: creature.spectre.hurt
+    Clips:
+    - {fileID: 11400000, guid: 3d7632a92a789ad45b71260a4d4c1a96, type: 2}
+    - {fileID: 11400000, guid: 64c21521b884ef64b91aaa3c0e3cd8fd, type: 2}
+    - {fileID: 11400000, guid: 4fa20556138050c439ecd4cebdbaa1a3, type: 2}
+    - {fileID: 11400000, guid: cba85df6655e6d641b0bfacc32abba7d, type: 2}
+    - {fileID: 11400000, guid: 2215d5f1cf38822409e7f49ca0a5a8ab, type: 2}
+  - Key: creature.spectre.death
+    Clips:
+    - {fileID: 11400000, guid: a49ae66e2692da04e93acc19f7e4ca36, type: 2}
+    - {fileID: 11400000, guid: c9efe4f79050eec44a67c4d558c09709, type: 2}
+    - {fileID: 11400000, guid: 3e7a484fb6e15a54bbe30c89036aa65a, type: 2}
+    - {fileID: 11400000, guid: 5f07708b4c5f992448cd43041b89f437, type: 2}
+    - {fileID: 11400000, guid: a2c2a7e0b4fe5464bbf59a19e3110bf4, type: 2}
+  - Key: creature.insect.attack
+    Clips:
+    - {fileID: 11400000, guid: 1735a7b4e0cbe3348b332351bb170d9e, type: 2}
+    - {fileID: 11400000, guid: 4d7e242bf66162b439d94ac1915a9304, type: 2}
+    - {fileID: 11400000, guid: aa420897e5fa01b4ea8cdd9efe31c0bd, type: 2}
+    - {fileID: 11400000, guid: f33dfd35597ed5444aabf28717183377, type: 2}
+    - {fileID: 11400000, guid: 9c142bbc9c84285408837b15582a7603, type: 2}
+    - {fileID: 11400000, guid: b64ab78bf4f1d944fab13bcfa9257011, type: 2}
+  - Key: creature.insect.hurt
+    Clips:
+    - {fileID: 11400000, guid: 2770a814157b3714ba53a5035f466446, type: 2}
+    - {fileID: 11400000, guid: 8db1a8390ecd36b46894aa0ef11f9c25, type: 2}
+    - {fileID: 11400000, guid: ca7cf1c1e272f2548b38c8f3f6d78375, type: 2}
+    - {fileID: 11400000, guid: b08ef1ce3c7ee384c9952effabf0d689, type: 2}
+    - {fileID: 11400000, guid: e97aedd53ad54d14cba1d29ce0bdcb59, type: 2}
+  - Key: creature.insect.death
+    Clips:
+    - {fileID: 11400000, guid: 9edfa0c098ff65c4391c9b833266fc60, type: 2}
+    - {fileID: 11400000, guid: 5863b35e26a65014d9c937c7bf25afe3, type: 2}
+    - {fileID: 11400000, guid: fee6a5f2224a2e14e9febefee68b0bee, type: 2}
+    - {fileID: 11400000, guid: bc30c3f388cffa2438ea8acfc132fab1, type: 2}
+    - {fileID: 11400000, guid: 5348d160929aeb84ba9f2bc889157dec, type: 2}
+  - Key: creature.zombie.attack
+    Clips:
+    - {fileID: 11400000, guid: 50a2384c541baa444a418d687a1a1101, type: 2}
+    - {fileID: 11400000, guid: 846693271853f5441bae701b5c044a5c, type: 2}
+    - {fileID: 11400000, guid: c64a115ec12d0fb469c4104fcf28e410, type: 2}
+    - {fileID: 11400000, guid: 318480525e9c06d419c4636c2453b9dd, type: 2}
+  - Key: creature.zombie.hurt
+    Clips:
+    - {fileID: 11400000, guid: 82dc5b375d89b614abcd0f3bf71cb8d1, type: 2}
+    - {fileID: 11400000, guid: 4e320f33e3fad844abbbd5999bcf2795, type: 2}
+    - {fileID: 11400000, guid: c2c2fc1f3270e31468621a105600f54f, type: 2}
+    - {fileID: 11400000, guid: 6770f9eb3e9c46a4897fe2365a971a29, type: 2}
+  - Key: creature.zombie.death
+    Clips:
+    - {fileID: 11400000, guid: a4aaeb4ecbe890f4aa4a5b439655dade, type: 2}
+    - {fileID: 11400000, guid: daa0f174efab0784894e4ed43f74540c, type: 2}
+    - {fileID: 11400000, guid: 34a681322e20d8e438f0c4b0a438203b, type: 2}
+    - {fileID: 11400000, guid: 10fab162fbb41d54c9d0c2eb01e83109, type: 2}
+  - Key: creature.daemon.attack
+    Clips:
+    - {fileID: 11400000, guid: 237ee5b70c5c63e48909c9a492414300, type: 2}
+    - {fileID: 11400000, guid: 4326b646f569f874a905b8f1f5e6ce7e, type: 2}
+    - {fileID: 11400000, guid: 504eab2c5c0d884439704250bb5171ec, type: 2}
+    - {fileID: 11400000, guid: 0c6de2f8e7e14af4d8a60c86d3dff6c0, type: 2}
+    - {fileID: 11400000, guid: 6f841a971c7c4ff41bff96ccab0d510c, type: 2}
+    - {fileID: 11400000, guid: f8d6a58a3b1581049986ac393e3fc223, type: 2}
+    - {fileID: 11400000, guid: 340d9f3058c4f394ab524b641fca016d, type: 2}
+    - {fileID: 11400000, guid: 7b6664a21ca922649b614fdfaeacc8b5, type: 2}
+    - {fileID: 11400000, guid: 6bd381c7f6962804b8411fd4f42382a2, type: 2}
+  - Key: creature.daemon.hurt
+    Clips:
+    - {fileID: 11400000, guid: 3da2d9f47498c1b4e98a14d7422b2890, type: 2}
+    - {fileID: 11400000, guid: 4645d62153b9cca4e91761fa5f8d56a9, type: 2}
+    - {fileID: 11400000, guid: eec3555bcd92b7d40ba23a8c25c1cf84, type: 2}
+    - {fileID: 11400000, guid: bd5785356dce601449f190b9d4a24398, type: 2}
+    - {fileID: 11400000, guid: 9ab5823d1519f3c458047325001d87ea, type: 2}
+  - Key: creature.daemon.death
+    Clips:
+    - {fileID: 11400000, guid: 7b524597f422bc944a4f2d458b375bbe, type: 2}
+    - {fileID: 11400000, guid: 01b6b73ac2a74ea43830db0cf82ccdcb, type: 2}
+    - {fileID: 11400000, guid: e51e33de4b257e340b362b3d4ccdff7d, type: 2}
+    - {fileID: 11400000, guid: b5f7bb9c703b44048b88f68b138c147c, type: 2}
+  - Key: creature.beast.attack
+    Clips:
+    - {fileID: 11400000, guid: e517075032e14e44686accff247d82e2, type: 2}
+    - {fileID: 11400000, guid: 9d0fb5fda853d7f4a89108a31879e3b6, type: 2}
+    - {fileID: 11400000, guid: 7712ef20ebac43846a0a203f9d5da86a, type: 2}
+    - {fileID: 11400000, guid: 3029074feadd26545a49c38f3166a740, type: 2}
+    - {fileID: 11400000, guid: 9e7f05fd12dd6a54c8b3283fac513276, type: 2}
+    - {fileID: 11400000, guid: 2ac897a21890b2c438cc51949890111d, type: 2}
+    - {fileID: 11400000, guid: 624dfb956d08a15419e2e3082486d778, type: 2}
+    - {fileID: 11400000, guid: 815ca124a14cb834a85bfb7853fe119b, type: 2}
+    - {fileID: 11400000, guid: 594f1bb87e941b94197460eca5549128, type: 2}
+    - {fileID: 11400000, guid: 931201b87a86c724e96f5dd8f848db4b, type: 2}
+    - {fileID: 11400000, guid: e03de6c70750719489f407775d67ffad, type: 2}
+    - {fileID: 11400000, guid: 90b4c5f91e8e50b428d8e7fa952eb575, type: 2}
+  - Key: creature.beast.hurt
+    Clips:
+    - {fileID: 11400000, guid: a5162b2daf433e744b7f925ff4e4f53d, type: 2}
+    - {fileID: 11400000, guid: 2250339ee68c70943a7eac5b5fe6ea5e, type: 2}
+    - {fileID: 11400000, guid: a41d231dd6ac6be4a93d32d629c3adf6, type: 2}
+    - {fileID: 11400000, guid: d446abab66df4b341a69af193b0af55c, type: 2}
+    - {fileID: 11400000, guid: c81b0e02e027ab640bb1a999c758d126, type: 2}
+    - {fileID: 11400000, guid: 47291e7db546e704f9fb985a173dcecc, type: 2}
+    - {fileID: 11400000, guid: 4e66b08e1627f4d4493bca4536ca26e6, type: 2}
+    - {fileID: 11400000, guid: f41686dd50a999e42a53b032a35f3521, type: 2}
+    - {fileID: 11400000, guid: 2b51d2cc8182c4340b8c16d6090d9e4d, type: 2}
+    - {fileID: 11400000, guid: a602a12edd4894a4aa2468b82e555085, type: 2}
+    - {fileID: 11400000, guid: 61a1c46e5b3da08479f88f8d343387a2, type: 2}
+    - {fileID: 11400000, guid: 8d69ffdb640ff2d48b2e8717c48d2283, type: 2}
+    - {fileID: 11400000, guid: 8c42cda45214e854bb21fb0a36872954, type: 2}
+    - {fileID: 11400000, guid: bfce10b0e2dbb914f90c08f2ef4f60c5, type: 2}
+  - Key: creature.beast.death
+    Clips:
+    - {fileID: 11400000, guid: 50606910dc2a64d47a8b7a4e13f74ee7, type: 2}
+    - {fileID: 11400000, guid: 807b4383a622d644f8b479916e0f7714, type: 2}
+    - {fileID: 11400000, guid: f66c0817ef7c65643bb5fc4b82ff3fe6, type: 2}
+    - {fileID: 11400000, guid: 97d579c4577c9bf43934eda8191d95a5, type: 2}
+  - Key: creature.dog.attack
+    Clips:
+    - {fileID: 11400000, guid: 08786510b240c8e4c9c8c8cbf16ddd7a, type: 2}
+    - {fileID: 11400000, guid: 218000ca9d000e7449c0443c7be2fdec, type: 2}
+    - {fileID: 11400000, guid: b48f037de40dc414c9508603c528a47b, type: 2}
+    - {fileID: 11400000, guid: 043f5efb74ab15a4fb99b3647775c4fb, type: 2}
+    - {fileID: 11400000, guid: 05755454226baac418a490bc26b2ca6b, type: 2}
+    - {fileID: 11400000, guid: 765e105b8a6f96f41b5b61602273af7f, type: 2}
+    - {fileID: 11400000, guid: 09c7b52c89ed4af46b6a9c528aa596b5, type: 2}
+    - {fileID: 11400000, guid: 245eb5489f0031e41b369156f15b6042, type: 2}
+    - {fileID: 11400000, guid: 3c0abba4f1438054fb0d25f630f10c68, type: 2}
+    - {fileID: 11400000, guid: ae4542489d58635499207437f1dd2e93, type: 2}
+  - Key: creature.dog.hurt
+    Clips:
+    - {fileID: 11400000, guid: c6c9d68b5cee6334e9e143b1fd19edce, type: 2}
+    - {fileID: 11400000, guid: 20b74795ecb7f184cac70a3fd256d6ec, type: 2}
+    - {fileID: 11400000, guid: 7e51a2656aee9334a9362ed61d49cc67, type: 2}
+    - {fileID: 11400000, guid: b51d47d01a5554c46847c4acafb39711, type: 2}
+    - {fileID: 11400000, guid: dbe8494847817b341b92f9c105362019, type: 2}
+    - {fileID: 11400000, guid: 71ca8383d7932c1408dc8bc41ab5235e, type: 2}
+    - {fileID: 11400000, guid: f87107eff1d1c7141998255ce3ee1ff2, type: 2}
+    - {fileID: 11400000, guid: bcc62df8280c09549b8eca0a26619c0b, type: 2}
+    - {fileID: 11400000, guid: d51f922d626c1354790911f03c63ede3, type: 2}
+    - {fileID: 11400000, guid: cd807d7a4c7a2c5489b4e8c960cdec3d, type: 2}
+  - Key: creature.chicken.hurt
+    Clips:
+    - {fileID: 11400000, guid: 61c939ff06723a742b85aa588745b667, type: 2}
+    - {fileID: 11400000, guid: e1b9c50335178b04e9efe7603aca39b8, type: 2}
+    - {fileID: 11400000, guid: 3694c5635b0716f4db0bc6bf82c4504f, type: 2}
+    - {fileID: 11400000, guid: 2982a86641cfb0848a856160b01d770e, type: 2}
+    - {fileID: 11400000, guid: 8bc15aafad51bf24086ab89ea7a45a25, type: 2}
+  - Key: creature.chicken.death
+    Clips:
+    - {fileID: 11400000, guid: 9a45eb23647ac394480ab5ea676bb6c1, type: 2}
+    - {fileID: 11400000, guid: 6c014a7d158286b4ab37b521b95f8506, type: 2}
+    - {fileID: 11400000, guid: c4cab92968187b144be3e819d70e3a53, type: 2}
+    - {fileID: 11400000, guid: 0cf51f391616b9c45a708dfb74bc67fd, type: 2}
+    - {fileID: 11400000, guid: 79da524a6cfb4394d9d294b3cb1c906a, type: 2}
+  - Key: creature.cow.hurt
+    Clips:
+    - {fileID: 11400000, guid: 4cd2837d16fbe5e41af1d93581c5e5ed, type: 2}
+    - {fileID: 11400000, guid: 1337191c96768d646b93e354b4ca45d2, type: 2}
+    - {fileID: 11400000, guid: 6c7cd0638644e334badc91b0e22841fe, type: 2}
+    - {fileID: 11400000, guid: 80f1267121fdfdf4695b398ddb224d46, type: 2}
+    - {fileID: 11400000, guid: 48c5b178ff07b9f4f94fdae8569599a3, type: 2}
+    - {fileID: 11400000, guid: 4e99fb82ca5e10f4783e7c6de2ee7644, type: 2}
+    - {fileID: 11400000, guid: edf1192838ae359458bdb72a62835392, type: 2}
+    - {fileID: 11400000, guid: e0159ec7e146c04488510de82accac44, type: 2}
+  - Key: creature.cow.death
+    Clips:
+    - {fileID: 11400000, guid: 4112775e9b593e24d9c7f29790d4c135, type: 2}
+    - {fileID: 11400000, guid: d7d5dfc7aaefe5f45a485e65b460019a, type: 2}
+    - {fileID: 11400000, guid: 8681ff3e436ff8942b718a02ac6c0946, type: 2}
+    - {fileID: 11400000, guid: e5423e49c74a8824785393c453d60ebd, type: 2}
+    - {fileID: 11400000, guid: 592a7a32a72dfee41a451558647cab76, type: 2}
+    - {fileID: 11400000, guid: 2f830d0d656570d4695eef3306cb3f09, type: 2}
+    - {fileID: 11400000, guid: 7f2c8d8557857bf42bc1a4b3df0c9ec2, type: 2}
+    - {fileID: 11400000, guid: 2e68eeda5b2b94a4e843208f370fc9ad, type: 2}
+  - Key: creature.horse.hurt
+    Clips:
+    - {fileID: 11400000, guid: d59b6f9ef5e7b434b8078dadb30c4e09, type: 2}
+    - {fileID: 11400000, guid: 7541d8d8a3aa3154aa2a5bd3dadc0b25, type: 2}
+    - {fileID: 11400000, guid: da9629c9e3912334e8d7d24725af43ef, type: 2}
+    - {fileID: 11400000, guid: 112bf9b2a0a53e2439ca24a346165b4d, type: 2}
+  - Key: creature.horse.death
+    Clips:
+    - {fileID: 11400000, guid: 477ef6e2a653a274789ed753b3c9307b, type: 2}
+    - {fileID: 11400000, guid: f6fa63ff0360fd64c852362bf0458c23, type: 2}
+    - {fileID: 11400000, guid: cef814a3010d12a4faf6d5969d0f2858, type: 2}
+    - {fileID: 11400000, guid: b6adb36f3bd18d94ba6e76d1e0023a75, type: 2}
+  - Key: creature.pig.hurt
+    Clips:
+    - {fileID: 11400000, guid: d8a633b7c46a77d419bb0ca26f764a17, type: 2}
+    - {fileID: 11400000, guid: ee15f12a89f7a524787ace8d9987d6f7, type: 2}
+    - {fileID: 11400000, guid: 551df25e342e0584f856a75e37275ec9, type: 2}
+    - {fileID: 11400000, guid: 5f4993cbdda8867449934bdd172854a9, type: 2}
+    - {fileID: 11400000, guid: 143591df093ba104f887e79072924e1c, type: 2}
+    - {fileID: 11400000, guid: 97d8fa6688305d14bbdcebb704cb81f6, type: 2}
+    - {fileID: 11400000, guid: 3e2537ef4f0bf5140ab99ec022dd326d, type: 2}
+    - {fileID: 11400000, guid: a9289ebc36dcdad4ebc5ae3876277e9b, type: 2}
+    - {fileID: 11400000, guid: b7630162ab82fa242a1c0d8f5873d44b, type: 2}
+    - {fileID: 11400000, guid: 70751ef6a5c7d7b41ae9672fcc9dac20, type: 2}
+  - Key: creature.pig.death
+    Clips:
+    - {fileID: 11400000, guid: 9d556b31912a4ca498064813e3416c76, type: 2}
+    - {fileID: 11400000, guid: 3cbf2bb9780e6774ea530501308b79ce, type: 2}
+    - {fileID: 11400000, guid: 22eddaa725af40a428aec570ad53577b, type: 2}
+    - {fileID: 11400000, guid: 4be74e1676fcd4842bb8b2b2c10707b3, type: 2}
+    - {fileID: 11400000, guid: 08ffe78ff6064104883ff9824147a7f9, type: 2}
+    - {fileID: 11400000, guid: d63deadf1af8c29489d997a01b51e56b, type: 2}
+    - {fileID: 11400000, guid: ea8ad270296077e4da7ea5957951d109, type: 2}
+    - {fileID: 11400000, guid: 603648cb0eb36224687b98b07b89e57e, type: 2}
+    - {fileID: 11400000, guid: f0429de92ccb497458157185339ff9d4, type: 2}
+    - {fileID: 11400000, guid: e879ae9ed8c120a419ad3307f96c1067, type: 2}
+  - Key: creature.sheep.hurt
+    Clips:
+    - {fileID: 11400000, guid: fda733b6957e55d4e89c52e8db8e829f, type: 2}
+    - {fileID: 11400000, guid: 8594323a3c02f2844b6ff35865a8ed4e, type: 2}
+    - {fileID: 11400000, guid: aa530ee4d7f463043a5676074ba9d6e0, type: 2}
+    - {fileID: 11400000, guid: f5ee45adc5eb2fb47b6a7673d222f014, type: 2}
+    - {fileID: 11400000, guid: 299ec839b54f82a47af7a11034e758a5, type: 2}
+    - {fileID: 11400000, guid: 685b22d8a5ea73945b024d9f018d604e, type: 2}
+    - {fileID: 11400000, guid: 1bff304f5677a6445a068433c1e4837d, type: 2}
+    - {fileID: 11400000, guid: 9900032cf04d004458037922236ca857, type: 2}
+    - {fileID: 11400000, guid: 0cb605bdcb4d4b748a72df2fb2eb6007, type: 2}
+  - Key: creature.sheep.death
+    Clips:
+    - {fileID: 11400000, guid: 3d1fb441fc2e89b47a2b95a68b95dcab, type: 2}
+    - {fileID: 11400000, guid: 40c7b0e37107fda4fa10d2f9f34b1bc7, type: 2}
+    - {fileID: 11400000, guid: 1b66ec2f65996424e86b5d5356fd4789, type: 2}
+    - {fileID: 11400000, guid: 8a2bc21fc5848a542866fe1a0e8967b2, type: 2}
+    - {fileID: 11400000, guid: 421f6eb0f5c2fed44b8aa76f0b368524, type: 2}
+    - {fileID: 11400000, guid: 2104d077c8e02644f9b85d6495f8023a, type: 2}
+    - {fileID: 11400000, guid: 4d5c4c5be5aca9348a98ff31e16d760b, type: 2}
+    - {fileID: 11400000, guid: 1badbf03d45769f408d6a321bd14b163, type: 2}
+    - {fileID: 11400000, guid: 34ca80bc57e273e49a336f837fb2898e, type: 2}
+  - Key: gather.mining
+    Clips:
+    - {fileID: 11400000, guid: 9aaef80659f831440ab35b3985b75109, type: 2}
+    - {fileID: 11400000, guid: 0b833532cb34e05488d8e921b6d06859, type: 2}
+    - {fileID: 11400000, guid: 3b0eee51f83ff8540b6d4f4843f820a5, type: 2}
+    - {fileID: 11400000, guid: f426646db4b742b4cb4e8578989a64b1, type: 2}
+    - {fileID: 11400000, guid: ba1c9f8b6d9759d4599729dcc0a01b8d, type: 2}
+    - {fileID: 11400000, guid: 718e5feeb42aec7448911df5ca49396d, type: 2}
+    - {fileID: 11400000, guid: 10779882e2ab613408105ec0c2690d5e, type: 2}
+    - {fileID: 11400000, guid: 3c4fbc800b4b0fe4fb914b38dccca915, type: 2}
+    - {fileID: 11400000, guid: 06c91f41529e40140a4c2b3c5d3a933e, type: 2}
+    - {fileID: 11400000, guid: 73fc434ee84019246aa3d7469b6c7910, type: 2}
+    - {fileID: 11400000, guid: c9c2d0b07c2907d4f91134c4e2e5594c, type: 2}
+  - Key: gather.chopping
+    Clips:
+    - {fileID: 11400000, guid: 20f91325dc3c54344b53f5018e69bdf9, type: 2}
+    - {fileID: 11400000, guid: cfdafae7722ccfa42a624cc64163a9eb, type: 2}
+    - {fileID: 11400000, guid: dcb170ceed0835c4b9310e371259913c, type: 2}
+    - {fileID: 11400000, guid: 1ddfa94510ae5234daac49cd7486b7e8, type: 2}
+    - {fileID: 11400000, guid: 86cadf28aed75cd4cae497fa5511aa91, type: 2}
+    - {fileID: 11400000, guid: 6b8ac8e110a6a9b40944148f0bd89920, type: 2}
+    - {fileID: 11400000, guid: 693d60523b0e9c34ca53f282a13073a3, type: 2}
+    - {fileID: 11400000, guid: bea4f833add26364d82e0ef7a30de7ab, type: 2}
+    - {fileID: 11400000, guid: 84c1a21e112b6884e8bf0dddc443c2fc, type: 2}
+    - {fileID: 11400000, guid: 0889cd720a19f9d4195418f24de83821, type: 2}
+    - {fileID: 11400000, guid: 9696fa50c4017e749b534705c412eae4, type: 2}
+    - {fileID: 11400000, guid: 2b0eba2cb4b995547af3b2406735c40e, type: 2}
+    - {fileID: 11400000, guid: 01c106bb71169e34c9cbfde875a21662, type: 2}
+    - {fileID: 11400000, guid: 6114b17c2093c4b47b6a4bf6e8e0a179, type: 2}
+    - {fileID: 11400000, guid: d6cd49c3acdcadb4a9c5485fcba43b3c, type: 2}
+    - {fileID: 11400000, guid: a1f276c7fb48d4647bf1060212e385b3, type: 2}
+    - {fileID: 11400000, guid: ef469c7bd94b0c04ca1582b34ae9683b, type: 2}
+    - {fileID: 11400000, guid: 6a931419ac649bb489edb4c7e29b4207, type: 2}
+    - {fileID: 11400000, guid: e271b3c004e8ad84e8efcf1950d5e07e, type: 2}
+  - Key: gather.fishing
+    Clips:
+    - {fileID: 11400000, guid: 579b59a237d4af34b9f09167df8e4bbc, type: 2}
+    - {fileID: 11400000, guid: b911159e93bfb0a4faf07602a5e7dc82, type: 2}
+    - {fileID: 11400000, guid: ef7e1e7de00344f42a4bd56f6bdef6c8, type: 2}
+    - {fileID: 11400000, guid: de45dc7595131704c93ef9a919d9ed21, type: 2}
+    - {fileID: 11400000, guid: 8ea8e3272867bc74a8ffbecb0dbc1105, type: 2}
+    - {fileID: 11400000, guid: 08cb4bb44e40c03449dc1c56bc314cb6, type: 2}
+    - {fileID: 11400000, guid: 30b55fcb0055b894684c0ddea7c18bc0, type: 2}
+  - Key: craft.smithing
+    Clips:
+    - {fileID: 11400000, guid: 900196152bfae1141a068d13f15cdc6a, type: 2}
+    - {fileID: 11400000, guid: b2d39656fc64e854b9b4b086900a36f4, type: 2}
+    - {fileID: 11400000, guid: 93607607048ed1f43ac0b5c7c1a9d2da, type: 2}
+    - {fileID: 11400000, guid: 53419e9f7c4b0bd40b869342866340e0, type: 2}
+    - {fileID: 11400000, guid: f1d03cbf0f9e52749a501bab0133dfe5, type: 2}
+    - {fileID: 11400000, guid: f1e7b3d98ed6a6148920c9045959910e, type: 2}
+    - {fileID: 11400000, guid: db9d2134eca09444ca99b5ce521c2644, type: 2}
+    - {fileID: 11400000, guid: badd2b77fa22ea0499a65a2a6dec5a8f, type: 2}
+    - {fileID: 11400000, guid: 8e67aa7b98f38e048b2f79a3e06b3488, type: 2}
+    - {fileID: 11400000, guid: ecbc1343c5c06b2469fbddc2a873ac46, type: 2}
+    - {fileID: 11400000, guid: 7a9bf5fa1aaf5444bb643c41339a99d5, type: 2}
+    - {fileID: 11400000, guid: 05c762b9b1bdb7d46baceec9b9424d92, type: 2}
+    - {fileID: 11400000, guid: 80db6a4d7354e1e4aad332e656f3748b, type: 2}
+    - {fileID: 11400000, guid: f2bb1cf9cf8cfbf44b7a60ae8ca3b47f, type: 2}
+    - {fileID: 11400000, guid: ae489cb2d19b2b54895fffafad228f53, type: 2}
+    - {fileID: 11400000, guid: 81014556f1de6f9488f2151eaec7ad30, type: 2}
+    - {fileID: 11400000, guid: 133c34b0b5e702848b4327104d5bbc44, type: 2}
+    - {fileID: 11400000, guid: ae1fdd3b360ef1947bc422762a01650a, type: 2}
+    - {fileID: 11400000, guid: 79517b4f1f18af140b27d672dab3c51c, type: 2}
+    - {fileID: 11400000, guid: 242ed1078306fa643bd86a2f4e84ceb0, type: 2}
+    - {fileID: 11400000, guid: 837464960838a8744bccf2cfd2666635, type: 2}
+    - {fileID: 11400000, guid: 0e8db06d193fee44090adcb4b850abf2, type: 2}
+    - {fileID: 11400000, guid: 15bd71c467b9b8541b24341e0b23fe3e, type: 2}
+    - {fileID: 11400000, guid: 7a1a9eb4be67cb4468f9bb1096544cb3, type: 2}
+    - {fileID: 11400000, guid: 1437961e75e8c9b429a5d6f6baa96a82, type: 2}
+  - Key: craft.bench
+    Clips:
+    - {fileID: 11400000, guid: a9ec249d6c464714184c4277fc3be467, type: 2}
+    - {fileID: 11400000, guid: 07d2844dcd6e9e44ea3570ee74c9b199, type: 2}
+    - {fileID: 11400000, guid: 2c55f3eb687f6024c8e7cdf4ad78b20c, type: 2}
+    - {fileID: 11400000, guid: 3e3cbbe21e8186e4fa7d9a0c84d2f9fe, type: 2}
+    - {fileID: 11400000, guid: e8a2d185e06818b428323a6dae630ec3, type: 2}
+    - {fileID: 11400000, guid: 912cf30b1bd61b448baa462ec868e5b0, type: 2}
+    - {fileID: 11400000, guid: 237dbeca475546b45adca31b02f85899, type: 2}
+    - {fileID: 11400000, guid: a0685bb7a51a7d54da91ade30b23673e, type: 2}
+    - {fileID: 11400000, guid: f36049c3aa1d8b145a71898d7e9430ed, type: 2}
+    - {fileID: 11400000, guid: f3b2c35f1d2817f4797d4dbe04504f0b, type: 2}
+    - {fileID: 11400000, guid: adb174f8dfc3c2145a593f200dd046f7, type: 2}
+    - {fileID: 11400000, guid: fcd5de39416f14d4e9d4fe232e2d911f, type: 2}
+    - {fileID: 11400000, guid: deb9f1fd0ef295d4c8a592bcef736bbb, type: 2}
+    - {fileID: 11400000, guid: 1a781b2ee96ba5842aadd89d3dfd1e17, type: 2}
+    - {fileID: 11400000, guid: f0d366645b0fd054fbcffa6a242e8d34, type: 2}
+    - {fileID: 11400000, guid: 307f237425f45d34fa1b316f5787ef5f, type: 2}
+    - {fileID: 11400000, guid: 96aa0a18645dd1d4889e6fc2f69ad8ab, type: 2}
+    - {fileID: 11400000, guid: 1cc94b3ab3517f848a1ce8a756f60e47, type: 2}
+    - {fileID: 11400000, guid: 01e70dcc68d9f1441a7230beab60c9fa, type: 2}
+    - {fileID: 11400000, guid: eeb25057da7a75a45ad491cb04f1db66, type: 2}
+    - {fileID: 11400000, guid: ac3e80755f51fe44db1ef6b05ade1977, type: 2}
+    - {fileID: 11400000, guid: 4d3f60e1a7b4e9b47ae22b27744e3114, type: 2}
+    - {fileID: 11400000, guid: 6654fcbc5b3a8cb4292a1a1291277aaf, type: 2}
+    - {fileID: 11400000, guid: cc54c3c06bdda974f914db1ff4cc19f1, type: 2}
+    - {fileID: 11400000, guid: dd7a364bf0e2bae4f83be9ce47fffd39, type: 2}
+    - {fileID: 11400000, guid: 5228688dd40d77c45b5cb34754ddf9df, type: 2}
+    - {fileID: 11400000, guid: 6f2223f749b536643a71719743424727, type: 2}
+    - {fileID: 11400000, guid: 7b892a5d6b7e7f846b863bb6484e4b2f, type: 2}
+    - {fileID: 11400000, guid: 8c2d85740579f7b4ab61c50852be2a46, type: 2}
+    - {fileID: 11400000, guid: dcbb477258baffe47ac74f26e43abc2f, type: 2}
+    - {fileID: 11400000, guid: 4e3c40304e793074b968e4519cd05659, type: 2}
+    - {fileID: 11400000, guid: 7dd261aeacc13b947a7489752cf6d681, type: 2}
+    - {fileID: 11400000, guid: 512412aec18e3a446923d4ef52defb83, type: 2}
+    - {fileID: 11400000, guid: 3fa205329dffdab4d84d79e7c5111f02, type: 2}
+    - {fileID: 11400000, guid: e43a2a1048af2614c99059a643f9d8a4, type: 2}
+    - {fileID: 11400000, guid: 729201297a967e44297a3cbd3dc0329a, type: 2}
+    - {fileID: 11400000, guid: ad54e04e23b68704288f97d6de877dce, type: 2}
+    - {fileID: 11400000, guid: 0c396f35dbcc69742a7ffe85bb21647a, type: 2}
+    - {fileID: 11400000, guid: 6ea6e11e3c19d5e4fa76083cde0fdc47, type: 2}
+    - {fileID: 11400000, guid: 7387ff5b3e88d47428c44317382fb6a9, type: 2}
+    - {fileID: 11400000, guid: 77b57d596f56e3d4895c556c176db183, type: 2}
+    - {fileID: 11400000, guid: 4fc3c8ab955545f4e96b1cca3c8f5d81, type: 2}
+    - {fileID: 11400000, guid: df6c72aadd92e194c8ad139612bb6340, type: 2}
+    - {fileID: 11400000, guid: 443daaa67e0e41f4986a5191f2bbae7a, type: 2}
+    - {fileID: 11400000, guid: 2b47df163a6c0454397abe696137b608, type: 2}
+    - {fileID: 11400000, guid: db81f9d16c6f7614ba279980f54376d9, type: 2}
+    - {fileID: 11400000, guid: 5276e7d3e9050474b949d191fa1688f9, type: 2}
+    - {fileID: 11400000, guid: 8a07b3f3d4f5fb940bdb6fcd4762d44f, type: 2}
+    - {fileID: 11400000, guid: 5d62feff9bae1fe488e20367880d0c7c, type: 2}
+    - {fileID: 11400000, guid: b8ca4df0ea8d8a246a72d5fcc4645cc2, type: 2}
+    - {fileID: 11400000, guid: 9bf13c3410ae03f4abe2a227353e9f3e, type: 2}
+    - {fileID: 11400000, guid: c4da9e8f588db1b43bdacb1036c622c7, type: 2}
+    - {fileID: 11400000, guid: 8ddd49a62f0cf5847824994dd7d8fd9e, type: 2}
+    - {fileID: 11400000, guid: 9d7c255a8ecb22e4f81517432ee28f34, type: 2}
+    - {fileID: 11400000, guid: 7250efd068e0a6645aca32b9bd9a8c5a, type: 2}
+    - {fileID: 11400000, guid: f6136f17b49fb904b880a2c8c29ccc35, type: 2}
+    - {fileID: 11400000, guid: 3cbcb345b2c0c8943ab48fddc7399835, type: 2}
+    - {fileID: 11400000, guid: d14f0dcdb456f3f4b81867be932e06bf, type: 2}
+    - {fileID: 11400000, guid: 055dfbe1abe7f294b89f98c7dd0b0314, type: 2}
+  - Key: craft.brewing
+    Clips:
+    - {fileID: 11400000, guid: 560cc918df01c984fb9a745697f9b78c, type: 2}
+    - {fileID: 11400000, guid: 6b3ee51e23b53054d8f66c402e416764, type: 2}
+    - {fileID: 11400000, guid: 452c2eb867fa6694f8b663945e5d9315, type: 2}
+    - {fileID: 11400000, guid: 06aa290876c40d444a0be7e34df93d45, type: 2}
+    - {fileID: 11400000, guid: c70a288fdd42df54d8deb40d0e57feb0, type: 2}
+    - {fileID: 11400000, guid: 7b18a80e652d380479b7203c6611eb6f, type: 2}
+    - {fileID: 11400000, guid: f4a9feb857d275f4b989b5da93df4e9e, type: 2}
+    - {fileID: 11400000, guid: 071f4104eda81a54f9fe86366aaca35e, type: 2}
+    - {fileID: 11400000, guid: f52a434eb37e7b8449f91bd2132b69db, type: 2}
+    - {fileID: 11400000, guid: 6fd08e2482eeb5446bca120899ec73a2, type: 2}
+    - {fileID: 11400000, guid: d30570b26155aab459ca8c6b141461c5, type: 2}
+    - {fileID: 11400000, guid: 5e49572eb3cb96546ba3451644d25289, type: 2}
+    - {fileID: 11400000, guid: 0471cfdd13a84f34284be3e085e98e43, type: 2}
+    - {fileID: 11400000, guid: 0a7f8c781168a794b9abcdd1f47a82f8, type: 2}
+    - {fileID: 11400000, guid: bc6d0ff26e980024080a878bb060d28f, type: 2}
   - Key: door.open
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: b5c8068045d7da7489a467db5b0090cb, type: 2}
+    - {fileID: 11400000, guid: 91ea7803b0277db49afb9cc6f182ed45, type: 2}
+    - {fileID: 11400000, guid: b3556b3fc1699994c8a9cda69c0e7640, type: 2}
+    - {fileID: 11400000, guid: 46f6c671cbd094b4aba90ba339c38c1c, type: 2}
+    - {fileID: 11400000, guid: 7de4aed39ba16f54d810f808e179074c, type: 2}
+    - {fileID: 11400000, guid: 767e1f49a637ce4499fcc972d24e8e0d, type: 2}
+    - {fileID: 11400000, guid: c9d3291b98256274293bb9e6cf22ffbb, type: 2}
+    - {fileID: 11400000, guid: 0b14c348cf2bc0845828760311a533d3, type: 2}
+    - {fileID: 11400000, guid: 10caa453baa25a346bd4b13f7856dd3c, type: 2}
+    - {fileID: 11400000, guid: 712403be52bf8e144a8c041b97d33d63, type: 2}
+    - {fileID: 11400000, guid: e9beef56a0783e44da5189a8e357b486, type: 2}
+    - {fileID: 11400000, guid: 9798c2bb1e5811649871472fe90d04c7, type: 2}
+    - {fileID: 11400000, guid: 8e1196c10318d434f91d022d9fc2ca40, type: 2}
+    - {fileID: 11400000, guid: 6850f38dc0f0901499685695d71d8555, type: 2}
+    - {fileID: 11400000, guid: ac45d0e8e4d9bb740b9e88390e1997e1, type: 2}
+    - {fileID: 11400000, guid: 465d4dbddb2c3564fb7f62ff6b0eee19, type: 2}
+    - {fileID: 11400000, guid: 105816f063b83b6408105d8c5901db94, type: 2}
+    - {fileID: 11400000, guid: 3a1744f0111060d4ca00969db89e276e, type: 2}
+    - {fileID: 11400000, guid: 9df130199d8cc474d9a6b46af840aa52, type: 2}
+    - {fileID: 11400000, guid: 508cb87e771fc4b438dc853b45457113, type: 2}
   - Key: door.close
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: f931bfed1324f5b4ab4075f17097785b, type: 2}
+    - {fileID: 11400000, guid: e89425fd8478a0e4bb74cce6a91bcb8a, type: 2}
+    - {fileID: 11400000, guid: f2e3c8ea4a4197246a28d91fe0d7c48a, type: 2}
+    - {fileID: 11400000, guid: 3fb4369c67dbc6b40bfa125c0422481b, type: 2}
+    - {fileID: 11400000, guid: bf33b1253522b284282bc7c5160e540f, type: 2}
+    - {fileID: 11400000, guid: 916c32aac8a92554a8724ed0afdffdfa, type: 2}
+    - {fileID: 11400000, guid: 0d4ca33f6d379e74c9a96a0f5ef32946, type: 2}
+    - {fileID: 11400000, guid: 0231205b388777549bcb1695d59f7f3c, type: 2}
+    - {fileID: 11400000, guid: 747b8854dca093a4683ab3d2c0ddd533, type: 2}
+    - {fileID: 11400000, guid: f869753970fe0aa4fa7827ead4d35fc9, type: 2}
+    - {fileID: 11400000, guid: 4ccca78e1e0b4a44eb8fde80625b3926, type: 2}
+    - {fileID: 11400000, guid: cb0f5f791060bff4fb200030a508000b, type: 2}
+    - {fileID: 11400000, guid: bdb9dfa5159cd92499127743b5b62b7e, type: 2}
+    - {fileID: 11400000, guid: e3ad6a1258e665440a98909661c4b710, type: 2}
+    - {fileID: 11400000, guid: 466ab70b697009543a44d358b206c0b6, type: 2}
+    - {fileID: 11400000, guid: 06599c2ff91918744a59db7fce5071c4, type: 2}
+    - {fileID: 11400000, guid: 6cd40f2e1c3d2324fa5b16219c28389a, type: 2}
+    - {fileID: 11400000, guid: 98bdd9c224e0e08419034df35447c3d8, type: 2}
+    - {fileID: 11400000, guid: c1fff641f9dceb84489525286ff84977, type: 2}
+    - {fileID: 11400000, guid: e2ec3d32fed66724e8dac7d677c32846, type: 2}
   - Key: spell.begin
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: fd123745cb53ccf499eb176b27cec653, type: 2}
+    - {fileID: 11400000, guid: 7e198bd88dfdd114eb0464404683105b, type: 2}
+    - {fileID: 11400000, guid: bd8c04cf03d61724383b1d5441540d24, type: 2}
+    - {fileID: 11400000, guid: cb8ea7355096e8f47beb9d5a9c03825f, type: 2}
+    - {fileID: 11400000, guid: 8729d4b3e40de0a45997643d3e663768, type: 2}
+    - {fileID: 11400000, guid: 7aed208e10acd87469315d56ce883e02, type: 2}
+    - {fileID: 11400000, guid: 048d08f2060c6cb43af2cea216d1d96b, type: 2}
+    - {fileID: 11400000, guid: 6b6fc2ae7b407f048b34982b135bb67e, type: 2}
+    - {fileID: 11400000, guid: c957effb00507524c8bb0561cead2407, type: 2}
+    - {fileID: 11400000, guid: cc546010cbab06f40bfc51aa9445ed78, type: 2}
+    - {fileID: 11400000, guid: 59706041e76ff7943af8722db3366dae, type: 2}
+    - {fileID: 11400000, guid: dd4bf9c7a6a49844691f21262a6e7cae, type: 2}
+    - {fileID: 11400000, guid: b655884a36b95a64992f5929a24703c9, type: 2}
+    - {fileID: 11400000, guid: 5b82b3f4eada4bd43aa1a16f64979da6, type: 2}
+    - {fileID: 11400000, guid: b1bf305db7b810d458706e88f5eb3b8c, type: 2}
+    - {fileID: 11400000, guid: d9bf7bc396c2f2948bb9f902c1a7fcc1, type: 2}
+    - {fileID: 11400000, guid: 04146e733010d9742be330d303f8af2c, type: 2}
+    - {fileID: 11400000, guid: 377aef7a7a5d5014b861396f05b746b4, type: 2}
+    - {fileID: 11400000, guid: 0df462a8a118dd0449d14fbf9af2dcba, type: 2}
+    - {fileID: 11400000, guid: b5e4b0113a4a63641bf44c5719029df3, type: 2}
   - Key: spell.cast
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 02cef5dcedf0ab0499b9e350b9780a6d, type: 2}
+    - {fileID: 11400000, guid: 0b73f625739818a438c27745ec2a45f8, type: 2}
+    - {fileID: 11400000, guid: 5f768ae4c29a1b740be692ad93068cff, type: 2}
+    - {fileID: 11400000, guid: eebb22a09e83ff0419acf3efc1ab91f5, type: 2}
+    - {fileID: 11400000, guid: 30585a5733d2190489dbb00a098bcc8a, type: 2}
+    - {fileID: 11400000, guid: 3cdfb637a96d7564ab3c096d53f1d198, type: 2}
+    - {fileID: 11400000, guid: bdf9df18eda624649a8326ef7a7d60d6, type: 2}
+    - {fileID: 11400000, guid: bceb0e48946fe144188907ea16c1e134, type: 2}
+    - {fileID: 11400000, guid: c323e2db0dc1c224cbda82d69c5c1fad, type: 2}
+    - {fileID: 11400000, guid: 70ac7278ddb7b40428099a411c614cb6, type: 2}
+    - {fileID: 11400000, guid: 46006278ee788ad4bb3a9d82a696552c, type: 2}
+    - {fileID: 11400000, guid: 102adb0677654c147a1a1952a802eba0, type: 2}
+    - {fileID: 11400000, guid: 4600b53b1b2efd0408d8b798c69a6524, type: 2}
+    - {fileID: 11400000, guid: 50bbd2f99b420604f8127a479d4444ff, type: 2}
+    - {fileID: 11400000, guid: ee78474e1e4682046a331f5faec92ccd, type: 2}
+    - {fileID: 11400000, guid: 4c5294ce860519f46b6c25eea5a9cfe8, type: 2}
+    - {fileID: 11400000, guid: cf913188a12287e4485ebb5a57722d26, type: 2}
+    - {fileID: 11400000, guid: 0a1b73e917b3bd541855efcab60a2a38, type: 2}
+    - {fileID: 11400000, guid: 3dea07526c8ba3143bb99f1a2303cfa0, type: 2}
+    - {fileID: 11400000, guid: 3800a992392669c468d178a6baea7be0, type: 2}
   - Key: spell.fizzle
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: d35117f6f21e7c640bb09a31226f5587, type: 2}
+    - {fileID: 11400000, guid: 745a9ae8b2c26cd47a490e8b702be992, type: 2}
+    - {fileID: 11400000, guid: 9bf0ec7b08e26114c963482645ab3fca, type: 2}
+    - {fileID: 11400000, guid: 22f2362d8a604ca4a9d7b2912e411642, type: 2}
+    - {fileID: 11400000, guid: 1f50f58dec27ebc4f9686ceaa12a45c8, type: 2}
+    - {fileID: 11400000, guid: 1880ba1700982da45ade874e80c9afbd, type: 2}
+    - {fileID: 11400000, guid: 79967673d42161f408e419b24b564463, type: 2}
+    - {fileID: 11400000, guid: 1710b8e7bc493aa42b4e90c6b55f4f4e, type: 2}
+    - {fileID: 11400000, guid: ff3f2238eabc7084b856bcd7221ac33f, type: 2}
+    - {fileID: 11400000, guid: f163c7c3307f4064fb8f268086b3361c, type: 2}
   - Key: thunder
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 163f386af3d1cea4885f05756842ca4b, type: 2}
+    - {fileID: 11400000, guid: f456108c6f4de7f41a5a34b3aeb98296, type: 2}
+    - {fileID: 11400000, guid: 64c8e59370c3c6e4a9ef5cd1f9b593ad, type: 2}
+    - {fileID: 11400000, guid: 255f21d1c67c67c4cb0c4033d52a061c, type: 2}
+    - {fileID: 11400000, guid: c14ed024d7109c34ba0ae040a096b4f5, type: 2}
+    - {fileID: 11400000, guid: b2dfd887d8a5be1479149f055ee3469a, type: 2}
+    - {fileID: 11400000, guid: d8925709ac8c74741b21913c1d5a69c7, type: 2}
+    - {fileID: 11400000, guid: 082160260d0f1344b84b1d236f25c10a, type: 2}
   - Key: ui.click
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 24d3ed76003f11e40854d1939fbc8a48, type: 2}
+    - {fileID: 11400000, guid: 4ae92b973b3599b4f8ba50361fb80e10, type: 2}
+    - {fileID: 11400000, guid: c9b950b7ed9e8514b959aec43ceb669b, type: 2}
+    - {fileID: 11400000, guid: 50c7fbb6355d70242a50e43fdb9f0c50, type: 2}
+    - {fileID: 11400000, guid: f693a0b925f175a4cbae29a077695f78, type: 2}
+    - {fileID: 11400000, guid: fa975c630add7be4985f478d69e65f9d, type: 2}
+    - {fileID: 11400000, guid: 94aa02404cd1fa24ba978a248e3dcf3e, type: 2}
+    - {fileID: 11400000, guid: d61af818c12ddbf4f85fe98cf2ae8c2f, type: 2}
+    - {fileID: 11400000, guid: 5e8936b9e360c8040b2cd042621579f1, type: 2}
+    - {fileID: 11400000, guid: e674194a0bb55a74aa9ba83498f03b50, type: 2}
+    - {fileID: 11400000, guid: 3c5ce59c644bcef4a8860d5e6690f051, type: 2}
+    - {fileID: 11400000, guid: 5cb2e9b27a6f772438f502bb118ca7cb, type: 2}
+    - {fileID: 11400000, guid: 29c26425d79f2b04389cc633c73e5983, type: 2}
+    - {fileID: 11400000, guid: 0f08ff72854a9b8478ecb2c68affeeb6, type: 2}
+    - {fileID: 11400000, guid: 92e105c5ddf47b442b645448cd45cf99, type: 2}
   - Key: music.menu
     Clips:
     - {fileID: 11400000, guid: 4913a73c16a13d24ba6ea14a7957873f, type: 2}
@@ -75,12 +1094,45 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 94bc92295ad10ba43899e66eec830fa5, type: 2}
     - {fileID: 11400000, guid: a60f8a7f4ae9be94fb6386eb0da7a46b, type: 2}
   - Key: ambient.day
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 3c6f1246c6efb7140921951c2eaeab05, type: 2}
+    - {fileID: 11400000, guid: e9b353f70f4984943a85349309d999df, type: 2}
+    - {fileID: 11400000, guid: 4a0c954cbe2cdf441bc29d85d705db11, type: 2}
+    - {fileID: 11400000, guid: 6ba6ea5a21418c8448ea7371432a5d51, type: 2}
+    - {fileID: 11400000, guid: 6104bc3900b618d44a0587ee867a4361, type: 2}
   - Key: ambient.night
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 153d43703134ac14cafc639202618c0f, type: 2}
+    - {fileID: 11400000, guid: f7a626cef003baf4eb016fd63f21dc48, type: 2}
+    - {fileID: 11400000, guid: 320844ff105b6ef4f8f67b164c274293, type: 2}
+    - {fileID: 11400000, guid: 90abd820608d4f04b97dd1f8a47fc723, type: 2}
+    - {fileID: 11400000, guid: 8572cc0925f16b0438e923f14419f1f3, type: 2}
+  - Key: ambient.town
+    Clips:
+    - {fileID: 11400000, guid: 51335bf1c19ffea409927fa6c2d46f74, type: 2}
+    - {fileID: 11400000, guid: 4fb884998bb463d44884b7d7185f2128, type: 2}
+    - {fileID: 11400000, guid: 6d93b846048b09043a57274fa71dae30, type: 2}
   - Key: ambient.rain
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 9c964d3780dd9514b83af7ee1f59872e, type: 2}
+    - {fileID: 11400000, guid: 17cb536d6c8c3cb41a4bfbf0f40239a6, type: 2}
+    - {fileID: 11400000, guid: be1c683fc1d3eb341a4b318dc5541fcd, type: 2}
+    - {fileID: 11400000, guid: f92dd620e44577f45be15b4ef96e8c8b, type: 2}
   - Key: ambient.wind
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: fe9ef07f737073f48b66ba3720df3a98, type: 2}
+    - {fileID: 11400000, guid: f1751bc1966dece4192dd540d01d0166, type: 2}
+    - {fileID: 11400000, guid: 9310d9284f6b9554bae3e8d28f1dec90, type: 2}
+    - {fileID: 11400000, guid: b8887cf152a550b44964d4631c092f5c, type: 2}
+    - {fileID: 11400000, guid: 340b77ec2852b8745a6b862e9edfab3b, type: 2}
+    - {fileID: 11400000, guid: b39dc6fe6d7b9c544b1badc4ce62f6ac, type: 2}
+    - {fileID: 11400000, guid: 24bdd5ead81efbe42af8740f81f3e3ff, type: 2}
+    - {fileID: 11400000, guid: 91a602240449cbe488b818c4bf6c11a7, type: 2}
+    - {fileID: 11400000, guid: 1781e5781f1a4e24ab32b91d75d78a71, type: 2}
+    - {fileID: 11400000, guid: 1c8fb68e50661ba42bcbde4dbf09e96d, type: 2}
+    - {fileID: 11400000, guid: 2c8aaa8b2e161054d980af5a9b39075f, type: 2}
   - Key: ambient.dungeon
-    Clips: []
+    Clips:
+    - {fileID: 11400000, guid: 17cfb564addfc5047b552505e24b7c32, type: 2}
+    - {fileID: 11400000, guid: c51271801800a684e8deb87b97942b40, type: 2}
+    - {fileID: 11400000, guid: 7c9bf6e8e5fd35944af5ba4a01dfe97f, type: 2}

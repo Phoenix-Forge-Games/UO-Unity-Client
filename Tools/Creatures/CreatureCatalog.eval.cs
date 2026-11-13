@@ -45,6 +45,62 @@ UnityEditor.Animations.AnimatorController Locomotion(string name, string idle, s
     return ac;
 }
 
+void Once(string fbx)
+{
+    var imp = UnityEditor.AssetImporter.GetAtPath(fbx) as UnityEditor.ModelImporter;
+    if (imp == null) return;
+    var clips = imp.clipAnimations.Length > 0 ? imp.clipAnimations : imp.defaultClipAnimations;
+    bool changed = false;
+    foreach (var c in clips) if (c.loopTime) { c.loopTime = false; changed = true; }
+    if (changed) { imp.clipAnimations = clips; imp.SaveAndReimport(); }
+}
+
+// A creature controller: the locomotion blend tree on Speed, and the actions the game fires on everyone alike
+// (NpcAppearance, Corpse): Attack (Variant picks which), Hit, and Die (held on its last frame).
+UnityEditor.Animations.AnimatorController Creature(string name, string idle, string walk, string run, string[] attacks, string[] hits, string death)
+{
+    var ac = Locomotion(name, idle, walk, run);
+    if (ac == null) return null;
+    ac.AddParameter("Attack", UnityEngine.AnimatorControllerParameterType.Trigger);
+    ac.AddParameter("Hit", UnityEngine.AnimatorControllerParameterType.Trigger);
+    ac.AddParameter("Die", UnityEngine.AnimatorControllerParameterType.Trigger);
+    ac.AddParameter("Variant", UnityEngine.AnimatorControllerParameterType.Int);
+    // How many attacks and flinches there are (ActionAnimator picks a Variant below these).
+    ac.AddParameter(new UnityEngine.AnimatorControllerParameter { name = "AttackCount", type = UnityEngine.AnimatorControllerParameterType.Int, defaultInt = attacks.Length });
+    ac.AddParameter(new UnityEngine.AnimatorControllerParameter { name = "HitCount", type = UnityEngine.AnimatorControllerParameterType.Int, defaultInt = hits.Length });
+    var sm = ac.layers[0].stateMachine;
+    var home = sm.defaultState;
+
+    void Actions(string trigger, string[] fbxs, bool returns)
+    {
+        for (int k = 0; k < fbxs.Length; k++)
+        {
+            Once(fbxs[k]);
+            var clip = Clip(fbxs[k]);
+            if (clip == null) { log.AppendLine("missing " + fbxs[k]); continue; }
+            var s = sm.AddState(trigger + (k + 1));
+            s.motion = clip;
+            var t = sm.AddAnyStateTransition(s);
+            t.canTransitionToSelf = false;
+            t.duration = 0.1f;
+            t.AddCondition(UnityEditor.Animations.AnimatorConditionMode.If, 0, trigger);
+            if (fbxs.Length > 1) t.AddCondition(UnityEditor.Animations.AnimatorConditionMode.Equals, k, "Variant");
+            if (returns)
+            {
+                var back = s.AddTransition(home);
+                back.hasExitTime = true;
+                back.exitTime = 0.9f;
+                back.duration = 0.15f;
+            }
+        }
+    }
+
+    Actions("Attack", attacks, true);
+    Actions("Hit", hits, true);
+    if (death != null) Actions("Die", new[] { death }, false);
+    return ac;
+}
+
 UnityEngine.GameObject P(string path)
 {
     var go = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(path);
@@ -97,23 +153,52 @@ UnityEngine.GameObject Q(string pack, string name) => P(S + pack + "/Prefabs/Cha
 void H(string name, ushort[] bodies, UnityEngine.GameObject prefab, float height, UnityEngine.Color tint, params string[] hide) => Add(name, bodies, prefab, height, tint, humanoid, hide);
 ushort[] B(params int[] b) => System.Array.ConvertAll(b, v => (ushort)v);
 
-// Orcs and ogres (Fantasy Rivals, Dungeon goblins)
-H("orcs", B(17), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 1.95f, white);
-H("orc captains", B(7), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 2.05f, C(0.85f, 0.8f, 0.8f));
-H("orcish lords", B(138), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 2.15f, C(0.75f, 0.7f, 0.7f));
-H("orc brutes", B(189), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 2.6f, C(0.7f, 0.6f, 0.55f));
-H("orcish mages", B(140), Q("PolygonDungeon", "SM_Chr_Goblin_Shaman_01"), 1.8f, white);
-H("orc scouts and bombers", B(181, 182), Q("PolygonDungeon", "SM_Chr_Goblin_Warrior_Male_01"), 1.7f, white);
+// Goblins (Dungeon)
 H("goblins", B(723), Q("PolygonDungeon", "SM_Chr_Goblin_Male_01"), 1.35f, white);
-H("ogres", B(1), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 2.9f, C(0.8f, 0.75f, 0.6f));
-H("ogre lords", B(83), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 3.2f, C(0.7f, 0.6f, 0.5f));
-H("arctic ogre lords", B(135), Q("PolygonFantasyRivals", "SM_Chr_BR_BigOrk_01"), 3.2f, C(0.75f, 0.85f, 1f));
-H("ettins", B(18), Q("PolygonFantasyRivals", "SM_Chr_BR_BarbarianGiant_01"), 3.0f, white);
+
+// Orcs and ogres (PolyNext, Generic rigs with their own clips): Warriors for the rank and file, Heroes for the
+// captains and lords, Shamans for the mages. Their colourise shader ignores Tint: variety comes from the three
+// Combined colourways. Before these, Fantasy Rivals' BigOrk stood in for all of them.
+const string PN = "Assets/Secure/PolyNext/";
+if (UnityEditor.AssetDatabase.IsValidFolder(PN.TrimEnd('/')))
+{
+    string A(string pack, string clip) => PN + pack + "/Animations/" + clip + ".fbx";
+    var warrior = Creature("OrcWarrior", A("Low Poly Orc Warrior", "01_Orc_Warrior_Idle1"), A("Low Poly Orc Warrior", "03_Orc_Warrior_Walk"), A("Low Poly Orc Warrior", "04_Orc_Warrior_Run"),
+        new[] { A("Low Poly Orc Warrior", "07_Orc_Warrior_Attack1"), A("Low Poly Orc Warrior", "08_Orc_Warrior_Attack2") },
+        new[] { A("Low Poly Orc Warrior", "09_Orc_Warrior_Hit") }, A("Low Poly Orc Warrior", "10_Orc_Warrior_Death"));
+    var hero = Creature("OrcHero", A("Low Poly Orc Hero", "01_Orc_Hero_Idle1"), A("Low Poly Orc Hero", "03_Orc_Hero_Walk"), A("Low Poly Orc Hero", "04_Orc_Hero_Run"),
+        new[] { A("Low Poly Orc Hero", "08_Orc_Hero_Attack1"), A("Low Poly Orc Hero", "09_Orc_Hero_Attack2"), A("Low Poly Orc Hero", "10_Orc_Hero_Attack3") },
+        new[] { A("Low Poly Orc Hero", "11_Orc_Hero_Hit1"), A("Low Poly Orc Hero", "12_Orc_Hero_Hit2") }, A("Low Poly Orc Hero", "13_Orc_Hero_Death"));
+    var shaman = Creature("OrcShaman", A("Low Poly Orc Shaman", "01_Orc_Shaman_Idle"), A("Low Poly Orc Shaman", "02_Orc_Shaman_Walk"), A("Low Poly Orc Shaman", "03_Orc_Shaman_Run"),
+        new[] { A("Low Poly Orc Shaman", "05_Orc_Shaman_Attack_Staff1"), A("Low Poly Orc Shaman", "06_Orc_Shaman_Attack_Staff2"), A("Low Poly Orc Shaman", "07_Orc_Shaman_Attack_Magic1") },
+        new[] { A("Low Poly Orc Shaman", "09_Orc_Shaman_Hit1"), A("Low Poly Orc Shaman", "10_Orc_Shaman_Hit2") }, A("Low Poly Orc Shaman", "11_Orc_Shaman_Death"));
+    var ogre = Creature("Ogre", A("Low Poly Ogre", "01_Ogre_Idle1"), A("Low Poly Ogre", "07_Ogre_Walk"), A("Low Poly Ogre", "08_Ogre_Run"),
+        new[] { A("Low Poly Ogre", "09_Ogre_Attack1"), A("Low Poly Ogre", "10_Ogre_Attack2"), A("Low Poly Ogre", "11_Ogre_Attack3") },
+        new[] { A("Low Poly Ogre", "12_Ogre_Hit") }, A("Low Poly Ogre", "13_Ogre_Death"));
+    UnityEngine.GameObject N(string pack, string prefab) => P(PN + pack + "/Prefabs/" + prefab + ".prefab");
+    Add("orcs", B(17), N("Low Poly Orc Warrior", "Orc_Warrior_Combined1"), 1.95f, white, warrior);
+    Add("orc scouts", B(181), N("Low Poly Orc Warrior", "Orc_Warrior_Combined2"), 1.8f, white, warrior);
+    Add("orc bombers", B(182), N("Low Poly Orc Warrior", "Orc_Warrior_Combined3"), 1.85f, white, warrior);
+    Add("orc brutes", B(189), N("Low Poly Orc Warrior", "Orc_Warrior_Combined3"), 2.6f, white, warrior);
+    Add("orc captains", B(7), N("Low Poly Orc Hero", "Orc_Hero_Combined1"), 2.05f, white, hero);
+    Add("orcish lords", B(138), N("Low Poly Orc Hero", "Orc_Hero_Combined3"), 2.15f, white, hero);
+    Add("orcish mages", B(140), N("Low Poly Orc Shaman", "Orc_Shaman_Combined1"), 1.85f, white, shaman);
+    Add("ogres", B(1), N("Low Poly Ogre", "Ogre_Combined1"), 2.9f, white, ogre);
+    Add("ogre lords", B(83), N("Low Poly Ogre", "Ogre_Combined3"), 3.2f, white, ogre);
+    Add("arctic ogre lords", B(135), N("Low Poly Ogre", "Ogre_Combined2"), 3.2f, white, ogre);
+    entries.RemoveAll(e => e.Name == "orc scouts and bombers"); // split in two above
+}
+
+// Humanoid low-poly monsters (Lowpoly Pack): the two-headed ogre is UO's ettin; goblins and gremlins had no model.
+const string LP = "Assets/Secure/LowpolyPack_Humanoid monster/Prefabs/";
+H("ettins", B(18), P(LP + "Goblin Orc and Ogre/Two-Headed Ogre.prefab"), 3.0f, white);
+H("enslaved goblins", B(334), P(LP + "Goblin Orc and Ogre/Goblin Warrior.prefab"), 1.35f, white);
+H("gremlins", B(724), P(LP + "Gremlin and Troll/Gremlin.prefab"), 1.0f, white);
 H("cyclopes", B(75), Q("PolygonDarkFortress", "SM_Chr_Behemoth_01"), 3.4f, white);
 H("titans", B(76), Q("PolygonDarkFortress", "SM_Chr_Colossus_01"), 3.4f, white);
 // Trolls
 H("trolls", B(53, 54), Q("PolygonFantasyRivals", "SM_Chr_BR_Troll_01"), 2.5f, white);
-H("frost trolls", B(55), Q("PolygonGoblinWarCamp", "SM_Chr_Troll_01"), 2.6f, C(0.75f, 0.85f, 1f));
+H("frost trolls", B(55), P(LP + "Gremlin and Troll/Ice Troll.prefab"), 2.6f, white); // icy already (Lowpoly Pack)
 // Daemons
 H("daemons", B(9), Q("PolygonFantasyRivals", "SM_Chr_BR_RedDemon_01"), 2.8f, white);
 H("balrons", B(40), Q("PolygonDungeonRealms", "Chr_BR_Demon_01"), 3.6f, white);

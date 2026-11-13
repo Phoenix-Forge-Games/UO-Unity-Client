@@ -55,12 +55,13 @@ namespace UOGame
             foreach (Gear gear in look.Gear ?? Array.Empty<Gear>())
             {
                 Items.ItemDef def = catalog?.Get(gear.Item);
-                if (def == null || !def.Wearable)
+                // A tool with no hand slot of its own (a smith's hammer) is only worn when work put it in hand.
+                byte layer = def == null ? (byte)0 : def.Wearable ? (byte)def.Slot : def.Category == "Tool" ? (byte)Items.WearSlot.OneHanded : (byte)0;
+                if (layer == 0)
                 {
                     continue;
                 }
 
-                byte layer = (byte)def.Slot;
                 mobile.Equipment[layer] = new EquippedItem
                 {
                     Serial = (uint)(3 + layer),

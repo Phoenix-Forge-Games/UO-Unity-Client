@@ -28,7 +28,6 @@ namespace UOGame
     {
         private const float HearRange = 30f;
         private const float StepRange = 18f;
-        private const float Stride = 1.6f;
         private const float CombatMusicHold = 8f;
         private const float MusicSwitchGap = 12f;
 
@@ -158,6 +157,27 @@ namespace UOGame
             }
         }
 
+        /// <summary>Play the first of these sounds that has clips (the most fitting, then more general ones); which one, or null.</summary>
+        public static string PlayFirst(Vector3 at, params string[] keys)
+        {
+            GameAudio a = Instance;
+            if (a == null || !a._ready)
+            {
+                return null;
+            }
+
+            foreach (string key in keys)
+            {
+                if (key != null && a._bank.Has(key))
+                {
+                    Play(key, at);
+                    return key;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>Play an interface sound (flat, the same everywhere).</summary>
         public static void Ui(string key)
         {
@@ -213,19 +233,145 @@ namespace UOGame
 
         // ------------------------------------------------------------------ events
 
+        /// <summary>
+        /// A swing: the weapon's whoosh (or a creature's cry) at the attacker, then at the target the blow landing (by
+        /// what struck it: a blade, a club, a point, an arrow), a creature's hurt cry, or the miss.
+        /// </summary>
         private void OnSwing(SwingMessage m)
         {
             Combatant target = Find(m.TargetId);
             Combatant attacker = Find(m.AttackerId);
+            ActionAnimator.WeaponKind weapon = attacker != null && LookOf(attacker) is Look look ? ActionAnimator.Weapon(look) : ActionAnimator.WeaponKind.Unarmed;
+            string beast = attacker != null ? Family(attacker) : null;
             if (attacker != null)
             {
-                Play("swing", attacker.transform.position + Vector3.up);
+                Vector3 at = attacker.transform.position + Vector3.up;
+                if (beast != null)
+                {
+                    PlayFirst(at, $"creature.{beast}.attack");
+                }
+
+                PlayFirst(at, beast != null && weapon == ActionAnimator.WeaponKind.Unarmed ? null : SwingKey(weapon), "swing");
             }
 
             if (target != null)
             {
-                Play(m.Amount > 0 ? "hit" : "miss", target.transform.position + Vector3.up);
+                Vector3 at = target.transform.position + Vector3.up;
+                if (m.Amount <= 0)
+                {
+                    Play("miss", at);
+                    return;
+                }
+
+                PlayFirst(at, HitKey(weapon), "hit");
+                string hurt = Family(target);
+                if (hurt != null && Random.value < 0.6f)
+                {
+                    PlayFirst(at, $"creature.{hurt}.hurt");
+                }
             }
+        }
+
+        private static string SwingKey(ActionAnimator.WeaponKind w) => w switch
+        {
+            ActionAnimator.WeaponKind.Bow => "swing.bow",
+            ActionAnimator.WeaponKind.Crossbow => "swing.crossbow",
+            ActionAnimator.WeaponKind.Mace or ActionAnimator.WeaponKind.TwoHanded or ActionAnimator.WeaponKind.Polearm => "swing.heavy",
+            ActionAnimator.WeaponKind.Unarmed => "swing.unarmed",
+            _ => "swing",
+        };
+
+        private static string HitKey(ActionAnimator.WeaponKind w) => w switch
+        {
+            ActionAnimator.WeaponKind.Bow or ActionAnimator.WeaponKind.Crossbow => "hit.arrow",
+            ActionAnimator.WeaponKind.Mace or ActionAnimator.WeaponKind.Unarmed => "hit.blunt",
+            ActionAnimator.WeaponKind.Fencing => "hit.pierce",
+            _ => "hit",
+        };
+
+        /// <summary>What someone wears and wields (players and dressed NPCs), if anything.</summary>
+        private static Look? LookOf(Combatant c)
+        {
+            if (c.TryGetComponent(out PlayerIdentity id))
+            {
+                return id.Look.Value;
+            }
+
+            if (c.TryGetComponent(out NpcMobile npc) && ActorModel.IsHumanBody(npc.BodyId))
+            {
+                return npc.Look;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// The creature family whose voice a creature has (Sounds.json creature.FAMILY.attack / hurt / death), from its
+        /// kind; null for people and creatures with no voice yet.
+        /// </summary>
+        /// <summary>
+        /// Does this creature walk on feet (footsteps)? Not birds and bats, things that float or drift (spirits,
+        /// wisps, air elementals), slither (snakes, serpents, slimes) or swim.
+        /// </summary>
+        public static bool Footed(Combatant c)
+        {
+            if (c == null || !c.TryGetComponent(out NpcMobile npc) || npc.Def == null || ActorModel.IsHumanBody(npc.BodyId))
+            {
+                return true;
+            }
+
+            string t = npc.Def.Type ?? string.Empty;
+            foreach (string w in new[] { "Bird", "Bat", "Eagle", "Raven", "Crow", "Hawk", "Phoenix", "Harpy", "Wisp", "AirElemental",
+                         "Snake", "Serpent", "Slime", "Jelly", "Ooze", "Fish", "Eel", "Kraken", "Squid", "Dolphin", "Whale", "Sea" })
+            {
+                if (t.IndexOf(w, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return false;
+                }
+            }
+
+            return Family(c) != "spectre";
+        }
+
+        /// <summary>The creature's sound family (creature.orc.*, step.orc...), or null for people.</summary>
+        public static string Family(Combatant c)
+        {
+            if (!c.TryGetComponent(out NpcMobile npc) || npc.Def == null || ActorModel.IsHumanBody(npc.BodyId))
+            {
+                return null;
+            }
+
+            string t = npc.Def.Type ?? string.Empty;
+            bool Is(params string[] words)
+            {
+                foreach (string w in words)
+                {
+                    if (t.IndexOf(w, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            if (Is("Orc")) return "orc";
+            if (Is("Goblin", "Gremlin", "Ratman", "Imp", "Mongbat")) return "goblin";
+            if (Is("Troll", "Ogre", "Ettin", "Cyclops", "Titan", "Giant")) return "troll";
+            if (Is("Dragon", "Drake", "Wyrm", "Wyvern")) return "dragon";
+            if (Is("Spider")) return "spider";
+            if (Is("Skelet", "Bone", "Lich")) return "skeleton";
+            if (Is("Spectre", "Wraith", "Shade", "Ghost", "Spirit", "Soul")) return "spectre";
+            if (Is("Zombie", "Ghoul", "Mummy", "Corpse")) return "zombie";
+            if (Is("Scorpion", "Solen", "Beetle", "Ant")) return "insect";
+            if (Is("Daemon", "Demon", "Balron", "Fiend")) return "daemon";
+            if (Is("Chicken")) return "chicken";
+            if (Is("Cow", "Bull")) return "cow";
+            if (Is("Dog", "Wolf", "Hound")) return "dog";
+            if (Is("Horse", "Pony", "Steed")) return "horse";
+            if (Is("Pig", "Boar")) return "pig";
+            if (Is("Sheep", "Goat")) return "sheep";
+            return "beast";
         }
 
         private static Combatant Find(int objectId)
@@ -339,30 +485,11 @@ namespace UOGame
 
                 if (dead && !was.Dead)
                 {
-                    Play("death", at + Vector3.up);
+                    string beast = Family(c);
+                    PlayFirst(at + Vector3.up, beast != null ? $"creature.{beast}.death" : null, "death");
                 }
 
-                Vector3 moved = at - was.At;
-                float walked = was.Walked;
-                bool onFoot = !dead && !c.Hidden.Value && Mathf.Abs(moved.y) < 0.25f && !Swimming(c);
-                if (onFoot && moved.sqrMagnitude < 4f)
-                {
-                    walked += new Vector2(moved.x, moved.z).magnitude;
-                    if (walked >= Stride)
-                    {
-                        walked = 0f;
-                        if ((at - ear).sqrMagnitude <= StepRange * StepRange)
-                        {
-                            Play("step", at);
-                        }
-                    }
-                }
-                else
-                {
-                    walked = 0f;
-                }
-
-                _actors[c] = (at, walked, dead);
+                _actors[c] = (at, 0f, dead); // footsteps: each appearance's Footsteps
             }
 
             _gone.Clear();
@@ -379,8 +506,6 @@ namespace UOGame
                 _actors.Remove(c);
             }
         }
-
-        private static bool Swimming(Combatant c) => c.TryGetComponent(out PlayerIdentity id) && id.Swimming.Value;
 
         /// <summary>The music for where you are: the menu, combat, a dungeon, a town, or the wilds by day or night.</summary>
         private void UpdateMusic()
@@ -472,6 +597,10 @@ namespace UOGame
                 else
                 {
                     _wantedAmbient.Add(DayNight.Daylight >= 0.3f ? "ambient.day" : "ambient.night");
+                    if (DayNight.PlaceName != null && DayNight.Daylight >= 0.3f)
+                    {
+                        _wantedAmbient.Add("ambient.town"); // the town about you by day
+                    }
                     if (weather != null && weather.Rain > 0.2f)
                     {
                         _wantedAmbient.Add("ambient.rain");

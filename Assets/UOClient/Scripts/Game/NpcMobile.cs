@@ -246,8 +246,16 @@ namespace UOGame
         private const float ChaseSpeed = 5.5f;
         private const float Gravity = -20f;
         private const float ThinkSeconds = 0.25f;
-        /// <summary>How far from home a fight may drag a creature before it gives up (metres).</summary>
+        /// <summary>How far from where a fight began it may drag a creature before it gives up (metres).</summary>
         private const float Leash = 35f;
+        /// <summary>The longest a creature walks back evading before it's whole and fair game again, stuck or not.</summary>
+        private const float EvadeSeconds = 20f;
+        /// <summary>Where the creature was when its current fight began (it leashes from here and goes back here).</summary>
+        private Vector3? _fightStart;
+        private float _evadeUntil;
+        /// <summary>Seconds chasing without getting any closer (can't reach them) before it gives up.</summary>
+        private const float CantReachSeconds = 8f;
+        private float _closest = float.MaxValue, _closingSince;
 
         [SerializeField] private Transform _graphic;
 
@@ -479,9 +487,28 @@ namespace UOGame
 
             if (_returning)
             {
-                if (_goal == null)
+                // Evading: walk back to where the fight began, untouchable, until it's there; one that can't get
+                // there (no way back) is put there when its time is up.
+                Vector3 start = _fightStart ?? Home;
+                Vector3 away = transform.position - start;
+                away.y = 0f;
+                bool back = away.magnitude < 1.5f;
+                if (back || Time.time >= _evadeUntil)
                 {
+                    if (!back)
+                    {
+                        PlaceNear(start);
+                    }
+
+                    // Back where the fight began: whole again, and fair game.
                     _returning = false;
+                    _fightStart = null;
+                    _combat.EndEvade();
+                }
+                else if (_goal == null)
+                {
+                    _goal = start; // keep heading back
+                    _goalSpeed = ChaseSpeed;
                 }
 
                 return;
@@ -514,14 +541,32 @@ namespace UOGame
 
             if (target != null && _combat.AutoAttack)
             {
-                Vector3 offset = transform.position - Home;
-                offset.y = 0f;
-                if (offset.magnitude > Leash)
+                if (_fightStart == null)
                 {
-                    // Dragged too far: give up, walk home and heal (the fight ends for the player too).
-                    _combat.Evade();
-                    _goal = Home;
+                    _fightStart = transform.position;
+                    _closest = float.MaxValue;
+                    _closingSince = Time.time;
+                }
+
+                // Getting closer (or in reach) counts as a chase; no headway at all for a while means it can't reach
+                // them (blocked, no path), and it gives up the same as past the leash.
+                float apart = (target.transform.position - transform.position).magnitude;
+                if (apart < _closest - 0.5f || _combat.InReach(target))
+                {
+                    _closest = Mathf.Min(_closest, apart);
+                    _closingSince = Time.time;
+                }
+
+                Vector3 offset = transform.position - _fightStart.Value;
+                offset.y = 0f;
+                if (offset.magnitude > Leash || Time.time - _closingSince > CantReachSeconds)
+                {
+                    // Chased too far from where the fight began: drop aggro and walk back, untouchable, then heal
+                    // (the fight ends for the player too, unless something else wants them dead).
+                    _combat.BeginEvade();
+                    _goal = _fightStart.Value;
                     _goalSpeed = ChaseSpeed;
+                    _evadeUntil = Time.time + EvadeSeconds;
                     _returning = true;
                     return;
                 }
@@ -537,6 +582,8 @@ namespace UOGame
 
                 return;
             }
+
+            _fightStart = null; // no fight (won, or the foe is gone): the next one starts from wherever it is then
 
             if (Casts)
             {

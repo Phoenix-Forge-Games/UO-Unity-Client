@@ -5,7 +5,8 @@ Goal: 100% of the game in this Unity project, so ServUO can be retired. Written 
 **One build, three ways to run:**
 - **Solo:** server and client in one process.
 - **Host (listen server):** you play while friends connect to you.
-- **Headless:** a dedicated server build on phoenix-server.
+- **Headless:** a dedicated server build: the hosted shard in Azure Container Instances (Linux, `Docs/Shard.md`),
+  or phoenix-server.
 
 The same client connects to either a host or a headless server.
 
@@ -17,6 +18,12 @@ GameObjects. It provides:
 - interest management.
 
 Dedicated servers are ordinary headless player builds; Windows and Linux server build support is installed.
+
+**Hosting (2026-11-12):** the shard runs as an Azure Container Instance from the Linux server build
+(`ServerBuilder`, `Deploy/Shard`), deployed by `.github/workflows/shard.yml`: `develop` to the test shard, `main` to
+the live one (gitflow, `Docs/Shard.md`). Its accounts are the website's: with `BR_ACCOUNT_API`/`BR_SHARD_KEY` set,
+logins are checked by the website, and local accounts of the same name (including imported SeriousFun ones) are taken
+over by the website account. `BR_DATA_DIR` and `BR_WORLD_DIR` point the saves and the baked world at mounted shares.
 
 ## Phase 0: world ready for a server (in progress)
 

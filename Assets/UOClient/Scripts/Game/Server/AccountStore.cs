@@ -155,6 +155,9 @@ namespace UOGame.Server
             /// <summary>Moved from a ServUO shard (ServUOImport): the shard, and its old password hashes, checked once at the first
             /// login here and then replaced by our own (ServUO's: hex SHA-1, SHA-512 or MD5 of name + password).</summary>
             public string ImportedFrom, LegacySha1, LegacySha512, LegacyMd5;
+            /// <summary>A website account (WebsiteAccounts): its password lives only on the website, never here. A server
+            /// not connected to the website turns it away rather than letting the first password given become its own.</summary>
+            public bool Website;
             public List<Character> Characters = new List<Character>();
         }
 
@@ -204,12 +207,23 @@ namespace UOGame.Server
             }
         }
 
-        /// <summary>Where server data lives: next to the project in the editor, next to the game in a build.</summary>
         /// <summary>A new item id, unique for good (saved with the accounts).</summary>
         public uint NewItemId() => _data.NextItemId++;
 
-        public static string DefaultFolder =>
-            Path.GetFullPath(Path.Combine(Application.dataPath, "..", "ServerData"));
+        private static string _defaultFolder;
+
+        /// <summary>Where server data lives (accounts, houses, boats, live content changes, the admin token: everything
+        /// the server writes): <c>BR_DATA_DIR</c> when set (a hosted shard's mounted share), else next to the project in
+        /// the editor and next to the game in a build. Read once.</summary>
+        public static string DefaultFolder => _defaultFolder ??= FolderFromEnvironment("BR_DATA_DIR")
+            ?? Path.GetFullPath(Path.Combine(Application.dataPath, "..", "ServerData"));
+
+        /// <summary>A folder named by an environment variable, or null when it isn't set.</summary>
+        public static string FolderFromEnvironment(string variable)
+        {
+            string value = Environment.GetEnvironmentVariable(variable);
+            return string.IsNullOrWhiteSpace(value) ? null : Path.GetFullPath(value.Trim());
+        }
 
         /// <summary>Checks a login; creates the account if the name is new. Null when refused, with the reason.</summary>
         public Account Login(string name, string password, out string reason)
@@ -229,6 +243,12 @@ namespace UOGame.Server
             }
 
             Account account = _data.Accounts.Find(a => string.Equals(a.Name, name, StringComparison.OrdinalIgnoreCase));
+            if (account != null && account.Website)
+            {
+                reason = "This account signs in through the website, and this server isn't connected to it.";
+                return null;
+            }
+
             if (account == null)
             {
                 byte[] salt = new byte[16];
@@ -289,6 +309,36 @@ namespace UOGame.Server
                 return null;
             }
 
+            return account;
+        }
+
+        /// <summary>
+        /// A login the website has checked (WebsiteAccounts): the account by the website's own spelling of the name
+        /// (any case), made if new. A local or imported account of that name becomes the website account's (its local
+        /// or legacy password stops working; the website's is the only one). The website's admin flag adds to a
+        /// locally granted one, never takes it away.
+        /// </summary>
+        public Account WebsiteLogin(string name, bool admin)
+        {
+            Account account = Find(name);
+            if (account == null)
+            {
+                account = new Account
+                {
+                    Name = name,
+                    Created = DateTime.UtcNow.ToString("o"),
+                    Website = true,
+                };
+                _data.Accounts.Add(account);
+            }
+            else if (!account.Website)
+            {
+                Debug.Log($"[Game] Account {account.Name} is now a website account{(account.ImportedFrom != null ? $" (imported from {account.ImportedFrom})" : string.Empty)}.");
+                account.Website = true;
+            }
+
+            account.Admin |= admin;
+            Save();
             return account;
         }
 

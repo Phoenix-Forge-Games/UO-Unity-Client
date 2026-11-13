@@ -1,0 +1,206 @@
+# Builds the Linux shard and deploys it to Azure Container Instances (Docs/Shard.md):
+#   develop -> test shard (br-shard-test), main -> live shard (br-shard-live).
+#
+# SAFETY: this runs on the owner's own PC (self-hosted runner). It is triggered by pushes to develop/main and by hand
+# ONLY. Never add pull_request / pull_request_target: this repo is public and a fork's PR would run its code here.
+name: Shard
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: shard-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    # Only the two deploy branches, also when started by hand.
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, windows, unity-build]
+    timeout-minutes: 240
+    defaults:
+      run:
+        shell: powershell
+    env:
+      # The private art repo (Phoenix-Forge-Games/britannia-reborn-art), filled before each push by its pre-push hook,
+      # and the persistent checkout this job uses. Docs/Shard.md.
+      ART_REPO_DIR: ${{ vars.ART_REPO_DIR || 'G:\Ultima Online\BritanniaRebornArt' }}
+      ART_CHECKOUT: ${{ vars.ART_CHECKOUT || 'G:\actions-runner-art' }}
+      UNITY_EXE: ${{ vars.UNITY_EXE || 'G:\UnityInstalls\6000.6.8f1\Editor\Unity.exe' }}
+      AZCOPY_EXE: ${{ vars.AZCOPY_EXE || 'azcopy' }}
+      AZURE_RG: ${{ vars.AZURE_RG || 'phoenixforge-britannia' }}
+      ACR_NAME: ${{ vars.ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+      STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT }}
+      SHARD_IDENTITY_ID: ${{ vars.SHARD_IDENTITY_ID }}
+      ACCOUNT_API: ${{ vars.ACCOUNT_API }}
+
+    steps:
+      - name: Remove paid-art links left by an earlier run
+        run: |
+          # Junctions only (rmdir without /s removes the link, never the owner's files).
+          foreach ($p in 'Assets\Synty', 'Assets\Secure', 'Assets\BK', 'Assets\AddressableAssetsData') {
+            $path = Join-Path $env:GITHUB_WORKSPACE $p
+            if ((Test-Path $path) -and ((Get-Item $path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+              cmd /c rmdir "$path"
+            }
+          }
+
+      - name: Pick the shard
+        run: |
+          if ($env:GITHUB_REF_NAME -eq 'main') { $envName = 'live' } else { $envName = 'test' }
+          @(
+            "SHARD_ENV=$envName"
+            "SHARD_NAME=br-shard-$envName"
+            "SHARD_DNS=br-shard-$envName"
+            "DATA_SHARE=shard-$envName-data"
+            "WORLD_SHARE=shard-world-$envName"
+            "BUILD_CONTEXT=$env:RUNNER_TEMP\shard-context"
+          ) | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          foreach ($v in 'ACR_NAME', 'ACR_LOGIN_SERVER', 'STORAGE_ACCOUNT', 'SHARD_IDENTITY_ID', 'ACCOUNT_API') {
+            if (-not [Environment]::GetEnvironmentVariable($v)) { throw "Repository variable $v is not set." }
+          }
+
+      # clean: false keeps Library (and the copied art) between runs; a clean would mean a full Unity import each time.
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          clean: false
+
+      - name: Check out this commit's art
+        run: |
+          # The pre-push hook tagged the art for this exact commit as pub/<sha>.
+          $tag = "pub/$env:GITHUB_SHA"
+          git -C "$env:ART_REPO_DIR" rev-parse -q --verify "refs/tags/$tag" | Out-Null
+          if ($LASTEXITCODE -ne 0) {
+            git -C "$env:ART_REPO_DIR" fetch -q origin "refs/tags/${tag}:refs/tags/$tag"
+            if ($LASTEXITCODE -ne 0) { throw "No art tagged $tag: push from a machine with the art pre-push hook (Docs/Shard.md)." }
+          }
+          # A worktree of the art repo shares its LFS store, so a checkout copies nothing over the network.
+          if (-not (Test-Path (Join-Path $env:ART_CHECKOUT '.git'))) {
+            git -C "$env:ART_REPO_DIR" worktree add --detach "$env:ART_CHECKOUT" $tag
+          } else {
+            git -C "$env:ART_CHECKOUT" checkout -q --detach $tag
+          }
+          if ($LASTEXITCODE -ne 0) { throw "Couldn't check out $tag." }
+          "ART_ROOT=$env:ART_CHECKOUT" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Link the art into the project
+        run: |
+          $src = $env:ART_ROOT
+          if (-not (Test-Path (Join-Path $src 'Assets'))) { throw "The art checkout '$src' has no Assets folder." }
+          # Whole git-ignored folders (Docs/SecureArt.md, .gitignore): junctions, plus their .meta files.
+          foreach ($p in 'Assets\Synty', 'Assets\Secure', 'Assets\BK', 'Assets\AddressableAssetsData') {
+            $from = Join-Path $src $p
+            if (-not (Test-Path $from)) { Write-Host "skip $p (not in the working copy)"; continue }
+            cmd /c mklink /J "$(Join-Path $env:GITHUB_WORKSPACE $p)" "$from" | Out-Host
+            if ($LASTEXITCODE -ne 0) { throw "Couldn't link $p." }
+            if (Test-Path "$from.meta") { Copy-Item "$from.meta" "$(Join-Path $env:GITHUB_WORKSPACE $p).meta" -Force }
+          }
+          # Art files git-ignored inside tracked folders (Assets/UOClient images, models, audio; the SyntyWalls textures):
+          # copied, only when newer. Robocopy exit codes below 8 are success.
+          # The art repo's Assets/UOClient holds only those files (and their .meta), so copy all of it.
+          robocopy "$src\Assets\UOClient" "$env:GITHUB_WORKSPACE\Assets\UOClient" * /S /XO /NP /NFL /NDL /R:1 /W:1 | Out-Host
+          if ($LASTEXITCODE -ge 8) { throw "Copying art failed ($LASTEXITCODE)." }
+          $global:LASTEXITCODE = 0
+
+      - name: Build the Linux server
+        run: |
+          $server = Join-Path $env:BUILD_CONTEXT 'server'
+          if (Test-Path $env:BUILD_CONTEXT) { Remove-Item $env:BUILD_CONTEXT -Recurse -Force }
+          New-Item -ItemType Directory -Force $server | Out-Null
+          & $env:UNITY_EXE -batchmode -quit -projectPath . -buildTarget Linux64 -standaloneBuildSubtarget Server `
+            -executeMethod UOClient.EditorTools.ServerBuilder.BuildLinuxFromCommandLine -buildOutput "$server" -logFile - | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "Unity exited with $LASTEXITCODE." }
+          if (-not (Test-Path (Join-Path $server 'UOGameServer.x86_64'))) { throw 'No UOGameServer.x86_64 in the build output.' }
+          Copy-Item Deploy\Shard\Dockerfile $env:BUILD_CONTEXT
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Storage key and shares
+        run: |
+          $key = az storage account keys list -g $env:AZURE_RG -n $env:STORAGE_ACCOUNT --query "[0].value" -o tsv
+          if ($LASTEXITCODE -ne 0 -or -not $key) { throw "Couldn't read the storage account key." }
+          Write-Host "::add-mask::$key"
+          "STORAGE_KEY=$key" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          foreach ($share in $env:WORLD_SHARE, $env:DATA_SHARE) {
+            az storage share create --name $share --account-name $env:STORAGE_ACCOUNT --account-key $key --output none
+            if ($LASTEXITCODE -ne 0) { throw "Couldn't create share $share." }
+          }
+
+      - name: Sync WorldData to the world share
+        run: |
+          $world = Join-Path $env:ART_ROOT 'WorldData'
+          if (-not (Test-Path $world)) { throw "No WorldData at $world (bake it first)." }
+          $expiry = (Get-Date).ToUniversalTime().AddHours(4).ToString('yyyy-MM-ddTHH:mmZ')
+          $sas = az storage share generate-sas --name $env:WORLD_SHARE --account-name $env:STORAGE_ACCOUNT --account-key $env:STORAGE_KEY `
+            --permissions rcwdl --expiry $expiry --https-only -o tsv
+          if ($LASTEXITCODE -ne 0 -or -not $sas) { throw "Couldn't make a SAS for the world share." }
+          Write-Host "::add-mask::$sas"
+          # Incremental: only files whose size or time changed go up; files gone from WorldData are removed.
+          & $env:AZCOPY_EXE sync "$world" "https://$env:STORAGE_ACCOUNT.file.core.windows.net/$env:WORLD_SHARE`?$sas" `
+            --recursive --delete-destination=true --log-level=WARNING | Out-Host
+          if ($LASTEXITCODE -ne 0) { throw "azcopy sync failed ($LASTEXITCODE)." }
+
+      - name: Build the image (ACR)
+        run: |
+          az acr build --registry $env:ACR_NAME --image "shard:$env:GITHUB_SHA" --image "shard:$env:SHARD_ENV" `
+            --file (Join-Path $env:BUILD_CONTEXT 'Dockerfile') $env:BUILD_CONTEXT
+          if ($LASTEXITCODE -ne 0) { throw "az acr build failed." }
+
+      - name: Deploy the container group
+        env:
+          SHARD_KEY: ${{ secrets.SHARD_KEY }}
+        run: |
+          if (-not $env:SHARD_KEY) { throw 'Secret SHARD_KEY is not set.' }
+          # Secrets go in a parameters file (not on the command line), deleted afterwards.
+          $params = Join-Path $env:RUNNER_TEMP 'shard-params.json'
+          @{
+            '$schema' = 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
+            contentVersion = '1.0.0.0'
+            parameters = @{
+              name = @{ value = $env:SHARD_NAME }
+              image = @{ value = "$env:ACR_LOGIN_SERVER/shard:$env:GITHUB_SHA" }
+              acrLoginServer = @{ value = $env:ACR_LOGIN_SERVER }
+              acrIdentityId = @{ value = $env:SHARD_IDENTITY_ID }
+              dnsLabel = @{ value = $env:SHARD_DNS }
+              storageAccountName = @{ value = $env:STORAGE_ACCOUNT }
+              storageAccountKey = @{ value = $env:STORAGE_KEY }
+              worldShare = @{ value = $env:WORLD_SHARE }
+              dataShare = @{ value = $env:DATA_SHARE }
+              accountApi = @{ value = $env:ACCOUNT_API }
+              shardKey = @{ value = $env:SHARD_KEY }
+            }
+          } | ConvertTo-Json -Depth 5 | Out-File -FilePath $params -Encoding ascii
+          try {
+            $out = az deployment group create -g $env:AZURE_RG -n "$env:SHARD_NAME-$env:GITHUB_RUN_NUMBER" `
+              --template-file Deploy\Shard\shard.bicep --parameters "@$params" --query properties.outputs -o json
+            if ($LASTEXITCODE -ne 0) { throw "Deployment failed." }
+          } finally {
+            Remove-Item $params -Force -ErrorAction SilentlyContinue
+          }
+          $o = ($out | Out-String) | ConvertFrom-Json
+          Write-Host "Shard $env:SHARD_NAME ($env:SHARD_ENV): $($o.fqdn.value) / $($o.ip.value), UDP 7770"
+          "### Shard $env:SHARD_ENV deployed`n`n``$($o.fqdn.value)`` ($($o.ip.value)), UDP 7770, image ``shard:$env:GITHUB_SHA``" |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Remove paid-art links
+        if: always()
+        run: |
+          foreach ($p in 'Assets\Synty', 'Assets\Secure', 'Assets\BK', 'Assets\AddressableAssetsData') {
+            $path = Join-Path $env:GITHUB_WORKSPACE $p
+            if ((Test-Path $path) -and ((Get-Item $path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+              cmd /c rmdir "$path"
+            }
+          }

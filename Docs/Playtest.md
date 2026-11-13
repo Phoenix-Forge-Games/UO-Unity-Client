@@ -6,7 +6,7 @@ The new game, played on the real server, by you and your friends. It started 202
 
 - **Patch host:** `http://seriousfun.tplinkdns.com:7780/`. This is IIS on phoenix-server, serving
   `C:\GameServers\Patches` read-only on port 7780.
-- **Channel `live`:** version 0.1.0, about 2.6 GB installed, 2.1 GB to download.
+- **Channel `live`:** version 0.2.0 (2026-11-12, protocol 28), about 2.7 GB installed; 2.2 GB to update from 0.1.0.
 - **Signing:** the patch is signed with the updater's patch key. GameUpdater checks every file it downloads, so a
   tampered download is rejected.
 - **For friends:** GameUpdater from the updater's GitHub releases

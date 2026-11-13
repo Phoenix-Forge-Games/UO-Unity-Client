@@ -206,7 +206,9 @@ namespace UOGame.Menu
 
         private void OnSpinStart(PointerDownEvent e)
         {
-            if (e.target != _root || e.button != 0 || _stage != Stage.Characters || _standIn == null || !_standIn.Arrived)
+            // The open view: the menu's full-screen element itself (or its container), not a panel or a button on it.
+            bool openView = e.target == _root || e.target is VisualElement v && v.ClassListContains("menu-screen");
+            if (!openView || e.button != 0 || _stage != Stage.Characters || _standIn == null || !_standIn.Arrived)
             {
                 return;
             }

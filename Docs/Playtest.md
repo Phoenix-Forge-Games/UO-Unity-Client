@@ -6,7 +6,7 @@ The new game, played on the real server, by you and your friends. It started 202
 
 - **Patch host:** `http://seriousfun.tplinkdns.com:7780/`. This is IIS on phoenix-server, serving
   `C:\GameServers\Patches` read-only on port 7780.
-- **Channel `live`:** version 0.2.0 (2026-11-12, protocol 28), about 2.7 GB installed; 2.2 GB to update from 0.1.0.
+- **Channel `live`:** version 0.2.4 (2026-11-12, protocol 28, with the launcher skin), about 2.7 GB installed.
 - **Signing:** the patch is signed with the updater's patch key. The launcher checks every file it downloads, so a
   tampered download is rejected.
 - **For friends:** The Britannia Reborn launcher (`BritanniaReborn.exe`, called GameUpdater.exe before v0.3.0) from the updater's GitHub releases
@@ -73,13 +73,20 @@ When something is wrong, note what you did and roughly when. The server's log ke
 ## Shipping a fix
 
 1. Build the client: **UO Client > Release > Build Playtest**, or `UOClient.EditorTools.PlaytestBuilder.Build()`.
-2. Publish a new version:
+2. Put the launcher skin in the build root. It ships only in this friends-only patch, never on GitHub; the
+   updater's `tools/launcher-skin/build_skin.py` builds it:
 
    ```powershell
-   patchtool publish --build "G:\Ultima Online\UnityClient\Builds\Playtest\UOGame" --host "G:\Ultima Online\PatchHost" --channel live --version 0.1.1 --product "Britannia Reborn" --launch UOGame.exe --key "$env:USERPROFILE\.uo-unity-updater\keys\patch.pem"
+   Copy-Item "$env:USERPROFILE\.uo-unity-updater\LauncherSkin.pak" "G:\Ultima Online\UnityClient\Builds\Playtest\UOGame\"
    ```
 
-3. Upload it:
+3. Publish a new version (the next number after the live one):
+
+   ```powershell
+   patchtool publish --build "G:\Ultima Online\UnityClient\Builds\Playtest\UOGame" --host "G:\Ultima Online\PatchHost" --channel live --version 0.2.5 --product "Britannia Reborn" --launch UOGame.exe --key "$env:USERPROFILE\.uo-unity-updater\keys\patch.pem"
+   ```
+
+4. Upload it:
 
    ```powershell
    ./tools/deploy-patches.ps1 -HostRoot "G:\Ultima Online\PatchHost" -Destination "\\phoenix-server\GameServers\Patches"

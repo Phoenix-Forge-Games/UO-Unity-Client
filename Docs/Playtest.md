@@ -7,9 +7,9 @@ The new game, played on the real server, by you and your friends. It started 202
 - **Patch host:** `http://seriousfun.tplinkdns.com:7780/`. This is IIS on phoenix-server, serving
   `C:\GameServers\Patches` read-only on port 7780.
 - **Channel `live`:** version 0.2.0 (2026-11-12, protocol 28), about 2.7 GB installed; 2.2 GB to update from 0.1.0.
-- **Signing:** the patch is signed with the updater's patch key. GameUpdater checks every file it downloads, so a
+- **Signing:** the patch is signed with the updater's patch key. The launcher checks every file it downloads, so a
   tampered download is rejected.
-- **For friends:** GameUpdater from the updater's GitHub releases
+- **For friends:** The Britannia Reborn launcher (`BritanniaReborn.exe`, called GameUpdater.exe before v0.3.0) from the updater's GitHub releases
   (`https://github.com/Phoenix-Forge-Games/UO-Unity-Updater/releases/latest`). Since v0.2.0 its built-in channel is
   this patch host, so it needs no settings file.
 
@@ -33,13 +33,13 @@ Do these once, so friends outside your home network can reach the patch host:
    - UDP 7770 (the game)
 3. **Testing from inside your network:** use the server's LAN address, because the router may not loop the public
    name back to you.
-   - Put a `GameUpdater.json` beside `GameUpdater.exe` containing
+   - Put a `BritanniaReborn.json` beside `BritanniaReborn.exe` containing
      `{ "channelUrl": "http://192.168.68.91:7780/live/channel.json" }`.
    - In the game's connect screen, set the server to `192.168.68.91`.
 
 ## For your friends
 
-1. Download `GameUpdater.exe` from
+1. Download `BritanniaReborn.exe` from
    `https://github.com/Phoenix-Forge-Games/UO-Unity-Updater/releases/latest` and put it in a folder of its own.
 2. Run it.
    - Windows may warn that it's an unrecognised app: choose **More info**, then **Run anyway**.
@@ -47,7 +47,7 @@ Do these once, so friends outside your home network can reach the patch host:
 3. In the game:
    - The server is already filled in: `seriousfun.tplinkdns.com`, port 7770.
    - Log in with your **SeriousFun account name and password**. Your characters moved over on 2026-11-11.
-4. **Next time**, start `GameUpdater.exe` again. It fetches only what changed, then starts the game.
+4. **Next time**, start `BritanniaReborn.exe` again. It fetches only what changed, then starts the game.
 
 Your UO install must be on the PC: the game reads its names and texts from it. It finds the install by itself
 (the SeriousFun launcher's folder, or the usual places).
@@ -76,7 +76,7 @@ When something is wrong, note what you did and roughly when. The server's log ke
 2. Publish a new version:
 
    ```powershell
-   patchtool publish --build "G:\Ultima Online\UnityClient\Builds\Playtest\UOGame" --host "G:\Ultima Online\PatchHost" --channel live --version 0.1.1 --product SeriousFun --launch UOGame.exe --key "$env:USERPROFILE\.uo-unity-updater\keys\patch.pem"
+   patchtool publish --build "G:\Ultima Online\UnityClient\Builds\Playtest\UOGame" --host "G:\Ultima Online\PatchHost" --channel live --version 0.1.1 --product "Britannia Reborn" --launch UOGame.exe --key "$env:USERPROFILE\.uo-unity-updater\keys\patch.pem"
    ```
 
 3. Upload it:

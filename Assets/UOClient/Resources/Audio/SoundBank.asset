@@ -1110,8 +1110,6 @@ MonoBehaviour:
   - Key: ambient.town
     Clips:
     - {fileID: 11400000, guid: 51335bf1c19ffea409927fa6c2d46f74, type: 2}
-    - {fileID: 11400000, guid: 4fb884998bb463d44884b7d7185f2128, type: 2}
-    - {fileID: 11400000, guid: 6d93b846048b09043a57274fa71dae30, type: 2}
   - Key: ambient.rain
     Clips:
     - {fileID: 11400000, guid: 9c964d3780dd9514b83af7ee1f59872e, type: 2}

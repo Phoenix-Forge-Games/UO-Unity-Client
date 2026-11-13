@@ -49,10 +49,10 @@ UnityEngine.Audio.AudioMixerGroup Group(string name, float db)
     return (UnityEngine.Audio.AudioMixerGroup)group;
 }
 
-// Music down, the quiet ambience loops up to sit level with it; effects as recorded (combat hits already peak at
+// Music down, the quiet ambience loops up a little (under the music); effects as recorded (combat hits already peak at
 // full scale), so footsteps and voices stand out over the quieter music.
 var musicGroup = Group("Music", -10f);
-var ambientGroup = Group("Ambient", 10f);
+var ambientGroup = Group("Ambient", 4f); // +10 was far too much in towns (playtest, 2026-11-12)
 var sfxGroup = Group("Sfx", 0f);
 var uiGroup = Group("UI", 0f);
 UnityEditor.EditorUtility.SetDirty((UnityEngine.Object)mixer);

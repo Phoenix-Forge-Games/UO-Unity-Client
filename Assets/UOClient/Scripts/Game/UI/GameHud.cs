@@ -93,6 +93,18 @@ namespace UOGame.UI
             _input = root.Q<TextField>("chat-input");
             _shown.Clear();
             _input.RegisterCallback<KeyDownEvent>(OnChatKey, TrickleDown.TrickleDown);
+            // A text field can also turn Enter into a submit: send what's typed, or just close an empty box.
+            _input.RegisterCallback<NavigationSubmitEvent>(e =>
+            {
+                string text = _input.value?.Trim();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    _network.ClientManager.Broadcast(new SayRequest { Text = text });
+                }
+
+                CloseChat();
+                e.StopPropagation();
+            }, TrickleDown.TrickleDown);
             _input.RegisterCallback<FocusOutEvent>(_ => CloseChat());
         }
 
@@ -114,7 +126,14 @@ namespace UOGame.UI
                 return;
             }
 
-            if (!GameInput.Typing && GameInput.Controls.Gameplay.Chat.WasPressedThisFrame())
+            // The Enter that closed the box mustn't open it again: wait for it to be let go first.
+            if (_chatKeyHeld && !GameInput.Controls.Gameplay.Chat.IsPressed())
+            {
+                _chatKeyHeld = false;
+            }
+
+            if (!GameInput.Typing && !_chatKeyHeld && Time.frameCount > _chatClosedFrame + 1 &&
+                GameInput.Controls.Gameplay.Chat.WasPressedThisFrame())
             {
                 _input.RemoveFromClassList("hidden");
                 _input.value = string.Empty;
@@ -130,7 +149,8 @@ namespace UOGame.UI
 
         private void OnChatKey(KeyDownEvent e)
         {
-            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+            // Enter arrives as the key, or as a bare newline character, depending on the text field's state.
+            if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter || e.character == (char)10 || e.character == (char)13)
             {
                 string text = _input.value?.Trim();
                 if (!string.IsNullOrEmpty(text))
@@ -158,7 +178,16 @@ namespace UOGame.UI
             _input.AddToClassList("hidden");
             _input.Blur();
             GameInput.SetTyping(false);
+            _chatClosedFrame = Time.frameCount;
+            _chatKeyHeld = true;
         }
+
+        /// <summary>
+        /// Closing the box with Enter: the same Enter is the chat key, and gameplay keys come back on while it's still
+        /// down, which opened the box again at once (an empty box looked like Enter did nothing).
+        /// </summary>
+        private bool _chatKeyHeld;
+        private int _chatClosedFrame = -10;
 
         private void OnSaid(SaidMessage message)
         {

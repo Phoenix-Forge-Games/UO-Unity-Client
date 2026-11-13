@@ -99,7 +99,7 @@
 
     "ambient.day":       { "Clips": ["Birds Loop 0*"] },
     "ambient.night":     { "Clips": ["Crickets Loop*", "Insects Loop *"] },
-    "ambient.town":      { "Clips": ["Village Amb Loop 01", "Crowd Loop 04", "Crowd Loop 05"] },
+    "ambient.town":      { "Clips": ["Village Amb Loop 01"] },
     "ambient.rain":      { "Clips": ["Rain Moderate Loop *"] },
     "ambient.wind":      { "Clips": ["Wind Loop *"] },
     "ambient.dungeon":   { "Clips": ["amb_darkness", "amb_dread", "amb_lost"] }

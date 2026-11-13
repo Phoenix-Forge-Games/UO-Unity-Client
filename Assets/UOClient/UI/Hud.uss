@@ -246,6 +246,13 @@
     flex-direction: column;
 }
 
+/* A quest's story, objectives and rewards: light on the dark window. */
+.quest-text {
+    color: rgb(236, 226, 206);
+    font-size: 15px;
+    margin: 2px 0 6px 0;
+}
+
 .window-footer {
     font-size: 15px;
     color: rgb(190, 176, 150);

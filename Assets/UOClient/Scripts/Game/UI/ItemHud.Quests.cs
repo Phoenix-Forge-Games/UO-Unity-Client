@@ -77,10 +77,7 @@ namespace UOGame.UI
                 }
 
                 var l = new Label(text) { style = { whiteSpace = WhiteSpace.Normal } };
-                if (heading)
-                {
-                    l.AddToClassList("stats-heading");
-                }
+                l.AddToClassList(heading ? "stats-heading" : "quest-text"); // light text on the dark window
 
                 scroll.Add(l);
             }

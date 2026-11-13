@@ -529,6 +529,18 @@ All ServUO-protocol client work is paused. Design: Docs/ServerDesign.md (draft, 
   - [ ] Swimming and falling damage (needs water surfaces and health)
   - [ ] Delete the UO-protocol client code (Net, WorldState packets, Walker) once nothing uses it
 
+## From the playtest, round 2, 2026-11-12 (user)
+- [ ] **Parties**: right-click a player -> Invite to party; party unit frames (each member's health, mana,
+  stamina); gold looted is split automatically between all party members.
+- [ ] **Your target over the player frame**: who you have targeted shows on (or by) your unit frame.
+- [ ] **A basic Attack ability**: something to press that starts melee combat with your target (WoW's Attack),
+  since there's no war mode.
+- [ ] **Meditation doesn't go up** from mana regeneration: it should gain as you regenerate mana (UO's passive
+  meditation gains).
+- [ ] **Some skills go up without telling you**: every skill gain shows a message.
+- [ ] **Tagged skills**: mark skills to watch; they show in a small transparent window with their values, live.
+- [ ] **A combat log**: hits, misses, damage, heals, deaths, and every skill gain.
+
 ## From the first playtest, 2026-11-12 (user)
 - [x] **No holes in the terrain** (urgent): a player who joined the live server took two steps after creating his
   character and fell through the world. Find every hole a player can reach and close it: the terrain cuts holes at

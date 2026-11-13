@@ -79,6 +79,14 @@ namespace UOGame
         /// A magenta capsule standing in for a body the creature catalog has no model for, so what is still missing
         /// can be seen in the world (see Docs/MissingVisuals.md). Its colour varies a little per body so groups read apart.
         /// </summary>
+        private static Material _missingModel;
+
+        /// <summary>
+        /// The capsule's material (Resources/Materials/MissingModel, URP Lit). A primitive's built-in default material
+        /// isn't in a player build (nothing references it, so its shader variants are stripped) and drew nothing.
+        /// </summary>
+        public static Material MissingModelMaterial => _missingModel != null ? _missingModel : _missingModel = Resources.Load<Material>("Materials/MissingModel");
+
         private static GameObject BuildPlaceholder(int body, Transform parent)
         {
             GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -91,6 +99,7 @@ namespace UOGame
             Color colour = Color.HSVToRGB(hue % 1f, 0.8f, 1f);
             var block = new MaterialPropertyBlock();
             Renderer r = capsule.GetComponent<Renderer>();
+            r.sharedMaterial = MissingModelMaterial ?? r.sharedMaterial;
             r.GetPropertyBlock(block);
             block.SetColor("_BaseColor", colour);
             block.SetColor("_Color", colour);

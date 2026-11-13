@@ -77,6 +77,7 @@ namespace UOGame.Menu
             {
                 // No UO data (or wardrobe) on this machine: a plain stand-in shape.
                 _model = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                _model.GetComponent<Renderer>().sharedMaterial = ActorModel.MissingModelMaterial ?? _model.GetComponent<Renderer>().sharedMaterial;
                 Destroy(_model.GetComponent<Collider>());
                 _model.transform.SetParent(transform, false);
                 _model.transform.localPosition = Vector3.up;

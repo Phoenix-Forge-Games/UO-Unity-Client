@@ -42,6 +42,7 @@ namespace UOClient.EditorTools
             Directory.CreateDirectory(output);
             BuildReport report;
             Active = true;
+            CopyIcons();
             try
             {
                 report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
@@ -57,6 +58,7 @@ namespace UOClient.EditorTools
             finally
             {
                 Active = false;
+                RemoveIcons();
             }
 
             if (report.summary.result != BuildResult.Succeeded)
@@ -88,6 +90,45 @@ namespace UOClient.EditorTools
             string done = $"Playtest build OK: {output} ({bytes / (1024 * 1024)} MB with the world).";
             Debug.Log("[Release] " + done);
             return done;
+        }
+
+        /// <summary>Where the icons go for a playtest build: a Resources folder in the git-ignored paid-art folder.</summary>
+        private const string IconResources = "Assets/Secure/Resources";
+
+        /// <summary>
+        /// The icons (Assets/Secure/Icons, loaded by address: there's no Addressables build yet, so a player had none)
+        /// go in as Resources for this build, at SecureArt/icon/<category>/<slug> (SecureArt.Get's playtest fallback).
+        /// Removed again after the build, so no release build can ever carry them unencrypted.
+        /// </summary>
+        private static void CopyIcons()
+        {
+            string from = "Assets/Secure/Icons";
+            if (!Directory.Exists(from))
+            {
+                return;
+            }
+
+            string to = Path.Combine(IconResources, "SecureArt", "icon");
+            foreach (string category in Directory.GetDirectories(from))
+            {
+                string target = Path.Combine(to, Path.GetFileName(category));
+                Directory.CreateDirectory(target);
+                foreach (string file in Directory.GetFiles(category, "*.png"))
+                {
+                    File.Copy(file, Path.Combine(target, Path.GetFileName(file)), true);
+                }
+            }
+
+            AssetDatabase.Refresh();
+        }
+
+        private static void RemoveIcons()
+        {
+            if (Directory.Exists(IconResources))
+            {
+                AssetDatabase.DeleteAsset(IconResources);
+                AssetDatabase.Refresh();
+            }
         }
 
         private static void CopyFolder(string from, string to)

@@ -65,6 +65,9 @@ namespace UOClient.Content
         }
 
         /// <summary>The asset at an address, loading it now (blocking) if needed; null when there isn't one.</summary>
+        /// <summary>Where a playtest build keeps art it can't get by address (Resources path prefix).</summary>
+        public const string PlaytestResources = "SecureArt/";
+
         public static T Get<T>(string address) where T : Object
         {
             if (string.IsNullOrEmpty(address))
@@ -98,6 +101,13 @@ namespace UOClient.Content
             else
             {
                 asset = EditorFallback<T>(address);
+            }
+#else
+            else
+            {
+                // A playtest build (friends only, art not encrypted) carries the icons as Resources under
+                // SecureArt/<address> (PlaytestBuilder copies them in for the build and removes them after).
+                asset = Resources.Load<T>(PlaytestResources + address);
             }
 #endif
 

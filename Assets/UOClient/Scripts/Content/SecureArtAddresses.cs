@@ -64,8 +64,8 @@ namespace UOClient.Content
         public static string SpellIcon(string spellName) => Icon(SpellCategory, spellName);
 
         /// <summary>
-        /// An item icon file, by item id. Unused for now: equipment icons are rendered at runtime (ItemIcons) and
-        /// never written to files.
+        /// An item's chosen icon, by its Items.json Type (e.g. "IronIngot" → icon/item/ironingot; picked in
+        /// Content/Icons.json "item"). Items without one keep the picture rendered from their model (ItemIcons).
         /// </summary>
         public static string ItemIcon(string itemId) => Icon(ItemCategory, itemId);
 

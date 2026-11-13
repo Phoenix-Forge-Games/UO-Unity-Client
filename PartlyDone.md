@@ -81,8 +81,11 @@ may be dropped rather than finished.
   serialized fields (editor) or placeholders. Icons already load in the editor from Assets/Secure/Icons.
 
 ## UI icons (2026-11-11)
-- **Item pictures**: only worn gear has a rendered picture; everything else keeps its name on the tile. Rings,
-  earrings and bracelets show nothing on the Sidekick body, so they keep their name too. The drag ghost is still text.
+- **Item pictures**: worn gear has a rendered picture and 327 other item types have chosen pack art (2026-11-13:
+  gold, ores, ingots, wood, leather, reagents, gems, potions, cloth, food, tools, bags; spell scrolls show their spell).
+  Everything else (~550 deeds, furniture and decorations, rarer food and tools) keeps its name on the tile. Rings,
+  earrings and bracelets show nothing on the Sidekick body, so they keep their name too. Chosen art isn't tinted, so
+  a dyed bolt of cloth looks undyed. The drag ghost is still text.
 - **Hotbar**: holds spells only (no items or skills), so there are no item icons on it yet.
 - **Prompt icons**: keyboard/mouse art only; gamepad bindings aren't shown.
 

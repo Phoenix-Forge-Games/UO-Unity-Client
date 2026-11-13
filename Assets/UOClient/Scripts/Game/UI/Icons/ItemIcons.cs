@@ -19,6 +19,9 @@ namespace UOGame.UI
     /// colour scheme), made one per frame, and kept for the session. Items that are not worn on the body, or that
     /// show nothing on it (rings, earrings), have no picture: callers keep their name.
     ///
+    /// Items with a chosen picture (Content/Icons.json "item": gold, ores, ingots, wood, reagents, gems, potions, food,
+    /// tools, bags...) show that instead (<see cref="Show"/>, <see cref="ArtAddress"/>); spell scrolls show their spell.
+    ///
     /// Stage: far below the world on <see cref="PaperdollStage.Layer"/>, away from the paperdoll; the sun, fog and
     /// ambient light are swapped out only for the instant of each render, so icons look the same day or night.
     /// </summary>
@@ -92,8 +95,34 @@ namespace UOGame.UI
         }
 
         /// <summary>
-        /// Shows an item on a tile: its picture as <paramref name="icon"/>'s background when it has one, its name
-        /// (<paramref name="fallback"/>) otherwise. The latest call on an element wins.
+        /// The chosen picture for an item kind, when it could have one: icon/item/&lt;Items.json Type&gt; (the art picked in
+        /// Content/Icons.json "item": gold, ores and ingots, wood, reagents, gems, potions, food, tools...), or a spell
+        /// scroll's spell icon. Null for an unknown kind. The address may still have no art in this build.
+        /// </summary>
+        public static string ArtAddress(ushort kind)
+        {
+            ItemDef def = Server.ItemService.Catalog?.Get(kind);
+            if (def == null || string.IsNullOrEmpty(def.Type))
+            {
+                return null;
+            }
+
+            if (def.Category == "Scroll")
+            {
+                Server.SpellService.SpellDef spell = Server.SpellService.Spells.Find(s => s.Scroll == def.Type);
+                if (spell != null)
+                {
+                    return GameIcons.Spell(spell);
+                }
+            }
+
+            return global::UOClient.Content.SecureArtAddresses.ItemIcon(def.Type);
+        }
+
+        /// <summary>
+        /// Shows an item on a tile: its chosen picture (<see cref="ArtAddress"/>) when there is one, else the rendered
+        /// picture of its model, as <paramref name="icon"/>'s background; its name (<paramref name="fallback"/>) when it
+        /// has neither. The latest call on an element wins.
         /// </summary>
         public static void Show(VisualElement icon, ItemView item, VisualElement fallback)
         {
@@ -104,6 +133,37 @@ namespace UOGame.UI
 
             string token = $"{item.Kind}:{item.Hue}";
             icon.userData = token;
+            string art = ArtAddress(item.Kind);
+            if (art == null)
+            {
+                ShowRendered(icon, item, fallback, token);
+                return;
+            }
+
+            global::UOClient.Content.SecureArt.Load<Texture2D>(art, texture =>
+            {
+                if (!Equals(icon.userData, token))
+                {
+                    return; // given another item meanwhile
+                }
+
+                if (texture == null)
+                {
+                    ShowRendered(icon, item, fallback, token);
+                    return;
+                }
+
+                icon.style.backgroundImage = new StyleBackground(texture);
+                icon.style.display = DisplayStyle.Flex;
+                if (fallback != null)
+                {
+                    fallback.style.display = DisplayStyle.None;
+                }
+            });
+        }
+
+        private static void ShowRendered(VisualElement icon, ItemView item, VisualElement fallback, string token)
+        {
             if (!CanRender(item.Kind))
             {
                 icon.style.display = DisplayStyle.None;

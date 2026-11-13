@@ -375,8 +375,16 @@ namespace UOGame.UI
             foreach (ShopLine line in sorted)
             {
                 ShopLine l = line;
+                var view = new ItemView { Id = l.Id, Kind = l.Kind, Amount = 1, Hue = l.Hue };
                 var row = new VisualElement();
                 row.AddToClassList("shop-row");
+                VisualElement frame = GameIcons.Frame(30f);
+                frame.style.marginRight = 8;
+                var picture = new VisualElement { pickingMode = PickingMode.Ignore };
+                picture.AddToClassList("item-picture");
+                frame.Add(picture);
+                ItemIcons.Show(picture, view, null);
+                row.Add(frame);
                 row.Add(Text(LineName(l), "shop-name"));
                 row.Add(Text($"{l.Price:N0} gp", "shop-price"));
                 row.Add(Text(_offer.Selling ? $"have {l.Available}" : $"{l.Available} left", "shop-stock"));
@@ -386,7 +394,6 @@ namespace UOGame.UI
                 row.Add(qty);
                 row.Add(Qty("+", () => Change(l, +1)));
                 row.Add(Qty("All", () => Change(l, l.Available)));
-                var view = new ItemView { Id = l.Id, Kind = l.Kind, Amount = 1, Hue = l.Hue };
                 row.RegisterCallback<PointerEnterEvent>(e => ShowTooltip(view, e.position));
                 row.RegisterCallback<PointerLeaveEvent>(_ => _tooltip.style.display = DisplayStyle.None);
                 _shopList.Add(row);

@@ -935,7 +935,17 @@ had registered the pointer-over-UI check). Corpse loot keeps its magic propertie
   rebinding. In use on the door/loot/talk prompts, notices (server notices too), build-mode banners and help line.
 - [ ] Run in the editor: Tools/Icons/IconImport.eval.cs, then Tools/SecureArt/SetupSecureArt.eval.cs (needs the
   Addressables package) so the icons are in Protected_Icons.
-- [ ] Non-equipment items (reagents, potions, gold, scrolls, tools) still show their name: no 3D model to render.
-  The pack's loot/resource icons could cover them (would need choosing like the spells).
+- [x] Item icons for things with no body model (2026-11-13): 327 Items.json types picked by eye from the 6000 Fantasy
+  Icons item pictures (Content/Icons.json "item", keyed by Type): gold, each metal's ore and ingot, wood/leather/hides/
+  scales/granite families (one picture recoloured per material hue by place_icons.py), all 15 reagents, 17 gems, 33
+  potions (colour by kind, bottle size by strength), cloth and thread, tinkering parts, essences, peerless ingredients,
+  fish, common food, tools, keys, bags and chests. Spell scrolls show their spell's icon. The pack has no
+  opaque item art, so the pictures are laid on black like the rendered gear. Items with chosen art show it
+  (ItemIcons.ArtAddress); the rest keep the rendered model. Vendor rows now have a picture too.
+- [ ] Item icons still missing for the rest of what the game uses: ~550 "Other" types (deeds, furniture, decorations,
+  quest items), the less common food (miso soups, bowls, pies, steaks of rare fish), carpentry tools (planes, froe,
+  inshave, scorp, draw knife), maps other than blank/local/city, instruments other than drums, lights, baskets.
+  They keep their name. Pick more in Icons.json "item" and rerun place_icons.py.
+- [ ] Dyed items with chosen art (dyed cloth, a hued bag) show the undyed picture: chosen art is never tinted.
 - [ ] Weapon abilities have icons and addresses (GameIcons.Ability) but no UI shows weapon abilities yet.
 - [ ] Prompt icons are keyboard and mouse only; a gamepad binding falls back to the keyboard one.

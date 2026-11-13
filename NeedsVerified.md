@@ -286,6 +286,11 @@ Last updated 2026-11-12.
   the same day and night (the renderer swaps out the sun, fog and ambient light for each render). Check no frame
   hitch when a full backpack first opens (one render a frame).
 - Stack counts on tiles: bottom centre, outlined, readable over pictures.
+- Item art (2026-11-13; run python Tools/Icons/place_icons.py, then IconImport.eval.cs and SetupSecureArt.eval.cs, or
+  rely on the editor fallback after an asset refresh): in Solo, the backpack shows gold as a coin stack, logs/boards,
+  ingots and ores per metal (dull copper, shadow, copper, bronze, gold, agapite, verite, valorite all different),
+  reagents, potions; a scroll shows its spell's icon; worn gear still shows its rendered model. A vendor's Buy/Sell
+  list has a small picture at the start of each row (blank frame for items with neither art nor a model).
 - Control prompts: door "[E] Open", corpse/vendor prompts, "Press [H] to build" notice, build palette help line;
   rebind Use on the Controls page and the prompts change to the new key without reopening anything.
 

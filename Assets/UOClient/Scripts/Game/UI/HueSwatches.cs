@@ -12,7 +12,7 @@ namespace UOGame.UI
     public sealed class HueSwatches : VisualElement, INotifyValueChanged<int>
     {
         /// <summary>Which of a hue's 32 shades (0 dark, 31 light) a swatch shows: a mid-light one, as it reads on skin and hair.</summary>
-        private const int Shade = 22;
+        private const int Shade = UOClient.Data.Hues.SwatchShade;
 
         private readonly Dictionary<int, VisualElement> _swatches = new Dictionary<int, VisualElement>();
         private int _value, _low, _high = -1;

@@ -325,6 +325,8 @@ namespace UOGame.Server
                         if (lower != skill && lower.Lock == 1 && lower.Value >= toGain)
                         {
                             lower.Value = Round(lower.Value - toGain);
+                            ItemService.Instance?.Tell(player.Connection, $"Your skill in {(CreationRules.Skills.Find(d => d.Key == lower.Skill)?.Name ?? lower.Skill)} has decreased by {toGain:0.0}. It is now {lower.Value:0.0}.");
+                            player.Dirty = true;
                             break;
                         }
                     }
@@ -381,6 +383,7 @@ namespace UOGame.Server
                 }
 
                 Set(c, lower, Get(c, lower) - 1);
+                ItemService.Instance?.Tell(player.Connection, $"Your {Long(lower)} has decreased.");
             }
 
             Set(c, stat, Get(c, stat) + 1);

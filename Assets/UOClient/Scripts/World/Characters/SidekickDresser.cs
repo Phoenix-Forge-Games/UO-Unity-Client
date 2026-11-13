@@ -1098,14 +1098,13 @@ namespace UOClient
             return saturation <= 0.10f;
         }
 
-        /// <summary>Recolours one 2×2 cell of the grid with a hue, keeping its brightness.</summary>
+        /// <summary>
+        /// Recolours one 2×2 cell of the grid with a hue: exactly the colour its swatch shows (Hues.SwatchShade), so
+        /// what you pick is what you see.
+        /// </summary>
         private void Rehue(Texture2D map, int u, int v, ushort hue, int lowest = 8, int range = 22)
         {
-            Color current = map.GetPixel(u * 2, v * 2);
-            float lum = current.r * 0.3f + current.g * 0.59f + current.b * 0.11f;
-            // By default shades 8..30, so dark cells don't go black and light ones don't wash out.
-            int shade = lowest + Mathf.RoundToInt(lum * range);
-            if (!_hues.TryShade(hue, shade, out byte r, out byte g, out byte b))
+            if (!_hues.TryShade(hue, UOClient.Data.Hues.SwatchShade, out byte r, out byte g, out byte b))
             {
                 return;
             }

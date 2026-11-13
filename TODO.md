@@ -530,16 +530,36 @@ All ServUO-protocol client work is paused. Design: Docs/ServerDesign.md (draft, 
   - [ ] Delete the UO-protocol client code (Net, WorldState packets, Walker) once nothing uses it
 
 ## From the playtest, round 2, 2026-11-12 (user)
-- [ ] **Parties**: right-click a player -> Invite to party; party unit frames (each member's health, mana,
+Done 2026-11-12 (protocol 29): E near a player or a quick right-click on them opens their menu (Trade, Invite to
+party / Remove from party); parties up to ten (WorldServices.Party: invite, accept, leave, leader removes) with
+party frames under yours and gold looted shared evenly (odd coins to the looter); trading between players
+(WorldServices.Trade: both sides, both accept, everything moves whole, walking apart calls it off); the target frame
+sits beside yours (the old client's Hud.uss made .unit-frame absolute); Attack on the spells page and first on a new
+character's hotbar (R still works); Meditation and Focus gain checks on every mana tick, none for Meditation in
+metal armour (its bonus to regen is already off then), the hands-free rule gone; skill and stat decreases told, the
+middle-screen messages stack (a swing raising two skills showed one); the combat log is the chat's Combat tab;
+star a skill in the Skills tab to watch it on the right; ghosts pass through doors; hair, skin and dyes are drawn
+at exactly the swatch's shade; the mouse wheel over any window scrolls it instead of zooming (only the old client
+had registered the pointer-over-UI check). Corpse loot keeps its magic properties now (single items move whole).
+- [x] **Parties**: right-click a player -> Invite to party; party unit frames (each member's health, mana,
   stamina); gold looted is split automatically between all party members.
-- [ ] **Your target over the player frame**: who you have targeted shows on (or by) your unit frame.
-- [ ] **A basic Attack ability**: something to press that starts melee combat with your target (WoW's Attack),
+- [x] **Your target over the player frame**: who you have targeted shows on (or by) your unit frame.
+- [x] **A basic Attack ability**: something to press that starts melee combat with your target (WoW's Attack),
   since there's no war mode.
-- [ ] **Meditation doesn't go up** from mana regeneration: it should gain as you regenerate mana (UO's passive
-  meditation gains).
-- [ ] **Some skills go up without telling you**: every skill gain shows a message.
-- [ ] **Tagged skills**: mark skills to watch; they show in a small transparent window with their values, live.
-- [ ] **A combat log**: hits, misses, damage, heals, deaths, and every skill gain.
+- [x] **Meditation doesn't go up** from mana regeneration: it should gain as you regenerate mana (UO's passive
+  meditation gains). It's a passive mana-regen skill here, yet it tells you you need your hands free (UO's
+  active meditation rule): drop that requirement and message so it works whatever you hold. Metal armour
+  reduces mana regeneration (user, 2026-11-12): UO's armour Meditation rating (an item's "Meditation": All,
+  Half, None, already in ItemDef/ArmorStats) scales how much Meditation adds to regen; leather and cloth don't
+  hurt it, metal does.
+- [x] **Some skills go up without telling you**: every skill gain shows a message.
+- [x] **Tagged skills**: mark skills to watch; they show in a small transparent window with their values, live.
+- [x] **A combat log**: hits, misses, damage, heals, deaths, and every skill gain.
+- [x] **Colours are exactly the swatch** (user, 2026-11-12): the blonde swatch didn't make blonde hair. Don't
+  convert through UO's colour ramps: hair, skin and dyed things are drawn in the very colour the swatch shows
+  (HueSwatches' shade), so what you pick is what you get, everywhere (creator, world, paperdoll).
+- [x] **Ghosts walk through doors**: a dead player passes through closed doors (as in UO), so they can always
+  reach a healer or shrine.
 
 ## From the first playtest, 2026-11-12 (user)
 - [x] **No holes in the terrain** (urgent): a player who joined the live server took two steps after creating his

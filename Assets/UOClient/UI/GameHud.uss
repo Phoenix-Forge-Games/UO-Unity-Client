@@ -9,11 +9,25 @@
 .chat-log { max-height: 220px; background-color: rgba(10, 10, 14, 0.35); border-radius: 4px; padding: 4px 6px; }
 .chat-line { color: rgb(230, 230, 230); font-size: 13px; white-space: normal; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); }
 .chat-input { margin-top: 4px; }
+.chat-tabs { flex-direction: row; margin-bottom: 2px; }
+.chat-tab { height: 22px; margin: 0 4px 0 0; padding: 0 10px; font-size: 12px; color: rgb(214, 200, 176);
+    background-color: rgba(10, 10, 14, 0.45); border-width: 1px; border-color: rgba(120, 94, 50, 0.6); border-radius: 4px; }
+.chat-tab-active { background-color: rgba(150, 116, 58, 0.85); color: rgb(20, 16, 10); }
+.log-line { font-size: 13px; white-space: normal; color: rgb(220, 220, 220); -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); }
+.log-hit { color: rgb(255, 226, 140); }
+.log-hurt { color: rgb(255, 120, 105); }
+.log-miss { color: rgb(170, 170, 170); }
+.log-death { color: rgb(255, 160, 80); }
+.log-skill { color: rgb(130, 210, 255); }
+.log-system { color: rgb(220, 220, 220); }
 .door-prompt { position: absolute; translate: -50% -50%; color: rgb(255, 235, 170); font-size: 15px; -unity-font-style: bold;
     background-color: rgba(10, 10, 14, 0.7); border-radius: 5px; padding: 3px 9px; -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9); }
 .unit-frames { position: absolute; left: 16px; top: 16px; flex-direction: row; }
 .unit-frame { width: 230px; margin-right: 12px; padding: 6px 8px; background-color: rgba(10, 10, 14, 0.7); border-radius: 6px;
     border-width: 2px; border-color: rgba(0, 0, 0, 0); }
+/* The old client's Hud.uss (loaded on the same panel) makes .unit-frame absolute and 340 px: that stacked the
+   target's frame on yours. In the row they sit side by side. */
+.unit-frames .unit-frame { position: relative; width: 230px; left: auto; top: auto; }
 .unit-frame.in-combat { border-color: rgb(200, 40, 30); }
 .unit-name { color: rgb(235, 225, 200); font-size: 14px; -unity-font-style: bold; margin-bottom: 4px; }
 .unit-frame.hostile .unit-name { color: rgb(255, 120, 105); }

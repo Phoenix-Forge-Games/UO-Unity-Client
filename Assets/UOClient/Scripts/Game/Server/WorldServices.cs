@@ -20,7 +20,7 @@ namespace UOGame.Server
     /// a moment later it shuts it the same way. Clients never decide a door's state.</item>
     /// </list>
     /// </summary>
-    public sealed class WorldServices : MonoBehaviour
+    public sealed partial class WorldServices : MonoBehaviour
     {
         [SerializeField] private NetworkManager _network;
 
@@ -57,6 +57,8 @@ namespace UOGame.Server
             _network.ServerManager.RegisterBroadcast<UseDoor>(OnUseDoor);
             _network.ClientManager.RegisterBroadcast<SaidMessage>((m, c) => Said?.Invoke(m));
             _network.ClientManager.RegisterBroadcast<DoorChanged>(OnDoorChanged);
+            RegisterParties();
+            RegisterTrades();
         }
 
         // ------------------------------------------------------------------ say
@@ -206,6 +208,12 @@ namespace UOGame.Server
 
         private void Update()
         {
+            if (_network != null && _network.IsServerStarted)
+            {
+                UpdateParties();
+                UpdateTrades();
+            }
+
             if (!_network.IsServerStarted || _closeAt.Count == 0)
             {
                 return;

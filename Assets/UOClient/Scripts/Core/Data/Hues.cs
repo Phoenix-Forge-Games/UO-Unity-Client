@@ -39,6 +39,12 @@ namespace UOClient.Data
         public int Count => _ramps.Length;
 
         /// <summary>
+        /// The one shade of a hue the game shows: what a colour swatch shows, and exactly what hair, skin and dyed
+        /// things are drawn in (no mapping through UO's ramp by the texture's brightness, which turned blonde brown).
+        /// </summary>
+        public const int SwatchShade = 22;
+
+        /// <summary>
         /// Shade 0 (dark) to 31 (light) of a hue as the server sends it (1-based; the top bits are flags),
         /// as 8-bit RGB; false for hue 0 (the art's own colours) or an unknown hue.
         /// </summary>

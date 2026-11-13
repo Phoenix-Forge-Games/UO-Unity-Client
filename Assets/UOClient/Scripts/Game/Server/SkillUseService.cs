@@ -462,13 +462,6 @@ namespace UOGame.Server
                 return;
             }
 
-            ItemDef one = InHand(character, WearSlot.OneHanded), two = InHand(character, WearSlot.TwoHanded);
-            if (one != null && one.Weapon != null && one.Weapon.MaxDamage > 0 || two != null && (two.Armor != null || two.Weapon != null && two.Weapon.MaxDamage > 0))
-            {
-                Tell(connection, Text("Meditation", "Hands"));
-                return;
-            }
-
             float skill = Skill(character, "Meditation");
             double chance = Expr(R("Meditation")?["Chance"], n => n == "Skill" ? skill : n == "ManaMax" ? body.ManaMax.Value : n == "Mana" ? body.Mana.Value : 0);
             if (chance > _random.NextDouble())

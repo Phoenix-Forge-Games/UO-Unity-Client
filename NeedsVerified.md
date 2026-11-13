@@ -9,6 +9,15 @@ Last updated 2026-11-12.
 - Picked by measurement, not by ear: listen in a town by day that the village and crowd loops (Crowd Loop 04, 05)
   have no traffic, engines, modern voices or phones.
 
+## Playtest round 2, 2026-11-12 (protocol 29)
+- Seen in Solo: party frames, the trade window, the invitation prompt and stacked skill messages drawn from sample
+  data; inviting or trading with yourself refused; the combat tab filling with hits, misses, a death and messages;
+  the skill watch; the target frame beside yours; a ghost's nearby door colliders ignored, and restored on revival.
+- Not checked (needs two players): inviting and joining a party, the frames' live numbers, gold shared on looting,
+  a whole trade (both accept, items swap with their properties), walking apart ending a trade.
+- Not checked: a Meditation gain from regen (the test character is at the total skill cap); hair and skin at the
+  swatch colour on the model; the wheel over every window; right-click tap vs camera drag by hand.
+
 ## First playtest fixes, 2026-11-12 (client 0.2.5, server 10:31 PM)
 - Seen in Solo: /help, an unknown command, /stuck (to the Wayfarer's Inn, on its floor) and its 5-minute wait;
   swatches for skin and hair in real colours; the start-city map with nine cities, clicking New Haven chose it;

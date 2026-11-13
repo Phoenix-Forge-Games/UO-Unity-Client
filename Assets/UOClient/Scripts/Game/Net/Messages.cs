@@ -7,7 +7,7 @@ namespace UOGame.Net
     public static class Protocol
     {
         /// <summary>Bump when any message changes shape.</summary>
-        public const int Version = 28; // 28: MMO-style combat (no war mode, leash and evade), tools for the job
+        public const int Version = 29; // 29: parties and trading between players
 
         /// <summary>
         /// What this build's world content is: the chunk format and the palette it was baked against. A client whose
@@ -568,5 +568,72 @@ namespace UOGame.Net
     {
         public byte Kind;
         public string Text;
+    }
+
+    // ------------------------------------------------------------------ parties
+
+    /// <summary>
+    /// Client → server: party business. Op 1 invite (ObjectId: the player), 2 accept the invitation, 3 decline it,
+    /// 4 leave your party, 5 remove a member (leader only; ObjectId: who).
+    /// </summary>
+    public struct PartyRequest : IBroadcast
+    {
+        public byte Op;
+        public int ObjectId;
+    }
+
+    /// <summary>Server → client: someone invites you to their party.</summary>
+    public struct PartyInvite : IBroadcast
+    {
+        public int FromObjectId;
+        public string FromName;
+    }
+
+    /// <summary>One party member as the party frames show them (their numbers even when they're far away).</summary>
+    public struct PartyMemberView
+    {
+        public int ObjectId;
+        public string Name;
+        public int Hits, HitsMax, Mana, ManaMax, Stam, StamMax;
+        public bool Dead;
+    }
+
+    /// <summary>Server → each member: the party (none: no Members), sent when it changes and every second.</summary>
+    public struct PartyState : IBroadcast
+    {
+        public int LeaderObjectId;
+        public PartyMemberView[] Members;
+    }
+
+    // ------------------------------------------------------------------ trading between players
+
+    /// <summary>
+    /// Client → server: trading with another player. Op 1 ask to trade (ObjectId: the player), 2 accept the ask,
+    /// 3 decline it, 4 offer an item from your backpack (Item, Amount), 5 take an offered item back (Item),
+    /// 6 accept the trade as it stands, 7 cancel. Changing either offer clears both acceptances.
+    /// </summary>
+    public struct PlayerTradeRequest : IBroadcast
+    {
+        public byte Op;
+        public int ObjectId;
+        public uint Item;
+        public int Amount;
+    }
+
+    /// <summary>Server → client: someone asks to trade with you.</summary>
+    public struct PlayerTradeAsk : IBroadcast
+    {
+        public int FromObjectId;
+        public string FromName;
+    }
+
+    /// <summary>Server → both traders: the trade as it stands (Open false: it ended; Note says how).</summary>
+    public struct PlayerTradeState : IBroadcast
+    {
+        public bool Open;
+        public string OtherName;
+        public ItemView[] Mine, Theirs;
+        public bool MineAccepted, TheirsAccepted;
+        public string Note;
     }
 }

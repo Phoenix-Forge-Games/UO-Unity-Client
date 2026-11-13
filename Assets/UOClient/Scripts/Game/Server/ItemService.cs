@@ -283,6 +283,47 @@ namespace UOGame.Server
             return true;
         }
 
+        /// <summary>
+        /// Server: move (some of) an item from one character's backpack to another's, keeping everything about it
+        /// (magic properties, exceptional, material). False, and nothing moved, when it isn't there or won't fit.
+        /// </summary>
+        public static bool Transfer(AccountStore.Character from, AccountStore.Character to, uint id, int amount)
+        {
+            AccountStore.Item item = from.Items.Find(i => i.Id == id && i.Slot == 0);
+            if (item == null)
+            {
+                return false;
+            }
+
+            amount = Math.Max(1, Math.Min(amount, item.Amount));
+            ItemDef def = Catalog.Find(item.Type);
+            if (def != null && def.Stackable)
+            {
+                if (!AddToBackpack(to, item.Type, amount, item.Hue, 0, item.Exceptional, item.Resource))
+                {
+                    return false;
+                }
+
+                Take(from.Items, item, amount);
+                return true;
+            }
+
+            if (to.Items.FindAll(i => i.Slot == 0).Count >= BackpackSize)
+            {
+                return false;
+            }
+
+            from.Items.Remove(item);
+            to.Items.Add(item);
+            return true;
+        }
+
+        /// <summary>Free places in a character's backpack.</summary>
+        public static int BackpackFree(AccountStore.Character character) => BackpackSize - character.Items.FindAll(i => i.Slot == 0).Count;
+
+        /// <summary>How an item shows on a client (its kind, amount, hue, label, properties).</summary>
+        public static ItemView ViewOf(AccountStore.Item item) => Views(new List<AccountStore.Item> { item })[0];
+
         /// <summary>Server: a crafted item into the backpack, remembering whether it's exceptional and its material.</summary>
         public static bool GiveCrafted(AccountStore.Character character, string type, int amount, int hue, bool exceptional, string resource) =>
             AddToBackpack(character, type, amount, hue, 0, exceptional, resource);
@@ -1259,7 +1300,24 @@ namespace UOGame.Server
                     continue;
                 }
 
-                if (AddToBackpack(carrier.Character, item.Type, item.Amount, item.Hue, item.Id))
+                ItemDef def = Catalog.Find(item.Type);
+                if (def != null && def.IsGold && WorldServices.Instance != null && WorldServices.Instance.SplitGold(connection, item.Type, item.Amount))
+                {
+                    corpse.Loot.RemoveAt(i); // shared out between the party
+                    continue;
+                }
+
+                if (def != null && !def.Stackable)
+                {
+                    // A single item moves across whole, magic properties and all (rebuilding it from its type lost them).
+                    if (BackpackFree(carrier.Character) > 0)
+                    {
+                        item.Slot = 0;
+                        carrier.Character.Items.Add(item);
+                        corpse.Loot.RemoveAt(i);
+                    }
+                }
+                else if (AddToBackpack(carrier.Character, item.Type, item.Amount, item.Hue, item.Id))
                 {
                     corpse.Loot.RemoveAt(i);
                 }

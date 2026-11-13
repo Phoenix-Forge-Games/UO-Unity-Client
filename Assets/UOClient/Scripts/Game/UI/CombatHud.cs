@@ -52,6 +52,7 @@ namespace UOGame.UI
 
         private void OnUIReload(PanelRenderer panelRenderer, VisualElement root, int version)
         {
+            GameHud.RegisterUI(root); // the mouse wheel and clicks over it are the UI's, not the camera's
             _root = root;
             root.pickingMode = PickingMode.Ignore;
             var frames = new VisualElement { pickingMode = PickingMode.Ignore };

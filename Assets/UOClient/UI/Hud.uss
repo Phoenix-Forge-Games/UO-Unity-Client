@@ -968,3 +968,105 @@
     color: rgb(24, 18, 12);
     -unity-font-style: bold;
 }
+
+/* The skill watch: skills tagged (star) in the Skills tab, live, see-through, on the right. */
+.skill-watch {
+    position: absolute;
+    right: 16px;
+    top: 34%;
+    min-width: 190px;
+    padding: 6px 10px;
+    background-color: rgba(10, 10, 14, 0.35);
+    border-radius: 5px;
+}
+
+.skill-watch-row {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.skill-watch-name, .skill-watch-value {
+    font-size: 14px;
+    color: rgb(236, 226, 206);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.85);
+    padding: 1px 0;
+}
+
+.skill-watch-value {
+    color: rgb(130, 210, 255);
+    margin-left: 14px;
+}
+
+.skill-tagged {
+    color: rgb(255, 214, 110);
+}
+
+/* Party frames: under your own frame, one per member (hits, mana, stamina), wherever they are. */
+.party-frames {
+    position: absolute;
+    left: 16px;
+    top: 140px;
+    width: 230px;
+}
+
+.party-title {
+    flex-grow: 1;
+    font-size: 13px;
+    color: rgb(226, 190, 116);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.85);
+}
+
+.party-leave {
+    height: 20px;
+    font-size: 11px;
+    padding: 0 8px;
+    margin: 0;
+    background-color: rgba(60, 48, 32, 0.9);
+    border-color: rgb(120, 94, 50);
+    color: rgb(236, 226, 206);
+}
+
+.party-frame {
+    margin-top: 4px;
+    padding: 4px 6px;
+    background-color: rgba(10, 10, 14, 0.7);
+    border-radius: 5px;
+}
+
+.party-dead {
+    opacity: 0.6;
+}
+
+.party-name {
+    font-size: 13px;
+    color: rgb(235, 225, 200);
+    margin-bottom: 2px;
+}
+
+.party-bar {
+    height: 6px;
+    margin-top: 2px;
+    background-color: rgba(40, 10, 10, 0.9);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.party-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.party-hits { background-color: rgb(40, 170, 60); }
+.party-mana { background-color: rgb(50, 110, 230); }
+.party-stam { background-color: rgb(230, 190, 40); }
+
+.trade-list {
+    min-height: 200px;
+    background-color: rgba(10, 10, 14, 0.4);
+    border-radius: 4px;
+    padding: 4px;
+}

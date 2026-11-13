@@ -308,6 +308,7 @@ namespace UOGame.UI
             _spellsPage.Clear();
             PlayerIdentity me = PlayerMotor.Local != null ? PlayerMotor.Local.GetComponent<PlayerIdentity>() : null;
             bool gargoyle = me != null && me.IsGargoyle;
+            AddAttackRow();
             if (AdminService.IsAdmin)
             {
                 AddAdminSection();
@@ -491,6 +492,12 @@ namespace UOGame.UI
             if (IsAdminSlot(spell))
             {
                 UseAdminSlot(spell);
+                return;
+            }
+
+            if (spell == AttackSlot)
+            {
+                AttackTarget();
                 return;
             }
 
@@ -689,6 +696,11 @@ namespace UOGame.UI
                 // a missing preference store just means an empty hotbar
             }
 
+            if (string.IsNullOrEmpty(saved))
+            {
+                saved = AttackSlot.ToString(); // a new character starts with Attack on the first slot
+            }
+
             string[] parts = saved.Split(',');
             for (int i = 0; i < HotbarSlots; i++)
             {
@@ -701,7 +713,7 @@ namespace UOGame.UI
         /// <summary>A hotbar slot shows its spell's icon (its name as the tooltip), or nothing when empty.</summary>
         private void ShowSlot(int slot, int spell)
         {
-            string name = spell >= 0 ? AdminSlotName(spell) ?? SpellService.Find(spell)?.Name ?? string.Empty : string.Empty;
+            string name = spell == AttackSlot ? "Attack" : spell >= 0 ? AdminSlotName(spell) ?? SpellService.Find(spell)?.Name ?? string.Empty : string.Empty;
             _slotLabels[slot].text = name;
             _hotbar[slot].tooltip = name;
             GameIcons.Show(_slotIcons[slot], spell >= 0 ? GameIcons.Spell(spell) : null, _slotLabels[slot]);

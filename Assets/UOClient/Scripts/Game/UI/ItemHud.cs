@@ -83,6 +83,7 @@ namespace UOGame.UI
             OnEnableBulkOrders();
             OnEnableQuests();
             OnEnableAdmin();
+            OnEnableParty();
         }
 
         private void OnDestroy() => _stage?.Dispose();
@@ -96,10 +97,13 @@ namespace UOGame.UI
             OnDisableBulkOrders();
             OnDisableQuests();
             OnDisableAdmin();
+            OnDisableLog();
+            OnDisableParty();
         }
 
         private void OnUIReload(PanelRenderer panelRenderer, VisualElement root, int version)
         {
+            GameHud.RegisterUI(root); // the mouse wheel and clicks over it are the UI's, not the camera's
             _root = root;
             Window.All.Clear(); // a reload builds them all again
             if (_hudStyles != null && !root.styleSheets.Contains(_hudStyles))
@@ -142,6 +146,8 @@ namespace UOGame.UI
             BuildHousingWindows();
             BuildPetWindows();
             BuildMicroMenu();
+            BuildLog();
+            BuildParty();
 
             _dragGhost = new Label { pickingMode = PickingMode.Ignore };
             _dragGhost.AddToClassList("drag-ghost");
@@ -196,6 +202,11 @@ namespace UOGame.UI
 
             UpdatePets();
             UpdateMicroMenu();
+            UpdateLog();
+            if (!GameInput.Typing)
+            {
+                UpdateParty();
+            }
             if (!GameInput.Typing)
             {
                 if (GameInput.Controls.Gameplay.Backpack.WasPressedThisFrame())
@@ -691,6 +702,14 @@ namespace UOGame.UI
                     tooltip = LockTips[view.Lock],
                 };
                 lockButton.AddToClassList("lock-button");
+                bool tagged = IsTagged(id);
+                var tag = new Button(() => ToggleTag(id))
+                {
+                    text = tagged ? "★" : "☆",
+                    tooltip = tagged ? "Stop watching this skill" : "Watch this skill: it shows, live, in the skill watch on the right",
+                };
+                tag.AddToClassList("lock-button");
+                tag.EnableInClassList("skill-tagged", tagged);
                 Button use = null;
                 if (SkillService.Usable.Contains(def.Key))
                 {
@@ -705,6 +724,7 @@ namespace UOGame.UI
                 row.Add(name);
                 row.Add(value);
                 row.Add(cap);
+                row.Add(tag);
                 row.Add(lockButton);
                 if (use != null)
                 {

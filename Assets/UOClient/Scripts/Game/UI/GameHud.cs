@@ -28,7 +28,52 @@ namespace UOGame.UI
 
         private VisualElement _plates;
         private VisualElement _doorPrompt;
-        private ScrollView _log;
+        private ScrollView _log, _combat;
+        private Button _chatTab, _combatTab;
+        private const int CombatLines = 300;
+
+        private static GameHud _instance;
+
+        /// <summary>
+        /// A line in the combat log (the chat window's Combat tab): your hits and misses, what hit you, deaths
+        /// nearby, skill and stat changes, server messages. Kind styles it: hit, hurt, miss, death, skill, system.
+        /// </summary>
+        public static void AddCombat(string text, string kind) => _instance?.AddCombatLine(text, kind);
+
+        private void AddCombatLine(string text, string kind)
+        {
+            if (_combat == null || string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            var line = new Label($"{System.DateTime.Now:HH:mm}  {text}");
+            line.AddToClassList("log-line");
+            line.AddToClassList("log-" + kind);
+            _combat.Add(line);
+            while (_combat.contentContainer.childCount > CombatLines)
+            {
+                _combat.contentContainer.RemoveAt(0);
+            }
+
+            if (!_combat.ClassListContains("hidden"))
+            {
+                _chatActive = Time.unscaledTime; // the open tab's new line brings the window back
+            }
+
+            _combat.schedule.Execute(() => _combat.scrollOffset = new Vector2(0f, float.MaxValue));
+        }
+
+        /// <summary>Chat or Combat: which list the window shows.</summary>
+        private void ShowTab(bool combat)
+        {
+            _log.EnableInClassList("hidden", combat);
+            _combat.EnableInClassList("hidden", !combat);
+            _chatTab.EnableInClassList("chat-tab-active", !combat);
+            _combatTab.EnableInClassList("chat-tab-active", combat);
+            _chatActive = Time.unscaledTime;
+            (combat ? _combat : _log).schedule.Execute(() => (combat ? _combat : _log).scrollOffset = new Vector2(0f, float.MaxValue));
+        }
         private TextField _input;
         private readonly Dictionary<INamed, (VisualElement Plate, Label Name, Label Bubble)> _shown =
             new Dictionary<INamed, (VisualElement, Label, Label)>();
@@ -39,6 +84,49 @@ namespace UOGame.UI
         {
             GetComponent<PanelRenderer>().RegisterUIReloadCallback(OnUIReload);
             WorldServices.Said += OnSaid;
+            GameInput.PointerOverUI = OverAnyPanel; // only the old client set this, so the wheel zoomed over every window
+        }
+
+        private static readonly List<VisualElement> _uiRoots = new List<VisualElement>();
+        private static readonly List<IPanel> _panels = new List<IPanel>();
+
+        /// <summary>A HUD's UI (its panel's root) for the pointer check: on it, the wheel and clicks are the UI's.</summary>
+        public static void RegisterUI(VisualElement root)
+        {
+            _uiRoots.RemoveAll(r => r == null || r.panel == null);
+            if (root != null && !_uiRoots.Contains(root))
+            {
+                _uiRoots.Add(root);
+            }
+        }
+
+        /// <summary>
+        /// Is the pointer on any window, list, button or field of any of the game's UI panels (HUD, windows, chat,
+        /// menus)? Then the mouse wheel scrolls that, and clicks go to it, instead of the camera and the world.
+        /// </summary>
+        private static bool OverAnyPanel(Vector2 screen)
+        {
+            _panels.Clear();
+            foreach (VisualElement root in _uiRoots)
+            {
+                IPanel panel = root?.panel;
+                if (panel != null && !_panels.Contains(panel))
+                {
+                    _panels.Add(panel);
+                }
+            }
+
+            foreach (IPanel panel in _panels)
+            {
+                Vector2 position = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(screen.x, Screen.height - screen.y));
+                VisualElement picked = panel.Pick(position);
+                if (picked != null && picked != panel.visualTree && picked.resolvedStyle.opacity > 0.05f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void OnDisable()
@@ -77,6 +165,16 @@ namespace UOGame.UI
                 // Quick to appear, slow to go.
                 _chat.style.opacity = Mathf.MoveTowards(now, target, Time.unscaledDeltaTime * (target > now ? 6f : 0.7f));
             }
+
+            // Faded away, the window lets clicks and the mouse wheel through to the world (the camera zooms again).
+            PickingMode picking = _chat.resolvedStyle.opacity > 0.1f ? PickingMode.Position : PickingMode.Ignore;
+            if (_log.pickingMode != picking)
+            {
+                foreach (VisualElement e in new VisualElement[] { _log, _combat, _chatTab, _combatTab })
+                {
+                    e.pickingMode = picking;
+                }
+            }
         }
 
         private void OnUIReload(PanelRenderer panelRenderer, VisualElement root, int version)
@@ -89,7 +187,16 @@ namespace UOGame.UI
             _doorPrompt.AddToClassList("door-prompt");
             _doorPrompt.style.display = DisplayStyle.None;
             _plates.Add(_doorPrompt);
+            _instance = this;
+            RegisterUI(root);
             _log = root.Q<ScrollView>("chat-log");
+            _combat = root.Q<ScrollView>("combat-log");
+            _chatTab = root.Q<Button>("chat-tab-chat");
+            _combatTab = root.Q<Button>("chat-tab-combat");
+            _chatTab.clicked += () => ShowTab(false);
+            _combatTab.clicked += () => ShowTab(true);
+            // Pointing at the window keeps it up (and the wheel scrolls it, not the camera: GameInput.IsPointerOverUI).
+            _chat.RegisterCallback<PointerMoveEvent>(_ => _chatActive = Time.unscaledTime, TrickleDown.TrickleDown);
             _input = root.Q<TextField>("chat-input");
             _shown.Clear();
             _input.RegisterCallback<KeyDownEvent>(OnChatKey, TrickleDown.TrickleDown);

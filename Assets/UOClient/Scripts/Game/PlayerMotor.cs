@@ -183,6 +183,65 @@ namespace UOGame
             {
                 CatchFall();
             }
+
+            if (IsServerStarted || IsOwner)
+            {
+                GhostDoors(); // both sides move the body, so both must agree it passes the door
+            }
+        }
+
+        // ------------------------------------------------------------------ ghosts pass through doors
+
+        private readonly System.Collections.Generic.List<Collider> _ghostIgnored = new System.Collections.Generic.List<Collider>();
+        private float _nextGhostDoors;
+
+        /// <summary>
+        /// A ghost (dead) walks through closed doors, as in UO, so they can always reach a healer or shrine: the doors
+        /// near them stop blocking their body. Alive again, every door blocks again.
+        /// </summary>
+        private void GhostDoors()
+        {
+            bool ghost = _combat != null && _combat.Dead.Value;
+            if (!ghost)
+            {
+                if (_ghostIgnored.Count > 0)
+                {
+                    foreach (Collider c in _ghostIgnored)
+                    {
+                        if (c != null && _controller != null)
+                        {
+                            Physics.IgnoreCollision(_controller, c, false);
+                        }
+                    }
+
+                    _ghostIgnored.Clear();
+                }
+
+                return;
+            }
+
+            if (Time.time < _nextGhostDoors || _controller == null)
+            {
+                return;
+            }
+
+            _nextGhostDoors = Time.time + 0.3f;
+            foreach (UOClient.Buildings.BuildingDoor door in UOClient.Buildings.BuildingDoor.All)
+            {
+                if (door == null || (door.transform.position - transform.position).sqrMagnitude > 10f * 10f)
+                {
+                    continue;
+                }
+
+                foreach (Collider c in door.GetComponentsInChildren<Collider>(true))
+                {
+                    if (!_ghostIgnored.Contains(c))
+                    {
+                        Physics.IgnoreCollision(_controller, c, true);
+                        _ghostIgnored.Add(c);
+                    }
+                }
+            }
         }
 
         // ------------------------------------------------------------------ the safety net

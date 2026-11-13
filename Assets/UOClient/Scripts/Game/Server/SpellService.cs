@@ -309,6 +309,19 @@ namespace UOGame.Server
                 double interval = _manaRegen != null ? Expr(_manaRegen["Interval"], ManaRegenLookup(character, body)) : 5.0;
                 caster.NextMana = Time.time + (float)Math.Max(0.2, Math.Min(15.0, interval));
                 body.Mana.Value = Mathf.Min(body.ManaMax.Value, body.Mana.Value + 1);
+                // Meditation is passive here: every tick of mana coming back is a chance to get better at it (UO's
+                // passive gains; Spells.json Pools.Regen.Mana), and at Focus. Metal armour (an armour meditation
+                // penalty) stops Meditation helping the regen (MedBonus) and so stops it training too.
+                if (SkillService.Instance != null)
+                {
+                    if (!body.Meditating && SkillUseService.ArmorPenalty(character) <= 0)
+                    {
+                        SkillService.Instance.CheckSkill(body, "Meditation", 0, 100);
+                    }
+
+                    SkillService.Instance.CheckSkill(body, "Focus", 0, 100);
+                }
+
                 if (body.Mana.Value >= body.ManaMax.Value)
                 {
                     body.Disrupt(); // full: the trance ends

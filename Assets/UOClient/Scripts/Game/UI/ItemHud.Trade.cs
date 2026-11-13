@@ -6,6 +6,7 @@ using UOClient;
 using UOGame.Items;
 using UOGame.Net;
 using UOGame.Server;
+using UOGame.Combat;
 
 namespace UOGame.UI
 {
@@ -145,7 +146,8 @@ namespace UOGame.UI
                 return;
             }
 
-            ControlPrompts.Set(_notice, text);
+            StackNotice(text); // several at once (a swing that raises two skills shows both), and into the combat log
+            LogNotice(text);
             _notice.style.display = DisplayStyle.Flex;
             _noticeUntil = Time.unscaledTime + 4f;
         }
@@ -216,6 +218,17 @@ namespace UOGame.UI
                 {
                     NpcMobile n = npc;
                     Consider(n.transform, TalkReach, 1.2f, "{Use} Talk", () => Talk(n));
+                }
+            }
+
+            // Another player: their menu (trade, party).
+            Combatant meBody = PlayerMotor.Local != null ? PlayerMotor.Local.GetComponent<Combatant>() : null;
+            foreach (Combatant other in Combatant.Seen)
+            {
+                if (other != null && other != meBody && !other.Dead.Value && other.GetComponent<PlayerIdentity>() != null)
+                {
+                    Combatant o = other;
+                    Consider(o.transform, TalkReach, 1.2f, "{Use} Interact", () => PlayerMenu(o));
                 }
             }
 

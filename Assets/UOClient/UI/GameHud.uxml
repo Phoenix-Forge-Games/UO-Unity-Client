@@ -3,7 +3,12 @@
     <ui:VisualElement name="root" class="hud" picking-mode="Ignore">
         <ui:VisualElement name="nameplates" class="nameplates" picking-mode="Ignore" />
         <ui:VisualElement name="chat" class="chat" picking-mode="Ignore">
-            <ui:ScrollView name="chat-log" class="chat-log" picking-mode="Ignore" />
+            <ui:VisualElement name="chat-tabs" class="chat-tabs">
+                <ui:Button name="chat-tab-chat" text="Chat" class="chat-tab chat-tab-active" />
+                <ui:Button name="chat-tab-combat" text="Combat" class="chat-tab" />
+            </ui:VisualElement>
+            <ui:ScrollView name="chat-log" class="chat-log" />
+            <ui:ScrollView name="combat-log" class="chat-log hidden" />
             <ui:TextField name="chat-input" class="chat-input hidden" max-length="200" />
         </ui:VisualElement>
     </ui:VisualElement>

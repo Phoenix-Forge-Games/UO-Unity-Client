@@ -202,3 +202,95 @@
     font-size: 14px;
     margin: 2px 0 6px 120px;
 }
+
+/* Colour swatches (HueSwatches): skin, hair and dye colours, picked by clicking; never a slider. */
+.hue-swatches {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 1;
+}
+
+.hue-swatch {
+    width: 20px;
+    height: 20px;
+    margin: 1px;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.6);
+    border-radius: 3px;
+}
+
+.hue-swatch:hover {
+    border-color: rgb(236, 226, 206);
+}
+
+.hue-swatch-chosen {
+    border-width: 2px;
+    border-color: rgb(244, 217, 142);
+    scale: 1.15 1.15;
+}
+
+/* Where a new character begins: a map of Britannia, the starting cities marked (StartCityMap). */
+.city-map {
+    margin: 4px 0 6px 0;
+}
+
+.city-map-picture {
+    width: 100%;
+    max-width: 440px;
+    height: 300px; /* kept at the map's shape (5:4) by StartCityMap as the width changes */
+    background-color: rgb(24, 22, 20);
+    border-width: 1px;
+    border-color: rgb(150, 116, 58);
+    border-radius: 4px;
+    -unity-background-scale-mode: stretch-to-fill;
+    overflow: hidden;
+}
+
+.city-marker {
+    position: absolute;
+    translate: -6px -6px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.city-marker-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: rgb(226, 190, 116);
+    border-width: 2px;
+    border-color: rgb(30, 22, 12);
+}
+
+.city-marker-name {
+    margin-left: 3px;
+    font-size: 12px;
+    color: rgb(240, 230, 210);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(20, 14, 8);
+    padding: 0;
+}
+
+.city-marker:hover .city-marker-dot {
+    background-color: rgb(255, 236, 180);
+}
+
+.city-marker-chosen .city-marker-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    translate: -2px 0;
+    background-color: rgb(196, 52, 40);
+    border-color: rgb(255, 236, 180);
+}
+
+.city-marker-chosen .city-marker-name {
+    font-size: 14px;
+    color: rgb(255, 236, 180);
+}
+
+.city-map-caption {
+    margin-top: 4px;
+    color: rgb(226, 190, 116);
+    font-size: 14px;
+}

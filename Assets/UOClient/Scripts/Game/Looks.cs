@@ -131,5 +131,34 @@ namespace UOGame
                 return _tiles;
             }
         }
+
+        private static UOClient.Data.Hues _hues;
+        private static bool _triedHues;
+
+        /// <summary>hues.mul: the colour of each UO hue number (skin, hair, dyes), or null without UO data.</summary>
+        public static UOClient.Data.Hues Hues
+        {
+            get
+            {
+                if (_hues == null && !_triedHues)
+                {
+                    _triedHues = true;
+                    try
+                    {
+                        string path = System.IO.Path.Combine(ClientSettings.DataFolder, "hues.mul");
+                        if (System.IO.File.Exists(path))
+                        {
+                            _hues = new UOClient.Data.Hues(path);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"[Game] Couldn't read hues ({e.Message}).");
+                    }
+                }
+
+                return _hues;
+            }
+        }
     }
 }

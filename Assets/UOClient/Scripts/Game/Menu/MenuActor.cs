@@ -135,6 +135,18 @@ namespace UOGame.Menu
             return Mathf.Abs(next.y - at.y) > 0.45f;
         }
 
+        /// <summary>Turn on the spot by this many degrees (dragging them round on the character screen), and stay so.</summary>
+        public void Spin(float degrees)
+        {
+            if (_goal != null)
+            {
+                return; // still walking out
+            }
+
+            transform.Rotate(0f, degrees, 0f, Space.World);
+            _face = transform.rotation;
+        }
+
         /// <summary>Turn (gently) to face a point while standing.</summary>
         public void Face(Vector3 point)
         {

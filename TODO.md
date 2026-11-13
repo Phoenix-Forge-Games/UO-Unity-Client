@@ -529,6 +529,34 @@ All ServUO-protocol client work is paused. Design: Docs/ServerDesign.md (draft, 
   - [ ] Swimming and falling damage (needs water surfaces and health)
   - [ ] Delete the UO-protocol client code (Net, WorldState packets, Walker) once nothing uses it
 
+## From the first playtest, 2026-11-12 (user)
+- [x] **No holes in the terrain** (urgent): a player who joined the live server took two steps after creating his
+  character and fell through the world. Find every hole a player can reach and close it: the terrain cuts holes at
+  void ("NoName") land (TerrainStreamer.BuildHoles); the ground-under-water fix (NeedsVerified, 2026-11-12) keeps
+  ground under water tiles but only takes effect in chunks baked after it, so check which bake the shipped
+  WorldData is. Also check where new characters start (the spawn point's chunk), and add a safety net: anyone
+  falling far below the ground is put back on the nearest ground.
+  Done 2026-11-12: the cause was UO land named "NoName" that has a ground texture (path edges, 0x079B-0x07AB...),
+  which the classifier called void, so the bake cut single-tile holes (TiJay's Richard fell through one by New
+  Haven, 3511,2562). Now textureless "NoName" is void and textured is LandKind.Unnamed (painted as the ground round
+  it); outdoors (x < 5120) a hole is cut only where the ground would bury a walkable floor or stair
+  (TerrainStreamer.IsHole/BuriesFloor); the dungeons keep holes under footing and in wide void. Full Trammel
+  re-bake: New Haven, Britain and ten towns checked, no holes at all. Safety net: the server remembers where each
+  player last stood and puts anyone below -40 m back there (or on the ground above them) (PlayerMotor.CatchFall).
+- [x] **A /stuck command**: typed in chat, puts you somewhere safe and walkable nearby (or at your town's start
+  point), with a cooldown so it can't be used to escape fights. Done 2026-11-12: /stuck puts you on your starting
+  city's spot (its inn or bank), not while fighting, every 5 minutes; /help lists commands, unknown /commands get a
+  hint (WorldServices.Command). Chat lines starting with / are never spoken aloud.
+- [x] **Starting city on a map**: character creation shows a map of Britannia with the starting cities marked;
+  pick one by clicking it (purpose-built window, not a list). Done 2026-11-12: StartCityMap draws Britannia on the
+  player's machine from the map data (ground colours shaded by height, no UO art), the nine cities marked; click
+  one, the chosen is red with its inn or bank named below.
+- [x] **Colour swatches, no sliders**: hair, skin and dye colours are picked from a grid of swatches (the allowed
+  UO hues for each), never a slider. Done 2026-11-12 for skin, hair and beard (HueSwatches, real hue colours from
+  hues.mul); the dye-tub window, when it's built, uses the same control.
+- [x] **Turn the character in the main menu**: click and drag on the character (select and create screens) to spin
+  them round. Done 2026-11-12: drag on the open view (not a panel), like a turntable (MenuActor.Spin).
+
 ## Art
 - [ ] Art mapping: replace the placeholder colored boxes for statics with Fantasy Kingdom props and Pure Nature vegetation and rocks (in progress)
 - [x] Wall orientation from UO art (South/East edge, corner, post, full block) and Fantasy Kingdom walls from `Data/WallKit.asset`: plaster, timber, stone (stacked) and window half-walls, timber/stone posts, castle blocks; merged into one mesh per material per block (2026-11-09)

@@ -355,6 +355,12 @@ namespace UOGame.Server
         // ------------------------------------------------------------------ server: the work itself (window and API)
 
         /// <summary>Move someone (pets following come along). Ground not loaded yet: dropped from high above once it is.</summary>
+        /// <summary>
+        /// Server: put someone who fell out of the world back (PlayerMotor's safety net): exactly here, or on the ground
+        /// at this spot (waiting for it to load if it hasn't).
+        /// </summary>
+        public void Rescue(Combatant body, Vector3 to, bool exact) => Move(body, to, findGround: !exact);
+
         private void Move(Combatant body, Vector3 to, bool findGround)
         {
             body.GetComponent<PlayerMotor>()?.LandSafely();

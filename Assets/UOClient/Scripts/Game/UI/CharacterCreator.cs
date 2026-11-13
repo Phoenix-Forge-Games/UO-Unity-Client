@@ -31,7 +31,10 @@ namespace UOGame.UI
         private readonly Dictionary<int, Button> _professionButtons = new Dictionary<int, Button>();
         private readonly Button _male, _female, _create, _human, _gargoyleChoice;
         private readonly VisualElement _hairBlock;
-        private readonly SliderInt _skin, _hairHue, _beardHue, _str, _dex, _int;
+        private readonly SliderInt _str, _dex, _int;
+        /// <summary>Colours are picked from swatches, never a slider.</summary>
+        private readonly HueSwatches _skin, _hairHue, _beardHue;
+        private StartCityMap _cityMap;
         private readonly Label _hairName, _beardName;
         private readonly List<(DropdownField Skill, SliderInt Value)> _skillRows = new List<(DropdownField, SliderInt)>();
 
@@ -40,7 +43,6 @@ namespace UOGame.UI
         private int _profession;
         private int _city;
         private VisualElement _cities;
-        private readonly Dictionary<int, Button> _cityButtons = new Dictionary<int, Button>();
         private bool _balancing;
         private string _built;
 
@@ -112,7 +114,7 @@ namespace UOGame.UI
             side.Add(Labelled("Sex", sexRow));
 
             (int skinMin, int skinCount) = Outfits.HueRange("Skin");
-            _skin = HueSlider(skinMin, skinCount);
+            _skin = new HueSwatches(skinMin, skinCount);
             side.Add(Labelled("Skin", _skin));
 
             _hairBlock = new VisualElement();
@@ -125,7 +127,7 @@ namespace UOGame.UI
             hairRow.Add(Choice("▶", () => StepHair(+1)));
             _hairBlock.Add(Labelled("Hair", hairRow));
             (int hairMin, int hairCount) = Outfits.HueRange("Hair");
-            _hairHue = HueSlider(hairMin, hairCount);
+            _hairHue = new HueSwatches(hairMin, hairCount);
             _hairBlock.Add(Labelled("Hair colour", _hairHue));
 
             _beardRows = new VisualElement();
@@ -136,7 +138,7 @@ namespace UOGame.UI
             beardRow.Add(_beardName);
             beardRow.Add(Choice("▶", () => StepBeard(+1)));
             _beardRows.Add(Labelled("Beard", beardRow));
-            _beardHue = HueSlider(hairMin, hairCount);
+            _beardHue = new HueSwatches(hairMin, hairCount);
             _beardRows.Add(Labelled("Beard colour", _beardHue));
             _hairBlock.Add(_beardRows);
 
@@ -147,8 +149,9 @@ namespace UOGame.UI
 
             side.Add(Heading("Begin in"));
             _cities = new VisualElement();
-            _cities.AddToClassList("creator-professions");
             side.Add(_cities);
+            _cityMap = new StartCityMap(SetCity);
+            _cities.Add(_cityMap);
 
             _custom = new VisualElement();
             side.Add(_custom);
@@ -200,9 +203,9 @@ namespace UOGame.UI
                 side.Add(buttons); // embedded: the menu has its own Start Game and Back
             }
 
-            foreach (SliderInt slider in new[] { _skin, _hairHue, _beardHue })
+            foreach (HueSwatches swatches in new[] { _skin, _hairHue, _beardHue })
             {
-                slider.RegisterValueChangedCallback(_ => Validate());
+                swatches.RegisterValueChangedCallback(_ => Validate());
             }
 
             _str.RegisterValueChangedCallback(e => Balance(_str, e.previousValue, e.newValue));
@@ -288,9 +291,7 @@ namespace UOGame.UI
             (int min, int count) = Outfits.HueRange(gargoyle ? "GargoyleSkin" : "Skin");
             if (count > 0)
             {
-                _skin.lowValue = min;
-                _skin.highValue = min + count - 1;
-                _skin.SetValueWithoutNotify(Mathf.Clamp(_skin.value, min, min + count - 1));
+                _skin.SetRange(min, count);
             }
 
             _hairBlock.style.display = gargoyle ? DisplayStyle.None : DisplayStyle.Flex;
@@ -343,31 +344,17 @@ namespace UOGame.UI
             _professions.Add(custom);
         }
 
-        /// <summary>The starting cities (Creation.json StartCities), one button each; the default chosen.</summary>
+        /// <summary>The starting cities (Creation.json StartCities), marked on a map of Britannia; the default chosen.</summary>
         private void BuildCities()
         {
-            _cities.Clear();
-            _cityButtons.Clear();
-            for (int i = 0; i < CreationRules.StartCities.Count; i++)
-            {
-                int index = i;
-                CreationRules.StartCity c = CreationRules.StartCities[i];
-                var b = Choice(c.Name, () => SetCity(index));
-                b.tooltip = c.Place;
-                _cityButtons[i] = b;
-                _cities.Add(b);
-            }
-
+            _cityMap.Build();
             SetCity(CreationRules.DefaultCity);
         }
 
         private void SetCity(int index)
         {
             _city = index;
-            foreach (KeyValuePair<int, Button> pair in _cityButtons)
-            {
-                pair.Value.EnableInClassList("creator-chosen", pair.Key == index);
-            }
+            _cityMap.Show(index);
         }
 
         private void SetProfession(int id)
@@ -613,9 +600,6 @@ namespace UOGame.UI
             row.Add(control);
             return row;
         }
-
-        private static SliderInt HueSlider(int min, int count) =>
-            new SliderInt(min, Math.Max(min, min + count - 1)) { value = min };
 
         private static SliderInt StatSlider() =>
             new SliderInt(CreationRules.StatMin, CreationRules.StatMax) { value = CreationRules.StatTotal / 3, showInputField = true };

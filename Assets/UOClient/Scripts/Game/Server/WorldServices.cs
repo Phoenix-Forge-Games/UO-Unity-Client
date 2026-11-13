@@ -75,6 +75,12 @@ namespace UOGame.Server
                 text = text.Substring(0, MaxSayLength);
             }
 
+            if (text[0] == '/')
+            {
+                Command(connection, speaker, text); // a command, not speech: nobody hears it
+                return;
+            }
+
             var message = new SaidMessage
             {
                 SpeakerObjectId = speaker.ObjectId,
@@ -83,6 +89,70 @@ namespace UOGame.Server
             };
             _network.ServerManager.Broadcast(Near(speaker.transform.position, SayRange), message);
             ItemService.Instance?.Heard(connection, text);
+        }
+
+        // ------------------------------------------------------------------ chat commands
+
+        /// <summary>How long between two uses of /stuck (seconds): a way out, not a way to travel.</summary>
+        private const float StuckCooldown = 5f * 60f;
+
+        private readonly Dictionary<int, float> _stuckAgain = new Dictionary<int, float>();
+
+        /// <summary>Server: a line typed with a leading slash. /stuck frees you; /help lists the commands.</summary>
+        private void Command(NetworkConnection connection, NetworkObject speaker, string text)
+        {
+            string name = text.Substring(1).Split(' ')[0].Trim().ToLowerInvariant();
+            switch (name)
+            {
+                case "stuck":
+                    Stuck(connection, speaker);
+                    break;
+                case "help":
+                case "commands":
+                    ItemService.Instance?.Tell(connection, "Commands: /stuck (stuck somewhere? back to your starting town; every 5 minutes, not while fighting).");
+                    break;
+                default:
+                    ItemService.Instance?.Tell(connection, $"There's no /{name} command. Type /help for the list.");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// /stuck: someone wedged in a wall, a rock or a hole goes back to their starting town's spot (where new
+        /// characters appear: an inn, the bank), on its floor. Not while fighting, and only every few minutes.
+        /// </summary>
+        private void Stuck(NetworkConnection connection, NetworkObject speaker)
+        {
+            ItemService items = ItemService.Instance;
+            if (items == null || !items.TryCarrier(connection, out AccountStore.Character character, out Combat.Combatant body) || body == null)
+            {
+                return;
+            }
+
+            if (body.InCombat.Value)
+            {
+                items.Tell(connection, "Not while you're fighting.");
+                return;
+            }
+
+            if (_stuckAgain.TryGetValue(character.Id, out float again) && Time.time < again)
+            {
+                items.Tell(connection, $"You can use /stuck again in {Mathf.CeilToInt((again - Time.time) / 60f)} min.");
+                return;
+            }
+
+            var cities = Content.CreationRules.StartCities;
+            if (cities.Count == 0 || AdminService.Instance == null)
+            {
+                items.Tell(connection, "There's nowhere to send you.");
+                return;
+            }
+
+            Content.CreationRules.StartCity city = cities[character.StartCity >= 0 && character.StartCity < cities.Count
+                ? character.StartCity : Content.CreationRules.DefaultCity];
+            _stuckAgain[character.Id] = Time.time + StuckCooldown;
+            AdminService.Instance.Rescue(body, UOClient.WorldSpace.TileCenter(city.X, city.Y, city.Z) + Vector3.up * 0.5f, exact: true);
+            items.Tell(connection, $"You find your way back to {city.Place}.");
         }
 
         // ------------------------------------------------------------------ doors

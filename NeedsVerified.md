@@ -9,6 +9,15 @@ Last updated 2026-11-12.
 - Picked by measurement, not by ear: listen in a town by day that the village and crowd loops (Crowd Loop 04, 05)
   have no traffic, engines, modern voices or phones.
 
+## First playtest fixes, 2026-11-12 (client 0.2.5, server 10:31 PM)
+- Seen in Solo: /help, an unknown command, /stuck (to the Wayfarer's Inn, on its floor) and its 5-minute wait;
+  swatches for skin and hair in real colours; the start-city map with nine cities, clicking New Haven chose it;
+  dragging the character 100 px turned them 45 degrees; the fall safety net from -92 m and -300 m. The menu now
+  fades up even if Play Solo was clicked while it was still black (it stayed black before).
+- Holes: the re-bake has none in the twelve town chunks checked. Not checked: the rest of the world by walking it;
+  dungeons (their rule didn't change); terrain now drawn over former stray void spots (should look like ground).
+- Not checked: /stuck on the live server; the swatches on the gargoyle skin range; drag on a touch screen.
+
 ## Playtest client 0.2.1-0.2.3, 2026-11-12 (user: blank sky, then no terrain)
 - 0.2.1: the playtest build now includes MainMenu.unity (PlaytestBuilder built only Game.unity, so the menu never
   loaded: sky and music only).

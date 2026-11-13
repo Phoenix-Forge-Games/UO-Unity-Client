@@ -376,7 +376,53 @@ namespace UOClient
                 return HasLayer(paving) ? paving : LandKind.Dirt;
             }
 
+            if (kind == LandKind.Unnamed)
+            {
+                return NeighbourKindAt(x, y);
+            }
+
             return LandClassifier.IsLayer(kind) ? kind : LandKind.Dirt;
+        }
+
+        /// <summary>
+        /// The ground most of the eight tiles round this one are (for unnamed ground, so it blends in rather than
+        /// showing as a lone square of another ground); dirt when none of them is a named ground.
+        /// </summary>
+        private LandKind NeighbourKindAt(int x, int y)
+        {
+            var votes = new int[LandClassifier.LayerKindCount];
+            LandKind best = LandKind.Dirt;
+            int bestVotes = 0;
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (dx == 0 && dy == 0)
+                    {
+                        continue;
+                    }
+
+                    LandKind k = LandClassifier.Get(_map.GetLand(x + dx, y + dy).TileId);
+                    if (k == LandKind.Town)
+                    {
+                        LandKind paving = LandClassifier.Paving(_map.GetLand(x + dx, y + dy).TileId);
+                        k = HasLayer(paving) ? paving : LandKind.Dirt;
+                    }
+
+                    if (!LandClassifier.IsLayer(k))
+                    {
+                        continue;
+                    }
+
+                    if (++votes[(int)k] > bestVotes)
+                    {
+                        bestVotes = votes[(int)k];
+                        best = k;
+                    }
+                }
+            }
+
+            return HasLayer(best) ? best : LandKind.Dirt;
         }
 
         /// <summary>The paving layer of a flat paving static lying on this tile's ground, if its layer is set.</summary>
@@ -564,11 +610,133 @@ namespace UOClient
                 for (int col = 0; col < ChunkTiles; col++)
                 {
                     int x = originX + col;
-                    solid[row, col] = LandClassifier.Get(_map.GetLand(x, y).TileId) != LandKind.Void || WaterZAt(x, y).HasValue;
+                    solid[row, col] = !IsHole(x, y);
                 }
             }
 
             return solid;
+        }
+
+        /// <summary>
+        /// A terrain hole only where UO's "no land" really is one and nobody can walk into it: void land (or unnamed
+        /// land) that has something solid standing on it (a floor, a wall, rock: what's walked on there is that), or,
+        /// in the dungeons, lies inside a wide void area (the rock between corridors). Anywhere else a void or unnamed
+        /// tile is ground (path edges, a lone square with only a bush on it, the black map borders): such tiles were
+        /// single-tile holes players fell through. Never a hole under water.
+        /// </summary>
+        private bool IsHole(int x, int y)
+        {
+            if (!IsVoidLike(x, y) || WaterZAt(x, y).HasValue)
+            {
+                return false;
+            }
+
+            if (x < DungeonX)
+            {
+                // Out in the world: a hole only where the ground would bury what's walked on there (a cellar floor, a
+                // stair sunk below the ground). Anything else is ground, whatever stands on it: an upper storey's
+                // floor, a lamp post or a tuft of grass is no floor at ground level, and a hole under it is a pit.
+                return BuriesFloor(x, y);
+            }
+
+            if (HasFooting(x, y))
+            {
+                return true;
+            }
+
+            // In the dungeons: wide void (most of the 7x7 round it is void too) is the rock between the corridors.
+            int voids = 0;
+            for (int dy = -3; dy <= 3; dy++)
+            {
+                for (int dx = -3; dx <= 3; dx++)
+                {
+                    if (IsVoidLike(x + dx, y + dy))
+                    {
+                        voids++;
+                    }
+                }
+            }
+
+            return voids >= WideVoid;
+        }
+
+        /// <summary>Where the dungeons start on Trammel and Felucca (x in tiles); the smaller facets have none past it.</summary>
+        private const int DungeonX = 5120;
+
+        /// <summary>Of the 49 tiles round a void tile, how many must be void for it to count as a wide void area.</summary>
+        private const int WideVoid = 40;
+
+        private bool IsVoidLike(int x, int y)
+        {
+            LandKind kind = LandClassifier.Get(_map.GetLand(x, y).TileId);
+            return kind == LandKind.Void || kind == LandKind.Unnamed;
+        }
+
+        /// <summary>
+        /// Would the terrain bury a walkable surface here: a floor or stair on this tile whose top is below the ground
+        /// at the tile's corners (by more than a step)?
+        /// </summary>
+        private bool BuriesFloor(int x, int y)
+        {
+            MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            int ground = int.MinValue;
+            for (int dy = 0; dy <= 1; dy++)
+            {
+                for (int dx = 0; dx <= 1; dx++)
+                {
+                    ground = Math.Max(ground, _map.GetLand(x + dx, y + dy).Z);
+                }
+            }
+
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X != (x & 7) || tile.Y != (y & 7))
+                {
+                    continue;
+                }
+
+                StaticTileInfo info = _tiles.GetStatic(tile.Graphic);
+                if ((info.Flags & TileFlag.Surface) != 0 && tile.Z + info.Height < ground - BuriedBy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>How far below the ground (UO Z) a floor's top must be for the terrain to need a hole over it.</summary>
+        private const int BuriedBy = 3;
+
+        /// <summary>Does something solid stand on this tile: a floor to walk on, a wall or rock?</summary>
+        private bool HasFooting(int x, int y)
+        {
+            MapBlock block = _map.GetBlock(x >> 3, y >> 3);
+            if (block == null)
+            {
+                return false;
+            }
+
+            foreach (StaticTile tile in block.Statics)
+            {
+                if (tile.X != (x & 7) || tile.Y != (y & 7))
+                {
+                    continue;
+                }
+
+                TileFlag flags = _tiles.GetStatic(tile.Graphic).Flags;
+                if ((flags & (TileFlag.Surface | TileFlag.Wall | TileFlag.Impassable)) != 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void BuildWater(Chunk chunk, int originX, int originY, int cx, int cy)

@@ -32,6 +32,12 @@ namespace UOClient.Data
 
         Town = 100,
         Void = 101,
+        /// <summary>
+        /// Not a UO land kind: real, textured ground whose tile has no name ("NoName" in tiledata, e.g. 0x079B-0x07AB
+        /// on path edges). It's ground, not void (calling it void cut single-tile holes players fell through); the
+        /// terrain paints it as the ground round it.
+        /// </summary>
+        Unnamed = 102,
     }
 
     public static class LandClassifier
@@ -81,7 +87,7 @@ namespace UOClient.Data
             var kinds = new LandKind[tiles.Land.Length];
             for (int i = 0; i < kinds.Length; i++)
             {
-                kinds[i] = Classify((ushort)i, tiles.Land[i].Name);
+                kinds[i] = Classify((ushort)i, tiles.Land[i].Name, tiles.Land[i].TextureId);
             }
 
             _cache = kinds;
@@ -143,13 +149,18 @@ namespace UOClient.Data
 
         public static bool IsLayer(LandKind kind) => (int)kind < LayerKindCount;
 
-        private static LandKind Classify(ushort id, string name)
+        private static LandKind Classify(ushort id, string name, ushort texture)
         {
-            if (SurfaceQuery.IsVoid(id) || string.IsNullOrEmpty(name) ||
-                name == "NoName" || name.StartsWith("VOID", StringComparison.OrdinalIgnoreCase) ||
-                name.Equals("NODRAW", StringComparison.OrdinalIgnoreCase))
+            if (SurfaceQuery.IsVoid(id) || name != null && (name.StartsWith("VOID", StringComparison.OrdinalIgnoreCase) ||
+                name.Equals("NODRAW", StringComparison.OrdinalIgnoreCase)))
             {
                 return LandKind.Void;
+            }
+
+            if (string.IsNullOrEmpty(name) || name == "NoName")
+            {
+                // No name: void only when it has no ground texture either; otherwise it's real ground.
+                return texture == 0 ? LandKind.Void : LandKind.Unnamed;
             }
 
             foreach ((string keyword, LandKind kind) in Keywords)

@@ -143,6 +143,10 @@ namespace UOGame.Menu
             _loadingWhat = root.Q<Label>("loading-what");
             _loadingPercent = root.Q<Label>("loading-percent");
             _fade = root.Q("fade");
+            // Click and drag on the open view (not on a panel) to turn your character round.
+            root.RegisterCallback<PointerDownEvent>(OnSpinStart);
+            root.RegisterCallback<PointerMoveEvent>(OnSpinMove);
+            root.RegisterCallback<PointerUpEvent>(OnSpinEnd);
             _status = root.Q<Label>("status");
             _characterStatus = root.Q<Label>("character-status");
             _busy = root.Q<Label>("busy");
@@ -190,6 +194,46 @@ namespace UOGame.Menu
             SetOpacity(_fade, 1f);
             _openedOnTown = false;
             StartupCurtain.Lift(); // the menu's own black takes over from the one over the game's first frames
+        }
+
+        // ------------------------------------------------------------------ turning your character
+
+        /// <summary>Degrees your character turns per pixel dragged.</summary>
+        private const float SpinPerPixel = 0.45f;
+
+        private int _spinPointer = -1;
+        private float _spinX;
+
+        private void OnSpinStart(PointerDownEvent e)
+        {
+            if (e.target != _root || e.button != 0 || _stage != Stage.Characters || _standIn == null || !_standIn.Arrived)
+            {
+                return;
+            }
+
+            _spinPointer = e.pointerId;
+            _spinX = e.position.x;
+            _root.CapturePointer(e.pointerId);
+        }
+
+        private void OnSpinMove(PointerMoveEvent e)
+        {
+            if (e.pointerId != _spinPointer || _standIn == null)
+            {
+                return;
+            }
+
+            _standIn.Spin(-(e.position.x - _spinX) * SpinPerPixel); // like a turntable: drag right and the side facing you turns right
+            _spinX = e.position.x;
+        }
+
+        private void OnSpinEnd(PointerUpEvent e)
+        {
+            if (e.pointerId == _spinPointer)
+            {
+                _root.ReleasePointer(e.pointerId);
+                _spinPointer = -1;
+            }
         }
 
         // ------------------------------------------------------------------ the menu
@@ -743,8 +787,9 @@ namespace UOGame.Menu
                 return;
             }
 
-            // The town fades up from black once it's in (or after a few seconds regardless).
-            if (!_openedOnTown && _stage == Stage.Menu)
+            // The town fades up from black once it's in (or after a few seconds regardless), on whichever page
+            // you're on by then: Play Solo clicked through the black left it black for good.
+            if (!_openedOnTown && (_stage == Stage.Menu || _stage == Stage.Connecting || _stage == Stage.Characters))
             {
                 var view = FindFirstObjectByType<UOClient.Bake.BakedWorldView>();
                 if (view == null || view.Progress >= 0.95f || Time.timeSinceLevelLoad > 12f)

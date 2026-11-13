@@ -178,6 +178,49 @@ namespace UOGame
             {
                 _jumpQueued = true;
             }
+
+            if (IsServerStarted)
+            {
+                CatchFall();
+            }
+        }
+
+        // ------------------------------------------------------------------ the safety net
+
+        /// <summary>
+        /// Below the lowest ground the world can have (UO's lowest Z, -128, is -16 m) with room to spare: anyone down
+        /// here has fallen out of the world.
+        /// </summary>
+        public const float WorldFloor = -40f;
+
+        private Vector3? _lastSafe;
+        private float _nextSafe, _nextRescue;
+
+        /// <summary>
+        /// Server: remember where they last stood on solid ground; if they fall out of the world (a hole, a gap in a
+        /// floor), put them back there, or on the ground above where they are when there's nowhere remembered (a
+        /// character saved under the world).
+        /// </summary>
+        private void CatchFall()
+        {
+            Vector3 at = transform.position;
+            bool swimming = _identity != null && _identity.Swimming.Value;
+            bool flying = _identity != null && _identity.Flying.Value;
+            if (_controller != null && _controller.isGrounded && !swimming && !flying && at.y > WorldFloor &&
+                Time.time >= _nextSafe && GameWorld.IsReadyAt(at))
+            {
+                _lastSafe = at;
+                _nextSafe = Time.time + 0.5f;
+            }
+
+            if (at.y >= WorldFloor || Time.time < _nextRescue || _combat == null || Server.AdminService.Instance == null)
+            {
+                return;
+            }
+
+            _nextRescue = Time.time + 3f;
+            Debug.Log($"[Game] {name} fell out of the world at {at:0}; putting them back {(_lastSafe.HasValue ? "where they last stood" : "on the ground above")}");
+            Server.AdminService.Instance.Rescue(_combat, _lastSafe ?? new Vector3(at.x, 0f, at.z), exact: _lastSafe.HasValue);
         }
 
         protected override void TimeManager_OnTick()
